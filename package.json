@@ -4,6 +4,7 @@
   "private": true,
   "description": "Marine OS — Local-First PWA Operational Middleware & Nautical Copilot",
   "scripts": {
+    "build": "npm --prefix apps/web run build",
     "dev:web": "npm --prefix apps/web run dev",
     "build:web": "npm --prefix apps/web run build",
     "lint:web": "npm --prefix apps/web run lint",
