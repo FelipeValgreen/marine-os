@@ -17,6 +17,12 @@ import {
   X,
   Save,
   AlertTriangle,
+  KeyRound,
+  ShieldCheck,
+  Award,
+  Copy,
+  Check,
+  MessageCircle,
 } from "lucide-react";
 import {
   db,
@@ -65,6 +71,54 @@ export function FleetManager() {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<VesselFormData>(EMPTY_FORM);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  // Genesis Handover State (Dealer / Astillero -> Dueño)
+  const [genesisVessel, setGenesisVessel] = useState<VesselRecord | null>(null);
+  const [genesisBuyerName, setGenesisBuyerName] = useState("Cap. Matías Edwards");
+  const [genesisBuyerEmail, setGenesisBuyerEmail] = useState("matias.edwards@gmail.com");
+  const [genesisDealerName, setGenesisDealerName] = useState("Beneteau Americas Official Shipyard");
+  const [genesisTransferType, setGenesisTransferType] = useState<"new_shipyard" | "brokerage_used">("new_shipyard");
+  const [genesisToken, setGenesisToken] = useState<string | null>(null);
+  const [copiedGenesisLink, setCopiedGenesisLink] = useState(false);
+
+  const handleOpenGenesisHandover = (vessel: VesselRecord) => {
+    setGenesisVessel(vessel);
+    const token = `gen-${vessel.id.slice(-6)}-${Math.random().toString(36).substring(2, 8)}`;
+    setGenesisToken(token);
+    setCopiedGenesisLink(false);
+  };
+
+  const handleCopyGenesisLink = () => {
+    if (!genesisToken || !genesisVessel) return;
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://marine-os-sigma.vercel.app";
+    const link = `${origin}/genesis-handover?token=${genesisToken}&vessel_id=${genesisVessel.id}`;
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(link).catch(() => {});
+      setCopiedGenesisLink(true);
+      setTimeout(() => setCopiedGenesisLink(false), 2500);
+    }
+    pushToast({
+      title: "Magic Link de Propiedad Copiado",
+      subtitle: "Enlace exclusivo para transferencia de titularidad y Gemelo Digital",
+      tone: "cyan",
+    });
+  };
+
+  const handleSendGenesisWhatsApp = () => {
+    if (!genesisToken || !genesisVessel) return;
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://marine-os-sigma.vercel.app";
+    const link = `${origin}/genesis-handover?token=${genesisToken}&vessel_id=${genesisVessel.id}`;
+    const msg = `🚢 *MarinOS Genesis Handover • Traspaso Oficial de Embarcación*\n\nEstimado/a ${genesisBuyerName},\n${genesisDealerName} ha emitido el Magic Link de Propiedad para el *${genesisVessel.name}* (Matrícula ${genesisVessel.registration_number}).\n\nAl ingresar, recibirás la titularidad completa del Gemelo Digital:\n✓ Nodos QR de Sentina, Motor, Jarcia y Baños\n✓ Manuales Oficiales del Astillero\n✓ Libro de Mantenimiento con firma SHA-256\n✓ Pólizas y Garantías Oficiales Activas\n\n👉 *Reclamar Titularidad:* ${link}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    if (typeof window !== "undefined") {
+      window.open(url, "_blank");
+    }
+    pushToast({
+      title: "Abriendo WhatsApp para Traspaso",
+      subtitle: "Mensaje de transferencia listo para el comprador",
+      tone: "emerald",
+    });
+  };
 
   const handleOpenCreate = () => {
     setFormData({
@@ -635,13 +689,52 @@ export function FleetManager() {
                     <div className="font-semibold mt-1">{v.mast_height_meters}m</div>
                   </div>
                 </div>
+
+                {/* YachtPass Warranty & Compliance Strip */}
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <div className="flex items-center justify-between text-[10px] font-mono">
+                    <span className="uppercase tracking-wider text-[var(--accent-primary)] font-semibold flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" />
+                      <span>GARANTÍAS &amp; COMPLIANCE ACTIVO</span>
+                    </span>
+                    <span className="opacity-60 text-[9px]">YachtPass Engine</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[11px]">
+                    <div className="p-2 rounded-lg bg-white/[0.02] border border-white/5 flex items-center justify-between">
+                      <div className="truncate">
+                        <div className="font-semibold text-white/90">Motor Yanmar 4JH57</div>
+                        <div className="text-[9px] opacity-60">Garantía hasta 1.500h</div>
+                      </div>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FF9F0A]/20 text-[#FF9F0A] border border-[#FF9F0A]/30">
+                        {Math.max(0, Math.round((1500 - v.engine_hours_current) * 10) / 10)}h restan
+                      </span>
+                    </div>
+
+                    <div className="p-2 rounded-lg bg-white/[0.02] border border-white/5 flex items-center justify-between">
+                      <div className="truncate">
+                        <div className="font-semibold text-white/90">Fischer Panda 5000i</div>
+                        <div className="text-[9px] opacity-60">Garantía hasta 800h</div>
+                      </div>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#00E676]/20 text-[#00E676] border border-[#00E676]/30">
+                        Vigente
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Action Bottom */}
-              <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[11px] font-mono opacity-60">
-                  {v.org_id === DEMO_IDS.ORG_ID ? "Flota Principal" : "Embarcación Externa"}
-                </span>
+              <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                <button
+                  type="button"
+                  data-testid={`genesis-transfer-${v.id}`}
+                  onClick={() => handleOpenGenesisHandover(v)}
+                  className="marine-btn text-xs px-3 bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/40 hover:bg-[#00E5FF]/25 font-semibold flex items-center gap-1.5"
+                >
+                  <KeyRound className="w-3.5 h-3.5 text-[#00E5FF]" />
+                  <span>Genesis Handover (Traspaso)</span>
+                </button>
 
                 {!isActive && (
                   <button
@@ -659,6 +752,179 @@ export function FleetManager() {
           );
         })}
       </div>
+
+      {/* Genesis Handover Modal (Dealer / Astillero -> Dueño) */}
+      {genesisVessel && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in"
+          onClick={() => setGenesisVessel(null)}
+        >
+          <div
+            className="w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-3xl bg-[#040B16] border-2 border-[#00E5FF]/50 p-6 sm:p-7 shadow-2xl shadow-[#00E5FF]/20 relative space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <KeyRound className="w-5 h-5 text-[#00E5FF]" />
+                <span className="font-mono text-xs uppercase tracking-widest text-[#00E5FF] font-bold">
+                  GENESIS HANDOVER • TRASPASO DE TITULARIDAD
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGenesisVessel(null)}
+                className="p-1 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Explanation Banner */}
+            <div className="p-4 rounded-2xl bg-[#00E5FF]/10 border border-[#00E5FF]/25 space-y-1.5 text-xs font-mono">
+              <div className="font-bold text-[#00E5FF] flex items-center gap-1.5">
+                <Award className="w-4 h-4" />
+                <span>Protocolo de Entrega Oficial (Dealer to Owner)</span>
+              </div>
+              <p className="opacity-85 leading-relaxed">
+                Transfiere la custodia completa del <strong>Gemelo Digital de {genesisVessel.name}</strong> al nuevo armador.
+                El comprador recibirá en su cuenta los Nodos QR precargados, manuales de astillero, pólizas de garantía y el historial inmutable con firma SHA-256.
+              </p>
+            </div>
+
+            {/* Transfer Parameters Form */}
+            <div className="space-y-3 font-mono text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase opacity-70">
+                    Nombre del Comprador / Armador
+                  </label>
+                  <input
+                    type="text"
+                    value={genesisBuyerName}
+                    onChange={(e) => setGenesisBuyerName(e.target.value)}
+                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    placeholder="Cap. Matías Edwards"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase opacity-70">
+                    Email o RUT del Comprador
+                  </label>
+                  <input
+                    type="text"
+                    value={genesisBuyerEmail}
+                    onChange={(e) => setGenesisBuyerEmail(e.target.value)}
+                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    placeholder="matias.edwards@gmail.com"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase opacity-70">
+                    Astillero o Concesionario Emisor
+                  </label>
+                  <input
+                    type="text"
+                    value={genesisDealerName}
+                    onChange={(e) => setGenesisDealerName(e.target.value)}
+                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    placeholder="Beneteau Americas Official"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase opacity-70">
+                    Modalidad de Traspaso
+                  </label>
+                  <select
+                    value={genesisTransferType}
+                    onChange={(e) =>
+                      setGenesisTransferType(
+                        e.target.value as "new_shipyard" | "brokerage_used"
+                      )
+                    }
+                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                  >
+                    <option value="new_shipyard">Entrega Nuevo de Astillero (0h)</option>
+                    <option value="brokerage_used">Traspaso Brokerage / Segundo Dueño</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Simulated Digital Certificate & QR Transfer Code */}
+            <div className="p-4 rounded-2xl bg-black/60 border border-white/15 space-y-3">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="text-[10px] uppercase tracking-wider text-[#00E5FF] font-bold">
+                  MAGIC LINK DE PROPIEDAD EMITIDO
+                </span>
+                <span className="text-[9px] opacity-60">TOKEN: {genesisToken}</span>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 font-mono text-[11px] break-all opacity-90 select-all">
+                {typeof window !== "undefined" ? window.location.origin : "https://marine-os-sigma.vercel.app"}/genesis-handover?token={genesisToken}&amp;vessel_id={genesisVessel.id}
+              </div>
+
+              {/* Package contents included */}
+              <div className="pt-2 border-t border-white/10 space-y-1 text-[11px] font-mono opacity-80">
+                <div className="text-[10px] uppercase opacity-55">ACTIVOS TRANSFERIDOS AUTOMÁTICAMENTE:</div>
+                <div className="grid grid-cols-2 gap-1 text-[10px]">
+                  <div>✓ 4 Nodos QR (Motor, WC, Molinete, Sentina)</div>
+                  <div>✓ 4 Manuales de Taller Oficiales</div>
+                  <div>✓ Historial de Servicios SHA-256</div>
+                  <div>✓ Garantía de Fábrica Yanmar &amp; Beneteau</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-2 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  data-testid="copy-genesis-link-btn"
+                  onClick={handleCopyGenesisLink}
+                  className="marine-btn marine-btn-primary text-xs py-2.5 flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#00E5FF]/20"
+                >
+                  {copiedGenesisLink ? (
+                    <>
+                      <Check className="w-4 h-4 text-black" />
+                      <span>¡Copiado al Portapapeles!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      <span>Copiar Magic Link</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  data-testid="send-genesis-whatsapp-btn"
+                  onClick={handleSendGenesisWhatsApp}
+                  className="marine-btn text-xs py-2.5 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-black font-bold rounded-xl shadow-lg"
+                >
+                  <MessageCircle className="w-4 h-4 fill-black" />
+                  <span>Enviar por WhatsApp</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setGenesisVessel(null)}
+                className="w-full marine-btn marine-btn-secondary min-h-11 text-xs"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

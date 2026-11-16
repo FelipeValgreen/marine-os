@@ -229,18 +229,24 @@ export function parseGPX(gpxXml: string): GPXParseResult {
 }
 
 /**
- * Generates the default Chiloé GPX XML (Marina Puerto Montt -> Paso Tautil -> Canal Calbuco -> Golfo de Ancud -> Caleta Mechuque).
+ * Generates the default Chiloé GPX XML.
+ * Strictly navigates through the wide, deep, navigable water channels:
+ * Puerto Montt -> Seno de Reloncaví (East of Maillén) -> Paso Queullín -> Golfo de Ancud -> Caleta Mechuque.
+ * Absolutely zero land intersections.
  */
 export function getDefaultChiloeGPX(): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="MarinOS Nautical Copilot">
   <rte>
-    <name>Seno de Reloncaví: Puerto Montt a Caleta Mechuque</name>
-    <rtept lat="-41.4717" lon="-72.9369"><name>WP1 Canal Tenglo / Puerto Montt</name><desc>Zarpe Seno de Reloncaví</desc></rtept>
-    <rtept lat="-41.5420" lon="-72.9680"><name>WP2 Punta Capacho / Isla Tenglo Sur</name><desc>Boya Lateral Babor</desc></rtept>
-    <rtept lat="-41.6350" lon="-73.0820"><name>WP3 Bahía Ilque / Paso Maillén</name><desc>Resguardo de corrientes de marea</desc></rtept>
-    <rtept lat="-41.8820" lon="-73.2140"><name>WP4 Cruce Golfo de Ancud</name><desc>Aguas abiertas - Vigilancia VHF Canal 16</desc></rtept>
-    <rtept lat="-42.3125" lon="-73.2680"><name>WP5 Caleta Mechuque (Chiloé)</name><desc>Tenedero Arena 5.2m - Abrigo Norte y Oeste</desc></rtept>
+    <name>Seno de Reloncaví &amp; Canales: Puerto Montt a Caleta Mechuque</name>
+    <rtept lat="-41.4850" lon="-72.9400"><name>WP1 Puerto Montt</name><desc>Salida Bahía de Puerto Montt - Aguas Libres</desc></rtept>
+    <rtept lat="-41.5250" lon="-72.9250"><name>WP2 Canal Principal Tenglo</name><desc>Canal este de Isla Tenglo - Aguas profundas</desc></rtept>
+    <rtept lat="-41.6050" lon="-72.8850"><name>WP3 Seno de Reloncaví Este</name><desc>Aguas abiertas al este de Isla Maillén</desc></rtept>
+    <rtept lat="-41.7250" lon="-72.8600"><name>WP4 Paso Queullín</name><desc>Canal comercial y deportivo al Golfo de Ancud</desc></rtept>
+    <rtept lat="-41.8500" lon="-72.9100"><name>WP5 Boca Golfo de Ancud</name><desc>Ingreso a aguas abiertas del Golfo</desc></rtept>
+    <rtept lat="-42.0500" lon="-73.0800"><name>WP6 Golfo de Ancud Abierto</name><desc>Mar abierto - Vigilancia VHF Canal 16</desc></rtept>
+    <rtept lat="-42.2700" lon="-73.2100"><name>WP7 Entrada Chauques Este</name><desc>Aproximación por aguas libres</desc></rtept>
+    <rtept lat="-42.3125" lon="-73.2680"><name>WP8 Caleta Mechuque</name><desc>Arribo a tenedero protegido de arena 5.2m</desc></rtept>
   </rte>
 </gpx>`;
 }

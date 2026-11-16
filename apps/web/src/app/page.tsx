@@ -67,6 +67,7 @@ import {
   type CopilotTelemetryContext,
 } from "@/components/MarineCopilot";
 import { ContextualTooltip } from "@/components/ContextualTooltip";
+import { VesselServiceBook } from "@/components/VesselServiceBook";
 import { MarineAcademy } from "@/components/MarineAcademy";
 import { DamageControl } from "@/components/DamageControl";
 import { FleetManager } from "@/components/FleetManager";
@@ -192,6 +193,14 @@ export default function MarineOSHomePage() {
   const userPrefs = useLiveQuery(() => db.user_preferences.get("default"), []);
   const activeVesselId = userPrefs?.active_vessel_id || DEMO_IDS.VESSEL_ID;
   const vessel = useLiveQuery(() => db.vessels.get(activeVesselId), [activeVesselId]);
+  const activeVoyage = useLiveQuery(
+    async () => {
+      const active = await db.voyages.where("status").equals("active").first();
+      if (active) return active;
+      return db.voyages.toCollection().first();
+    },
+    []
+  );
   const qrNodes = useLiveQuery(() => db.vessel_systems_qr.toArray(), [], []);
   const inventoryItems = useLiveQuery(
     () => db.inventory_items.toArray(),
@@ -343,7 +352,7 @@ export default function MarineOSHomePage() {
     "anchorage" | "routing" | "copilot"
   >("anchorage");
   const [vesselSubView, setVesselSubView] = useState<
-    "digital_twin" | "damage_control"
+    "digital_twin" | "damage_control" | "service_book"
   >("digital_twin");
   const [soundAlarmEnabled, setSoundAlarmEnabled] = useState<boolean>(true);
 
@@ -1218,6 +1227,40 @@ export default function MarineOSHomePage() {
           }}
         />
 
+        {/* FLOATING TOP ACTIVE VOYAGE PILL / CTA */}
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-30 hidden md:flex items-center">
+          {activeVoyage ? (
+            <button
+              type="button"
+              data-testid="bridge-active-voyage-pill"
+              onClick={() => setActiveSection("voyages")}
+              className="marine-pill px-4 py-2 flex items-center gap-2.5 hover:border-[var(--accent-primary)]/50 transition-all shadow-xl group cursor-pointer"
+            >
+              <div className="w-2 h-2 rounded-full bg-[#00E676] animate-pulse" />
+              <div className="text-left font-mono">
+                <div className="text-[9px] uppercase tracking-wider opacity-60">VIAJE ACTIVO:</div>
+                <div className="text-xs font-bold text-white group-hover:text-[var(--accent-primary)] flex items-center gap-1.5 transition-colors">
+                  <span>{activeVoyage.title}</span>
+                  <span className="opacity-50 font-normal">
+                    ({activeVoyage.departure_port} → {activeVoyage.arrival_port})
+                  </span>
+                </div>
+              </div>
+              <Compass className="w-3.5 h-3.5 text-[var(--accent-primary)] opacity-70 group-hover:opacity-100 group-hover:rotate-45 transition-transform" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              data-testid="bridge-select-or-plan-voyage-btn"
+              onClick={() => setActiveSection("voyages")}
+              className="marine-pill px-4 py-2 flex items-center gap-2 bg-[var(--accent-primary)]/20 border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/30 text-white font-mono text-xs font-bold transition-all shadow-xl cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+              <span>+ Seleccionar Ruta o Planificar Zarpe</span>
+            </button>
+          )}
+        </div>
+
         {/* 1. TOP-LEFT COMPACT PILL + LIVE YANMAR 4JH57 SIGNAL K CAPSULE */}
         <div className="fixed top-4 left-3 lg:left-20 z-30 flex flex-wrap items-center gap-2 max-w-[calc(100vw-9rem)]">
           <div className="marine-pill px-3.5 py-2 flex flex-wrap items-center gap-2.5">
@@ -1839,7 +1882,9 @@ export default function MarineOSHomePage() {
                 {vessel?.name || "SV Albatros (Oceanis 41.1)"} —{" "}
                 {vesselSubView === "digital_twin"
                   ? "Gemelo Digital & Telemetría Signal K"
-                  : "Damage Control & Marketplace de Repuestos"}
+                  : vesselSubView === "damage_control"
+                  ? "Damage Control & Marketplace de Repuestos"
+                  : "Libro de Mantenimiento Inmutable & Garantías"}
               </div>
             </div>
 
@@ -1870,10 +1915,25 @@ export default function MarineOSHomePage() {
                 <Activity className="w-4 h-4 text-[#FF2D55]" />
                 <span>Damage Control (Falla Motor / Marketplace)</span>
               </button>
+              <button
+                type="button"
+                data-testid="vessel-subview-service-book-btn"
+                onClick={() => setVesselSubView("service_book")}
+                className={`marine-btn text-xs ${
+                  vesselSubView === "service_book"
+                    ? "marine-btn-primary"
+                    : "marine-btn-secondary"
+                }`}
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>Libro de Mantenimiento</span>
+              </button>
             </div>
           </div>
 
-          {vesselSubView === "damage_control" ? (
+          {vesselSubView === "service_book" ? (
+            <VesselServiceBook vessel={vessel} />
+          ) : vesselSubView === "damage_control" ? (
             <DamageControl />
           ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

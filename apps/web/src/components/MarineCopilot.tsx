@@ -11,6 +11,7 @@ import {
   Compass,
   Wind,
   Gauge,
+  ShieldAlert,
 } from "lucide-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, DEMO_IDS } from "@/lib/offline/db";
@@ -56,6 +57,19 @@ export function MarineCopilot({
     [],
     []
   );
+
+  // YachtPass Warranty & Compliance Predictive Detection
+  const warrantyAlertItem = inventoryItems?.find((item) => {
+    if (item.warranty_max_hours) {
+      const remainingHours = item.warranty_max_hours - vesselContext.engine_hours;
+      return remainingHours <= 100;
+    }
+    return false;
+  });
+
+  const hoursRemaining = warrantyAlertItem?.warranty_max_hours
+    ? warrantyAlertItem.warranty_max_hours - vesselContext.engine_hours
+    : null;
 
   const [question, setQuestion] = useState<string>(
     "Detecté traza de aceite/refrigerante en la sentina y alarma en el panel Yanmar 4JH57, ¿qué maniobra y revisión ejecuto?"
@@ -307,6 +321,35 @@ export function MarineCopilot({
           </span>
         </div>
       </div>
+
+      {/* Alerta Predictiva de Garantía & Compliance (YachtPass Engine) */}
+      {warrantyAlertItem && (
+        <div
+          data-testid="copilot-warranty-predictive-alert"
+          className="p-3.5 sm:p-4 rounded-2xl bg-[#FF2D55]/15 border-2 border-[#FF2D55] text-white space-y-1.5 shadow-[0_0_24px_rgba(255,45,85,0.25)] animate-pulse"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#FF2D55] uppercase tracking-wide">
+              <ShieldAlert className="w-4 h-4 text-[#FF2D55] shrink-0" />
+              <span>ALERTA PREDICTIVA DE GARANTÍA • {warrantyAlertItem.warranty_provider || "OFICIAL"}</span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#FF2D55] text-white">
+              LÍMITE PRÓXIMO
+            </span>
+          </div>
+
+          <p className="text-xs font-mono leading-relaxed opacity-95">
+            Horómetro actual en <strong>{vesselContext.engine_hours.toFixed(1)} hrs</strong>.
+            La garantía de fábrica para <em>{warrantyAlertItem.item_name}</em> expira a las{" "}
+            <strong>{warrantyAlertItem.warranty_max_hours} hrs</strong> (restan{" "}
+            <strong className="text-[#FF2D55] underline">
+              {hoursRemaining !== null ? Math.max(0, hoursRemaining).toFixed(1) : "0"} hrs
+            </strong>{" "}
+            sin servicio registrado). ¡Debes registrar el servicio oficial antes de alcanzar el hito
+            para no anular la cobertura mundial del fabricante!
+          </p>
+        </div>
+      )}
 
       {/* Quick Diagnostic Presets */}
       <div className="flex flex-wrap gap-2">

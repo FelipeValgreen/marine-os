@@ -90,7 +90,7 @@ interface ThemeContextValue {
   switchAccountById: (accountId: string) => void;
   activeSection: MarineSection;
   setActiveSection: (section: MarineSection) => void;
-  requestedVesselSubView: "digital_twin" | "damage_control" | null;
+  requestedVesselSubView: "digital_twin" | "damage_control" | "service_book" | null;
   clearRequestedVesselSubView: () => void;
   openCommandCenter: () => void;
   isOffline: boolean;
@@ -192,7 +192,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(true);
   const [commandCenterOpen, setCommandCenterOpen] = useState<boolean>(false);
   const [requestedVesselSubView, setRequestedVesselSubView] = useState<
-    "digital_twin" | "damage_control" | null
+    "digital_twin" | "damage_control" | "service_book" | null
   >(null);
   const [activeAccount, setActiveAccount] = useState<UserProfileAccount>(
     DEFAULT_GOOGLE_AUTHENTICATED_PROFILE

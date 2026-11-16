@@ -48,7 +48,34 @@ export interface InventoryItemRecord {
   quantity: number;
   min_threshold: number;
   expiration_date: string | null;
+  warranty_expiration_date?: string | null;
+  warranty_max_hours?: number | null;
+  warranty_provider?: string;
+  warranty_status?: "active" | "expiring_soon" | "expired" | "void";
   updated_at: string;
+}
+
+export type VesselMaintenanceType =
+  | "preventive"
+  | "corrective"
+  | "warranty_check"
+  | "major_overhaul"
+  | "dealer_pdi";
+
+export interface VesselServiceRecord {
+  id: string;
+  vessel_id: string;
+  maintenance_type: VesselMaintenanceType;
+  service_title: string;
+  horometer_at_service: number;
+  replaced_parts: string[];
+  technician_name: string;
+  certified_dealer?: string;
+  cost_usd?: number;
+  service_date: string;
+  sha256_signature: string;
+  notes?: string;
+  created_at: string;
 }
 
 export interface AnchorageSpatialRecord {
@@ -427,6 +454,7 @@ export class MarinOSDatabase extends Dexie {
   crew_contacts!: Table<CrewContactRecord, string>;
   frequent_crew!: Table<CrewContactRecord, string>;
   community_reports!: Table<CommunityReportRecord, string>;
+  vessel_service_history!: Table<VesselServiceRecord, string>;
 
   constructor() {
     super("MarinOSLocalFirstDB");
@@ -460,6 +488,10 @@ export class MarinOSDatabase extends Dexie {
     // v8: community_reports table (Waze Náutico)
     this.version(8).stores({
       community_reports: "id, anchorage_slug, report_type, author_name, created_at",
+    });
+    // v9: vessel_service_history (Vessel Lifecycle Vault / YachtPass B2B2C)
+    this.version(9).stores({
+      vessel_service_history: "id, vessel_id, maintenance_type, horometer_at_service, service_date, created_at",
     });
   }
 }
@@ -626,6 +658,10 @@ export async function ensureDemoSeedData(): Promise<void> {
         db.voyage_tracks,
         db.user_profiles,
         db.user_preferences,
+        db.crew_contacts,
+        db.frequent_crew,
+        db.community_reports,
+        db.vessel_service_history,
       ],
       async () => {
         const existingPrefs = await db.user_preferences.get("default");
@@ -779,8 +815,23 @@ export async function ensureDemoSeedData(): Promise<void> {
             },
           ]);
 
-          // 4. Inventory Items (from 0002_seed_demo.sql)
+          // 4. Inventory Items (with YachtPass Warranty & Compliance fields)
           await db.inventory_items.bulkPut([
+            {
+              id: "55555555-5555-5555-5555-555555555550",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              qr_node_id: DEMO_IDS.QR_YANMAR_ID,
+              item_name: "Motor Principal Yanmar 4JH57 Common Rail",
+              category: "propulsion",
+              quantity: 1,
+              min_threshold: 1,
+              expiration_date: null,
+              warranty_expiration_date: "2027-12-31",
+              warranty_max_hours: 1500,
+              warranty_provider: "Yanmar Marine International",
+              warranty_status: "expiring_soon",
+              updated_at: now,
+            },
             {
               id: "55555555-5555-5555-5555-555555555551",
               vessel_id: DEMO_IDS.VESSEL_ID,
@@ -790,6 +841,10 @@ export async function ensureDemoSeedData(): Promise<void> {
               quantity: 2,
               min_threshold: 1,
               expiration_date: null,
+              warranty_expiration_date: "2028-12-01",
+              warranty_max_hours: 1500,
+              warranty_provider: "Yanmar Marine Chile",
+              warranty_status: "active",
               updated_at: now,
             },
             {
@@ -801,6 +856,10 @@ export async function ensureDemoSeedData(): Promise<void> {
               quantity: 3,
               min_threshold: 2,
               expiration_date: null,
+              warranty_expiration_date: "2027-06-30",
+              warranty_max_hours: 1500,
+              warranty_provider: "Parker Racor Certified",
+              warranty_status: "active",
               updated_at: now,
             },
             {
@@ -812,6 +871,9 @@ export async function ensureDemoSeedData(): Promise<void> {
               quantity: 1,
               min_threshold: 1,
               expiration_date: "2027-08-15",
+              warranty_expiration_date: "2027-08-15",
+              warranty_provider: "Comet Marine Safety",
+              warranty_status: "active",
               updated_at: now,
             },
             {
@@ -823,6 +885,24 @@ export async function ensureDemoSeedData(): Promise<void> {
               quantity: 1,
               min_threshold: 1,
               expiration_date: null,
+              warranty_expiration_date: "2028-01-01",
+              warranty_provider: "Xylem Jabsco",
+              warranty_status: "active",
+              updated_at: now,
+            },
+            {
+              id: "55555555-5555-5555-5555-555555555555",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              qr_node_id: null,
+              item_name: "Generador Fischer Panda 5000i Neo",
+              category: "electricidad",
+              quantity: 1,
+              min_threshold: 1,
+              expiration_date: null,
+              warranty_expiration_date: "2027-06-30",
+              warranty_max_hours: 800,
+              warranty_provider: "Fischer Panda GmbH",
+              warranty_status: "active",
               updated_at: now,
             },
           ]);
@@ -1223,6 +1303,79 @@ export async function ensureDemoSeedData(): Promise<void> {
               seabed_type: "Arcilla volcánica",
               upvotes: 15,
               created_at: new Date(Date.now() - 345600000).toISOString(),
+            },
+          ]);
+        }
+
+        // 11. Vessel Service History (YachtPass Immutable Lifecycle Vault)
+        const servicesCount = await db.vessel_service_history.count();
+        if (servicesCount === 0) {
+          await db.vessel_service_history.bulkPut([
+            {
+              id: "service-albatros-001",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              maintenance_type: "dealer_pdi",
+              service_title: "Genesis Handover & PDI (Pre-Delivery Inspection)",
+              horometer_at_service: 0.0,
+              replaced_parts: ["Inspección Estructural Casco", "Test Jarcia Firme", "Verificación Línea Eje & Bocina"],
+              technician_name: "Jean-Luc Dubois (Astillero)",
+              certified_dealer: "Beneteau Vendée Official Shipyard",
+              cost_usd: 0,
+              service_date: "2023-01-15",
+              sha256_signature: "e8f491c2b51239aa8d41fe09312bc89a7102e34589d91fae62104bb21a00881f",
+              notes: "Entrega inicial de astillero con Gemelo Digital activo y activación de garantía mundial Yanmar/Beneteau.",
+              created_at: "2023-01-15T12:00:00Z",
+            },
+            {
+              id: "service-albatros-002",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              maintenance_type: "preventive",
+              service_title: "Primer Servicio Oficial 50h (Break-In)",
+              horometer_at_service: 50.4,
+              replaced_parts: ["Aceite Mineral 15W40 Yanmar Genuine", "Filtro Aceite Yanmar #129150-35170", "Filtro Racor R20P"],
+              technician_name: "Carlos Morales (Yanmar Cert. #CL-901)",
+              certified_dealer: "Yanmar Marine Chile & Beneteau Service",
+              cost_usd: 340,
+              service_date: "2023-04-20",
+              sha256_signature: "7a89f310cd45ef2038914ba081f92e45cc230981dfae560021ba0991ee71ab23",
+              notes: "Aceite de rodaje sin virutas metálicas. Apriete de bancada y verificación de alineación eje Saildrive SD60.",
+              created_at: "2023-04-20T16:30:00Z",
+            },
+            {
+              id: "service-albatros-003",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              maintenance_type: "warranty_check",
+              service_title: "Inspección Anual & Certificación de Garantía 250h",
+              horometer_at_service: 248.0,
+              replaced_parts: ["Rodete Impulsor Bomba Agua Salada", "Ánodos de Zinc MaxProp & Saildrive", "Correa Alternador 125A"],
+              technician_name: "Gonzalo Rivera",
+              certified_dealer: "Yacht Service Puerto Montt",
+              cost_usd: 580,
+              service_date: "2024-02-18",
+              sha256_signature: "92bb3f01ccefa3819001baef482103e91da24059ee1102948bbcae710092fa77",
+              notes: "Certificación de cumplimiento de garantía de fábrica. Temperatura de escape dentro de rango normal (82°C).",
+              created_at: "2024-02-18T14:15:00Z",
+            },
+            {
+              id: "service-albatros-004",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              maintenance_type: "major_overhaul",
+              service_title: "Servicio Mayor 1.000 Horas (Ciclo Riguroso)",
+              horometer_at_service: 1012.3,
+              replaced_parts: [
+                "Codo de Escape Inox Yanmar",
+                "Limpieza Intercambiador de Calor",
+                "Reglaje de Válvulas Admisión/Escape",
+                "Calibración Inyectores Common Rail",
+                "Aceite Sintético Saildrive SD60",
+              ],
+              technician_name: "Marcelo Vivanco (Master Technician)",
+              certified_dealer: "Yanmar Official Master Dealer",
+              cost_usd: 1450,
+              service_date: "2025-05-12",
+              sha256_signature: "4190ba32ecfa1982bbef341092aae4819023cbdf0129aae884013bcdae991204",
+              notes: "Desarme e inmersión de haz tubular en ácido cítrico. Sin corrosión salina. Cobertura de garantía extendida revalidada.",
+              created_at: "2025-05-12T18:00:00Z",
             },
           ]);
         }
