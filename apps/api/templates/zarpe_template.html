@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rol de Tripulación y Zarpe Oficial — Marine OS</title>
+  <style>
+    body { font-family: 'Courier New', monospace; padding: 24px; color: #000; background: #fff; }
+    h1 { font-size: 18px; border-bottom: 2px solid #000; padding-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; }
+    .hash { margin-top: 24px; font-weight: bold; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <h1>DECLARACIÓN DE ZARPE Y ROL DE TRIPULACIÓN — DIRECTEMAR / MARINE OS</h1>
+  <p><strong>Embarcación:</strong> {{vessel_name}} ({{registration_number}})</p>
+  <p><strong>Ruta:</strong> {{departure_port}} &rarr; {{arrival_port}}</p>
+  <div class="hash">SHA-256: {{verification_hash}}</div>
+</body>
+</html>

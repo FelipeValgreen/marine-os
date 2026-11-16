@@ -1,0 +1,18 @@
+{
+  "name": "Marine OS — Copiloto Náutico & Gemelo Digital Offline-First",
+  "short_name": "Marine OS",
+  "description": "Sistema Operativo Local-First para Veleros, Catamaranes y Flotas de Chárter",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#FF1E1E",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

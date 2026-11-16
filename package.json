@@ -1,0 +1,13 @@
+{
+  "name": "marine-os-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Marine OS — Local-First PWA Operational Middleware & Nautical Copilot",
+  "scripts": {
+    "dev:web": "npm --prefix apps/web run dev",
+    "build:web": "npm --prefix apps/web run build",
+    "lint:web": "npm --prefix apps/web run lint",
+    "typecheck:web": "npm --prefix apps/web run typecheck",
+    "dev:api": "cd apps/api && .venv/bin/uvicorn main:app --reload --port 8000"
+  }
+}

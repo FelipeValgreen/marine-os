@@ -1,0 +1,407 @@
+{
+  "generated": {
+    "id": 1,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\"projectId\":\"7713357630640363437\",\"sessionId\":\"375123954722702849\",\"outputComponents\":[{\"design\":{\"screens\":[{\"screenshot\":{\"name\":\"projects/7713357630640363437/files/ef08a6cff0e64bdeb20f747ff6efa509\",\"downloadUrl\":\"https://stitch.googleapis.com/v1/projects/7713357630640363437/files/ef08a6cff0e64bdeb20f747ff6efa509:download\"},\"htmlCode\":{\"name\":\"projects/7713357630640363437/files/baa2283a231e4cadb015678c742fcd33\",\"downloadUrl\":\"https://stitch.googleapis.com/v1/projects/7713357630640363437/files/baa2283a231e4cadb015678c742fcd33:download\",\"mimeType\":\"text/html\"},\"id\":\"79c92d8cfb0840d1a8f2c7d873a15cc6\",\"generatedBy\":\"figaro_agent\",\"width\":\"2560\",\"height\":\"2048\",\"title\":\"Marine OS Bridge \u2014 Nautical Co-Pilot & Reloncav\u00ed Chart\",\"prompt\":\"Design a professional desktop Marine OS Bridge Nautical Co-Pilot screen:\\n- Theme & Aesthetic: Dark marine glassmorphism (palette: deep oceanic midnight #070B14, glass containers #0d1829 with 40-70% opacity, backdrop blur, cyan/teal neon accents #00f5ff, warning amber #f59e0b, emerald #10b981, crisp typography with monospace/telemetry Geist/JetBrains style for readings, crisp SVG nautical cartography lines).\\n- Left Docked 64px Icon Rail: Compact vertical navigation with vessel icon at top, active Chart/Nav icon, Radar, AIS Targets, Weather, Anchor Watch, Autopilot toggle at bottom with red DISENGAGE pill.\\n- Top Navigation & Telemetry Bar:\\n  - Brand mark 'AURA MARINE OS' with bridge status 'BRIDGE MFD 01 \u2022 SENO DE RELONCAV\u00cd'\\n  - Prominent Center Pill with DMS Coordinates: '41\u00b0 28.302\\\\' S \u2022 072\u00b0 56.214\\\\' W' with GNSS RTK 3D FIX status indicator (green dot, diff 0.02m)\\n  - Navigation tabs (CHART active with cyan underline, RADAR, ANCHOR, VESSEL)\\n  - Right controls: SIMULATOR toggle, satellite sync status, notifications alert, and drawer toggle button.\\n- Main Area - Full-screen Seno de Reloncav\u00ed Nautical Vector Chart:\\n  - Rich hydrographic chart visualization: Bathymetry depth contours (5m, 10m, 20m, 50m, 100m soundings), coastline of Isla Tenglo / Canal de Tenglo / Seno de Reloncav\u00ed / Puerto Montt approach.\\n  - Own ship 'SV PATAGONIA' (or 'SV ALBATROS') styled with heading vector (HDG 192\u00b0T, 10m line), speed prediction cone, SOG 6.8 kn.\\n  - AIS active targets: e.g. 'M/V CHAITEN' (Cargo, SOG 12.4 kn, CPA 1.8 nm), 'DON PEDRO' (Fishing, SOG 3.1 kn).\\n  - Navigational hazards & marks: 'Bajo Ingl\u00e9s (8.4m Shoal)' caution sector with red/amber buoy markers (Fl.R.3s '4', Fl.G.4s '3').\\n  - Planned route line with cyan dashed waypoints ('WP 03 // HUAPILAC').\\n  - Map overlay floating controls: Quick toggles for [Bathy HD], [AIS Live], [Streamlines / Currents], [Corridors], zoom +/- buttons.\\n- Bottom 4-Number Telemetry HUD:\\n  - Docked or floating glass HUD bar along bottom:\\n    1. SOG (Speed Over Ground): '6.8 kn' with trend micro-bar 'VEL STABLE +0.2'\\n    2. COG (Course Over Ground): '194\u00b0 MAG' (HDG TRUE 192\u00b0T)\\n    3. PROFUNDIDAD (Depth): '11.4 m' with 'CLEARANCE: SAFE' status indicator\\n    4. VIENTO REAL (TWS): '14.2 kn' with wind direction arrow '\u2197 SSW / 205\u00b0T'\\n  - Secondary lower sub-strip: Rudder angle (02\u00b0 P), Engine (2,150 RPM), Battery (13.4V 94%), Bilge (DRY).\\n- Right Collapsible Open-Meteo Anchorage & Anchor Watch Drawer:\\n  - Header: 'ANCHORAGE & ANCHOR WATCH' with 'SYS ARMED' green pill and close/collapse toggle.\\n  - Top Watch Mode Selector: Tabs for [Smart Match] and [Radar Scope].\\n  - Open-Meteo Live Hydro & Meteo card for Reloncav\u00ed:\\n    - Wind gusts: 14-22 kt SSW\\n    - Swell Ht: 0.4 m chop\\n    - Barometer: 1018 hPa (rising)\\n    - Tide Cycle: +1.8 m Flood\\n  - Anchor Watch Radar Scope widget:\\n    - Concentric ring swing circle visualization (45m max, 30m safe radius, drop point, current vessel drift 18.2m / 45.0m, chain payout 42.5m rode, load tension 1.4 kN).\\n  - Recommended Sheltered Caletas (Anchorage list):\\n    - Caleta La Arena (98% Shelter, Score 9.9/10, Dist 4.8 nm, Mud/Sand)\\n    - Estero Reloncav\u00ed / Poyo (94% Shelter, Score 9.3/10, Dist 11.2 nm, Clay)\\n    - Isla Tenglo South Cove (89% Match, Score 8.7/10, Dist 2.1 nm, Sand/Shell)\\n  - Primary CTA button: 'Plot Route & Set Swing Area' (cyan luminous button) with quick 'Weigh Anchor' / 'Test Alarm' secondary triggers.\\n- Ensure flawless responsive spacing, tactical contrast, high-tech maritime typography, and crisp visual hierarchy throughout.\",\"name\":\"projects/7713357630640363437/screens/79c92d8cfb0840d1a8f2c7d873a15cc6\",\"theme\":{\"colorMode\":\"DARK\",\"font\":\"GEIST\",\"roundness\":\"ROUND_EIGHT\",\"customColor\":\"#00f5ff\",\"headlineFont\":\"GEIST\",\"bodyFont\":\"GEIST\",\"labelFont\":\"JETBRAINS_MONO\",\"namedColors\":{\"surface_tint\":\"#00dce5\",\"surface_dim\":\"#0a1421\",\"primary_fixed\":\"#63f7ff\",\"secondary_fixed\":\"#6ffbbe\",\"on_surface\":\"#dae3f7\",\"secondary\":\"#4edea3\",\"tertiary\":\"#fff8f5\",\"surface_container_lowest\":\"#060e1c\",\"inverse_surface\":\"#dae3f7\",\"secondary_container\":\"#00a572\",\"on_secondary\":\"#003824\",\"surface_container_highest\":\"#2c3544\",\"error_container\":\"#93000a\",\"on_tertiary\":\"#482900\",\"error\":\"#ffb4ab\",\"surface_container\":\"#17202e\",\"outline\":\"#849495\",\"on_tertiary_fixed_variant\":\"#673d00\",\"surface_container_high\":\"#222a39\",\"primary\":\"#e9feff\",\"on_error\":\"#690005\",\"secondary_fixed_dim\":\"#4edea3\",\"on_secondary_fixed\":\"#002113\",\"on_primary_container\":\"#006c71\",\"on_background\":\"#dae3f7\",\"surface_bright\":\"#313949\",\"surface_variant\":\"#2c3544\",\"on_secondary_container\":\"#00311f\",\"surface_container_low\":\"#131c2a\",\"on_tertiary_fixed\":\"#2b1700\",\"outline_variant\":\"#3a494a\",\"tertiary_container\":\"#ffd6ad\",\"primary_container\":\"#00f5ff\",\"on_secondary_fixed_variant\":\"#005236\",\"background\":\"#0a1421\",\"on_surface_variant\":\"#b9caca\",\"inverse_primary\":\"#00696e\",\"tertiary_fixed_dim\":\"#ffb868\",\"on_primary_fixed\":\"#002021\",\"on_primary\":\"#003739\",\"tertiary_fixed\":\"#ffddbb\",\"on_tertiary_container\":\"#8c5400\",\"surface\":\"#0a1421\",\"on_primary_fixed_variant\":\"#004f53\",\"inverse_on_surface\":\"#283140\",\"on_error_container\":\"#ffdad6\",\"primary_fixed_dim\":\"#00dce5\"},\"colorVariant\":\"FIDELITY\",\"overridePrimaryColor\":\"#00f5ff\",\"overrideSecondaryColor\":\"#10b981\",\"overrideTertiaryColor\":\"#ff9f0a\",\"overrideNeutralColor\":\"#0d1624\",\"spacingScale\":2,\"typography\":{\"body-lg\":{\"fontFamily\":\"Geist\",\"fontSize\":\"16px\",\"fontWeight\":\"400\",\"lineHeight\":\"24px\"},\"headline-xl-mobile\":{\"fontFamily\":\"Geist\",\"fontSize\":\"28px\",\"fontWeight\":\"600\",\"lineHeight\":\"34px\",\"letterSpacing\":\"-0.01em\"},\"label-telemetry-md\":{\"fontFamily\":\"JetBrains Mono\",\"fontSize\":\"16px\",\"fontWeight\":\"500\",\"lineHeight\":\"20px\",\"letterSpacing\":\"0.04em\"},\"label-telemetry-sm\":{\"fontFamily\":\"JetBrains Mono\",\"fontSize\":\"12px\",\"fontWeight\":\"500\",\"lineHeight\":\"16px\",\"letterSpacing\":\"0.06em\"},\"label-hud-unit\":{\"fontFamily\":\"JetBrains Mono\",\"fontSize\":\"10px\",\"fontWeight\":\"400\",\"lineHeight\":\"12px\",\"letterSpacing\":\"0.08em\"},\"body-md\":{\"fontFamily\":\"Geist\",\"fontSize\":\"14px\",\"fontWeight\":\"400\",\"lineHeight\":\"20px\"},\"label-telemetry-lg\":{\"fontFamily\":\"JetBrains Mono\",\"fontSize\":\"28px\",\"fontWeight\":\"600\",\"lineHeight\":\"32px\",\"letterSpacing\":\"0.02em\"},\"headline-md\":{\"fontFamily\":\"Geist\",\"fontSize\":\"22px\",\"fontWeight\":\"500\",\"lineHeight\":\"28px\",\"letterSpacing\":\"-0.01em\"},\"body-sm\":{\"fontFamily\":\"Geist\",\"fontSize\":\"12px\",\"fontWeight\":\"400\",\"lineHeight\":\"16px\"},\"headline-xl\":{\"fontFamily\":\"Geist\",\"fontSize\":\"40px\",\"fontWeight\":\"600\",\"lineHeight\":\"48px\",\"letterSpacing\":\"-0.02em\"},\"headline-lg-mobile\":{\"fontFamily\":\"Geist\",\"fontSize\":\"24px\",\"fontWeight\":\"600\",\"lineHeight\":\"30px\",\"letterSpacing\":\"-0.01em\"},\"headline-lg\":{\"fontFamily\":\"Geist\",\"fontSize\":\"30px\",\"fontWeight\":\"600\",\"lineHeight\":\"38px\",\"letterSpacing\":\"-0.02em\"}},\"spacing\":{\"space-md\":\"0.875rem\",\"space-xl\":\"2rem\",\"margin\":\"1rem\",\"margin-desktop\":\"1.75rem\",\"space-xs\":\"0.25rem\",\"space-sm\":\"0.5rem\",\"gutter\":\"1rem\",\"gutter-desktop\":\"1.5rem\",\"space-lg\":\"1.25rem\"},\"headlineFontFamily\":\"Geist\",\"bodyFontFamily\":\"Geist\",\"labelFontFamily\":\"JetBrains Mono\"},\"deviceType\":\"DESKTOP\",\"screenType\":\"DESIGN\",\"screenMetadata\":{\"agentType\":\"PRO_AGENT\",\"status\":\"COMPLETE\"},\"designSystem\":{\"name\":\"assets/444d03447c814cb293de9377867198a3\",\"designSystem\":{\"displayName\":\"Marine OS Bridge\",\"styleGuidelines\":\"## Brand & Style\\n\\nThe design system embodies the high-stakes precision, calm focus, and effortless tactical elegance of an ultra-modern bridge control station. Drawing direct inspiration from aviation glass cockpits, Apple Maps Cartography, and military-grade marine telemetry, the interface blends tactical utility with Cupertino-grade polish.\\n\\n### Target Audience & Operational Mindset\\nEngineered for circumnavigators, offshore skippers, and high-performance marine pilots operating under demanding sea states. The operational mindset prioritizes split-second scanability, zero optical distraction, and dark-adapted night-vision preservation. \\n\\n### Design Philosophy\\n- **Dark Cockpit Discipline:** Illumination is strictly reserved for critical telemetry, route tracking, and active status. Static surfaces recede into deep oceanic depths to eliminate glare on the bridge glass.\\n- **Glassmorphic Precision HUD:** Telemetry layers float seamlessly over rich bathymetric and vector hydrographic charts using deep frosted acrylic blurs (`backdrop-filter: blur(24px)`), hairline specular rims, and directional depth cues.\\n- **Aerospace Tactility:** Critical controls (engine throttles, anchor deployment, radar sweep locks) balance featherlight digital gestures with deliberate, reassuring mechanical feedback.\\n\\n## Layout & Spacing\\n\\nThe bridge layout operates on a full-bleed, edge-to-edge chart canvas paired with floating modular instrument arrays. \\n\\n### Grid & Layout Structure\\n- **Canvas:** Fullscreen fluid mapping canvas with dynamic hardware safe zones (conforming to marine chartplotter displays and ruggedized iPad bridge docks).\\n- **Desktop / Helm Displays (12-inch to 24-inch MFDs):** 12-column dynamic overlay grid. Floating telemetry ribbons pin to the top header (`margin-desktop`), chart inspection panels pin to the right edge with a fixed width of `360px`, and engine/autopilot docks dock to the bottom.\\n- **Mobile / Handheld Co-Pilot (6-inch to 8-inch screens):** Single-column stacked HUD. Critical SOG (Speed Over Ground) and Heading remain locked in a compact top bar; route waypoint cards collapse into bottom bottom-sheet drawers.\\n\\n### Spacing Discipline\\nAll component padding and gaps conform strictly to 4px and 8px rhythmic increments. Tight spacing (`space-xs`, `space-sm`) is utilized within clustered telemetry pairs (e.g., Heading value to Unit descriptor), while generous spacing (`space-lg`, `space-xl`) isolates separate mission-critical touch targets to prevent accidental touches in heavy chop.\\n\\n## Elevation & Depth\\n\\nVisual hierarchy is maintained through high-performance optical glassmorphism, progressive luminance layering, and neon luminescence rather than standard opaque drop-shadows.\\n\\n### Layer Stack Architecture\\n1. **Cartographic Base Layer (Level 0):** Vector hydrographic chart, bathymetric gradient shading, AIS vessel layers.\\n2. **Backdrop Blur Underlay (Level 1):** `backdrop-filter: blur(28px) saturate(180%)`, filled with `#0D1624` at `75%` opacity. Employs a 1px continuous inner border (`rgba(255, 255, 255, 0.08)`).\\n3. **Floating HUD Instruments (Level 2):** Elevated cards filled with `#121F33` at `82%` opacity. Subtle diffuse ambient glow tinted with the primary phosphor tone (`box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(0, 245, 255, 0.15)`).\\n4. **Critical Interactive Flyouts & Warnings (Level 3):** Modal alarms and steerage course corrections. High-contrast perimeter with active pulsing edge halo (`rgba(255, 69, 58, 0.3)` for hazards).\\n\\n### Specular Edge Lighting\\nPanels feature an off-axis top specular highlight (`border-t: 1px solid rgba(255, 255, 255, 0.16)`) mimicking ambient sunlight or wheelhouse red-lighting skimming across an aerospace glass gauge.\\n\\n## Components\\n\\n### 1. Telemetry HUD Capsules (Floating Readout Pills)\\n- **Structure:** Pill-shaped glass container containing sensor icon, dynamic scalar value, and uppercase unit tag.\\n- **States:** Active Normal (Cyan glow border), Stabilized (Emerald border), Drift Alert (Amber pulse), Sensor Loss (Muted red outline with intermittent strobe).\\n- **Behavior:** Tap toggles between primary and secondary metrics (e.g., True Wind Speed to Apparent Wind Speed).\\n\\n### 2. Autopilot Tactile Aerospace Toggles\\n- **Structure:** Physical switch simulation recessed in an inset dark-slate bed (`#080E18`). The active switch rocker features a subtle brushed texture with an illuminated LED pip in phosphor cyan.\\n- **Micro-interaction:** Spring-damped haptic flip with instant vector recalculation readout on the chart line.\\n\\n### 3. Circular Anchor Watch Radar\\n- **Display:** Concentric range rings (0.01nm, 0.05nm, 0.1nm) rendered with 1px dotted hairpins in Emerald (`#10B981`) at 30% opacity.\\n- **Swing Radius Sector:** Dynamic arc showing vessel swing envelope based on chain scope and real-time wind/tide current arrows.\\n- **Drift Warning:** Breaching the safe radius threshold shifts the perimeter ring from Emerald to Safety Amber, then flashes Hazard Coral upon anchor dragging detection.\\n\\n### 4. Interactive Route Waypoint Cards\\n- **Structure:** Frosted glass panel with route ETA, Distance To Go (DTG), Time To Go (TTG), and Cross-Track Error (XTE).\\n- **Hierarchy:** Monospaced values dominate at `label-telemetry-lg`; secondary descriptions sit in `body-sm`.\\n\\n### 5. Tactical Action Buttons\\n- **Primary:** High-luminance fill (`#00F5FF`) with jet black typography (`#080E18`), bold weight, with an outer 4px cyan neon diffusion glow on hover or active engagement.\\n- **Hazard / Override (e.g., Disengage Autopilot, Mark MOB):** Hazard Coral background (`#FF453A`) with stark white text, accompanied by confirmation hold-to-activate circular fill timer.\\n- **Ghost Tactical:** Transparent background, `1px` rim border (`rgba(255, 255, 255, 0.14)`), white text, shifting to cyan highlight on tap.\\n\\n### 6. Bathymetric Depth Slider & Cross-Section\\n- **Structure:** Vertical slider with active depth sounder visualization, color-coding critical depth contours (under 6ft in hazard coral, 6-15ft in amber, 15ft+ in deep navy to emerald).\",\"theme\":{\"colorMode\":\"DARK\",\"font\":\"GEIST\",\"roundness\":\"ROUND_EIGHT\",\"customColor\":\"#00f5ff\",\"headlineFont\":\"GEIST\",\"bodyFont\":\"GEIST\",\"labelFont\":\"JETBRAINS_MONO\",\"namedColors\":{\"error_container\":\"#93000a\",\"on_secondary_fixed_variant\":\"#005236\",\"surface_bright\":\"#313949\",\"tertiary\":\"#fff8f5\",\"surface_container\":\"#17202e\",\"on_surface\":\"#dae3f7\",\"on_primary_fixed_variant\":\"#004f53\",\"secondary_container\":\"#00a572\",\"surface_container_high\":\"#222a39\",\"surface\":\"#0a1421\",\"secondary_fixed\":\"#6ffbbe\",\"inverse_surface\":\"#dae3f7\",\"tertiary_fixed\":\"#ffddbb\",\"primary_fixed\":\"#63f7ff\",\"secondary_fixed_dim\":\"#4edea3\",\"on_primary_container\":\"#006c71\",\"primary_fixed_dim\":\"#00dce5\",\"on_tertiary_container\":\"#8c5400\",\"background\":\"#0a1421\",\"inverse_primary\":\"#00696e\",\"on_primary_fixed\":\"#002021\",\"on_error_container\":\"#ffdad6\",\"surface_dim\":\"#0a1421\",\"inverse_on_surface\":\"#283140\",\"primary\":\"#e9feff\",\"outline\":\"#849495\",\"on_surface_variant\":\"#b9caca\",\"secondary\":\"#4edea3\",\"surface_container_highest\":\"#2c3544\",\"on_error\":\"#690005\",\"tertiary_fixed_dim\":\"#ffb868\",\"on_tertiary\":\"#482900\",\"surface_container_low\":\"#131c2a\",\"tertiary_container\":\"#ffd6ad\",\"on_secondary\":\"#003824\",\"on_secondary_container\":\"#00311f\",\"surface_variant\":\"#2c3544\",\"on_tertiary_fixed\":\"#2b1700\",\"on_primary\":\"#003739\",\"primary_container\":\"#00f5ff\",\"error\":\"#ffb4ab\",\"surface_container_lowest\":\"#060e1c\",\"on_secondary_fixed\":\"#002113\",\"outline_variant\":\"#3a494a\",\"on_background\":\"#dae3f7\",\"surface_tint\":\"#00dce5\",\"on_tertiary_fixed_variant\":\"#673d00\"},\"designMd\":\"---\\nname: Marine OS Bridge\\ncolors:\\n  surface: '#0a1421'\\n  surface-dim: '#0a1421'\\n  surface-bright: '#313949'\\n  surface-container-lowest: '#060e1c'\\n  surface-container-low: '#131c2a'\\n  surface-container: '#17202e'\\n  surface-container-high: '#222a39'\\n  surface-container-highest: '#2c3544'\\n  on-surface: '#dae3f7'\\n  on-surface-variant: '#b9caca'\\n  inverse-surface: '#dae3f7'\\n  inverse-on-surface: '#283140'\\n  outline: '#849495'\\n  outline-variant: '#3a494a'\\n  surface-tint: '#00dce5'\\n  primary: '#e9feff'\\n  on-primary: '#003739'\\n  primary-container: '#00f5ff'\\n  on-primary-container: '#006c71'\\n  inverse-primary: '#00696e'\\n  secondary: '#4edea3'\\n  on-secondary: '#003824'\\n  secondary-container: '#00a572'\\n  on-secondary-container: '#00311f'\\n  tertiary: '#fff8f5'\\n  on-tertiary: '#482900'\\n  tertiary-container: '#ffd6ad'\\n  on-tertiary-container: '#8c5400'\\n  error: '#ffb4ab'\\n  on-error: '#690005'\\n  error-container: '#93000a'\\n  on-error-container: '#ffdad6'\\n  primary-fixed: '#63f7ff'\\n  primary-fixed-dim: '#00dce5'\\n  on-primary-fixed: '#002021'\\n  on-primary-fixed-variant: '#004f53'\\n  secondary-fixed: '#6ffbbe'\\n  secondary-fixed-dim: '#4edea3'\\n  on-secondary-fixed: '#002113'\\n  on-secondary-fixed-variant: '#005236'\\n  tertiary-fixed: '#ffddbb'\\n  tertiary-fixed-dim: '#ffb868'\\n  on-tertiary-fixed: '#2b1700'\\n  on-tertiary-fixed-variant: '#673d00'\\n  background: '#0a1421'\\n  on-background: '#dae3f7'\\n  surface-variant: '#2c3544'\\ntypography:\\n  headline-xl:\\n    fontFamily: Geist\\n    fontSize: 40px\\n    fontWeight: '600'\\n    lineHeight: 48px\\n    letterSpacing: -0.02em\\n  headline-xl-mobile:\\n    fontFamily: Geist\\n    fontSize: 28px\\n    fontWeight: '600'\\n    lineHeight: 34px\\n    letterSpacing: -0.01em\\n  headline-lg:\\n    fontFamily: Geist\\n    fontSize: 30px\\n    fontWeight: '600'\\n    lineHeight: 38px\\n    letterSpacing: -0.02em\\n  headline-lg-mobile:\\n    fontFamily: Geist\\n    fontSize: 24px\\n    fontWeight: '600'\\n    lineHeight: 30px\\n    letterSpacing: -0.01em\\n  headline-md:\\n    fontFamily: Geist\\n    fontSize: 22px\\n    fontWeight: '500'\\n    lineHeight: 28px\\n    letterSpacing: -0.01em\\n  body-lg:\\n    fontFamily: Geist\\n    fontSize: 16px\\n    fontWeight: '400'\\n    lineHeight: 24px\\n  body-md:\\n    fontFamily: Geist\\n    fontSize: 14px\\n    fontWeight: '400'\\n    lineHeight: 20px\\n  body-sm:\\n    fontFamily: Geist\\n    fontSize: 12px\\n    fontWeight: '400'\\n    lineHeight: 16px\\n  label-telemetry-lg:\\n    fontFamily: JetBrains Mono\\n    fontSize: 28px\\n    fontWeight: '600'\\n    lineHeight: 32px\\n    letterSpacing: 0.02em\\n  label-telemetry-md:\\n    fontFamily: JetBrains Mono\\n    fontSize: 16px\\n    fontWeight: '500'\\n    lineHeight: 20px\\n    letterSpacing: 0.04em\\n  label-telemetry-sm:\\n    fontFamily: JetBrains Mono\\n    fontSize: 12px\\n    fontWeight: '500'\\n    lineHeight: 16px\\n    letterSpacing: 0.06em\\n  label-hud-unit:\\n    fontFamily: JetBrains Mono\\n    fontSize: 10px\\n    fontWeight: '400'\\n    lineHeight: 12px\\n    letterSpacing: 0.08em\\nrounded:\\n  sm: 0.25rem\\n  DEFAULT: 0.5rem\\n  md: 0.75rem\\n  lg: 1rem\\n  xl: 1.5rem\\n  full: 9999px\\nspacing:\\n  gutter: 1rem\\n  gutter-desktop: 1.5rem\\n  margin: 1rem\\n  margin-desktop: 1.75rem\\n  space-xs: 0.25rem\\n  space-sm: 0.5rem\\n  space-md: 0.875rem\\n  space-lg: 1.25rem\\n  space-xl: 2rem\\n---\\n\\n## Brand & Style\\n\\nThe design system embodies the high-stakes precision, calm focus, and effortless tactical elegance of an ultra-modern bridge control station. Drawing direct inspiration from aviation glass cockpits, Apple Maps Cartography, and military-grade marine telemetry, the interface blends tactical utility with Cupertino-grade polish.\\n\\n### Target Audience & Operational Mindset\\nEngineered for circumnavigators, offshore skippers, and high-performance marine pilots operating under demanding sea states. The operational mindset prioritizes split-second scanability, zero optical distraction, and dark-adapted night-vision preservation. \\n\\n### Design Philosophy\\n- **Dark Cockpit Discipline:** Illumination is strictly reserved for critical telemetry, route tracking, and active status. Static surfaces recede into deep oceanic depths to eliminate glare on the bridge glass.\\n- **Glassmorphic Precision HUD:** Telemetry layers float seamlessly over rich bathymetric and vector hydrographic charts using deep frosted acrylic blurs (`backdrop-filter: blur(24px)`), hairline specular rims, and directional depth cues.\\n- **Aerospace Tactility:** Critical controls (engine throttles, anchor deployment, radar sweep locks) balance featherlight digital gestures with deliberate, reassuring mechanical feedback.\\n\\n## Colors\\n\\nThe palette is anchored in abyssal navy and carbon depths, contrasted with electric phosphor accents tuned for both direct-sun daylight and red-light night-running operations.\\n\\n### Oceanic Abyss (Neutrals & Substrates)\\n- **Base Canvas (`#080E18`):** Deep oceanic void. Used for bottom canvas and nocturnal chart underlays.\\n- **Surface Level 1 / Deck (`#0D1624`):** Base structural container and docking sidebar surfaces.\\n- **Surface Level 2 / HUD Glass (`#121F33` with 65\u201380% opacity):** Translucent HUD cards, floating status pills, and radar sector overlays.\\n- **Surface Level 3 / Highlight (`#1C2D47`):** Active toggles, elevated cards, and segmented control backgrounds.\\n- **Specular Rim Border (`rgba(255, 255, 255, 0.08)` to `rgba(0, 245, 255, 0.2)`): Ultra-crisp 1px hairline edges separating glass panels.\\n\\n### Telemetry Accents & Semantic Roles\\n- **Phosphor Neon Cyan (`#00F5FF`):** Primary tracking accent. Used for cross-track error vectors, active waypoints, AIS target leads, and current vessel course vector.\\n- **Radar Emerald (`#10B981`):** System normal, clear fairway, green navigation lateral marks, active sonar ping, and optimum fuel burn.\\n- **Safety Amber (`#FF9F0A`):** Cautionary alerts, shallow water depth contour warnings, AIS CPA (Closest Point of Approach) proximity notices, and swing radius drift.\\n- **Hazard Coral (`#FF453A`):** Critical alerts, collision hazard, shoal stranding warning, MOB (Man Overboard), and port navigation lateral marks.\\n\\n## Typography\\n\\nThe typographical hierarchy is bifurcated cleanly between **Geist** (for clear navigation prompts, structural metadata, system alerts, and prose) and **JetBrains Mono** (for high-velocity tabular telemetry readouts).\\n\\n### Telemetry Readouts (SOG, COG, Depth, Bearing)\\nAll speed, position coordinates, heading degrees, wind vectors, and distance indicators must render strictly in **JetBrains Mono** with tabular numeric lining enabled (`font-feature-settings: 'tnum' 1, 'zero' 1`). This eliminates jitter during dynamic sensor recalculations (10Hz updates).\\n\\n### Display Hierarchy\\n- Telemetry units (e.g., `KTS`, `DEG M`, `FT`, `NM`) sit immediately adjacent or subscripted to numeric readouts using `label-hud-unit` in uppercase at 60% opacity.\\n- Waypoint naming and cartographic labels use `body-md` in medium weight with subtle atmospheric drop-shadows to ensure legibility across complex isobar chart backgrounds.\\n\\n## Layout & Spacing\\n\\nThe bridge layout operates on a full-bleed, edge-to-edge chart canvas paired with floating modular instrument arrays. \\n\\n### Grid & Layout Structure\\n- **Canvas:** Fullscreen fluid mapping canvas with dynamic hardware safe zones (conforming to marine chartplotter displays and ruggedized iPad bridge docks).\\n- **Desktop / Helm Displays (12-inch to 24-inch MFDs):** 12-column dynamic overlay grid. Floating telemetry ribbons pin to the top header (`margin-desktop`), chart inspection panels pin to the right edge with a fixed width of `360px`, and engine/autopilot docks dock to the bottom.\\n- **Mobile / Handheld Co-Pilot (6-inch to 8-inch screens):** Single-column stacked HUD. Critical SOG (Speed Over Ground) and Heading remain locked in a compact top bar; route waypoint cards collapse into bottom bottom-sheet drawers.\\n\\n### Spacing Discipline\\nAll component padding and gaps conform strictly to 4px and 8px rhythmic increments. Tight spacing (`space-xs`, `space-sm`) is utilized within clustered telemetry pairs (e.g., Heading value to Unit descriptor), while generous spacing (`space-lg`, `space-xl`) isolates separate mission-critical touch targets to prevent accidental touches in heavy chop.\\n\\n## Elevation & Depth\\n\\nVisual hierarchy is maintained through high-performance optical glassmorphism, progressive luminance layering, and neon luminescence rather than standard opaque drop-shadows.\\n\\n### Layer Stack Architecture\\n1. **Cartographic Base Layer (Level 0):** Vector hydrographic chart, bathymetric gradient shading, AIS vessel layers.\\n2. **Backdrop Blur Underlay (Level 1):** `backdrop-filter: blur(28px) saturate(180%)`, filled with `#0D1624` at `75%` opacity. Employs a 1px continuous inner border (`rgba(255, 255, 255, 0.08)`).\\n3. **Floating HUD Instruments (Level 2):** Elevated cards filled with `#121F33` at `82%` opacity. Subtle diffuse ambient glow tinted with the primary phosphor tone (`box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(0, 245, 255, 0.15)`).\\n4. **Critical Interactive Flyouts & Warnings (Level 3):** Modal alarms and steerage course corrections. High-contrast perimeter with active pulsing edge halo (`rgba(255, 69, 58, 0.3)` for hazards).\\n\\n### Specular Edge Lighting\\nPanels feature an off-axis top specular highlight (`border-t: 1px solid rgba(255, 255, 255, 0.16)`) mimicking ambient sunlight or wheelhouse red-lighting skimming across an aerospace glass gauge.\\n\\n## Shapes\\n\\nThe design system uses a balanced rounded geometry (Level 2: `0.5rem` base, `1rem` for floating instruments, `1.5rem` for major deck trays), balancing the organic fluidity of marine hydrodynamics with Apple-grade precision squircle ergonomics.\\n\\n### Specialized Geometry\\n- **Floating HUD Telemetry Capsules:** Full pill silhouettes (`rounded-full`) used exclusively for self-contained, real-time status monitors (e.g., GPS Fix, Autopilot Active, Tide Phase).\\n- **Radar & Sector Sweeps:** Strict concentric circles (`aspect-ratio: 1/1; border-radius: 50%`) with radial degree tick marks etched along outer radii.\\n- **Instrument Cards:** Base radius of `1rem` (`rounded-lg`) on floating cards, maintaining consistent corner curves with chart viewport framing.\\n\\n## Components\\n\\n### 1. Telemetry HUD Capsules (Floating Readout Pills)\\n- **Structure:** Pill-shaped glass container containing sensor icon, dynamic scalar value, and uppercase unit tag.\\n- **States:** Active Normal (Cyan glow border), Stabilized (Emerald border), Drift Alert (Amber pulse), Sensor Loss (Muted red outline with intermittent strobe).\\n- **Behavior:** Tap toggles between primary and secondary metrics (e.g., True Wind Speed to Apparent Wind Speed).\\n\\n### 2. Autopilot Tactile Aerospace Toggles\\n- **Structure:** Physical switch simulation recessed in an inset dark-slate bed (`#080E18`). The active switch rocker features a subtle brushed texture with an illuminated LED pip in phosphor cyan.\\n- **Micro-interaction:** Spring-damped haptic flip with instant vector recalculation readout on the chart line.\\n\\n### 3. Circular Anchor Watch Radar\\n- **Display:** Concentric range rings (0.01nm, 0.05nm, 0.1nm) rendered with 1px dotted hairpins in Emerald (`#10B981`) at 30% opacity.\\n- **Swing Radius Sector:** Dynamic arc showing vessel swing envelope based on chain scope and real-time wind/tide current arrows.\\n- **Drift Warning:** Breaching the safe radius threshold shifts the perimeter ring from Emerald to Safety Amber, then flashes Hazard Coral upon anchor dragging detection.\\n\\n### 4. Interactive Route Waypoint Cards\\n- **Structure:** Frosted glass panel with route ETA, Distance To Go (DTG), Time To Go (TTG), and Cross-Track Error (XTE).\\n- **Hierarchy:** Monospaced values dominate at `label-telemetry-lg`; secondary descriptions sit in `body-sm`.\\n\\n### 5. Tactical Action Buttons\\n- **Primary:** High-luminance fill (`#00F5FF`) with jet black typography (`#080E18`), bold weight, with an outer 4px cyan neon diffusion glow on hover or active engagement.\\n- **Hazard / Override (e.g., Disengage Autopilot, Mark MOB):** Hazard Coral background (`#FF453A`) with stark white text, accompanied by confirmation hold-to-activate circular fill timer.\\n- **Ghost Tactical:** Transparent background, `1px` rim border (`rgba(255, 255, 255, 0.14)`), white text, shifting to cyan highlight on tap.\\n\\n### 6. Bathymetric Depth Slider & Cross-Section\\n- **Structure:** Vertical slider with active depth sounder visualization, color-coding critical depth contours (under 6ft in hazard coral, 6-15ft in amber, 15ft+ in deep navy to emerald).\",\"colorVariant\":\"FIDELITY\",\"overridePrimaryColor\":\"#00f5ff\",\"overrideSecondaryColor\":\"#10b981\",\"overrideTertiaryColor\":\"#ff9f0a\",\"overrideNeutralColor\":\"#0d1624\",\"spacingScale\":2,\"typography\":{\"body-md\":{\"fontFamily\":\"Geist\",\"fontSize\":\"14px\",\"fontWeight\":\"400\",\"lineHeight\":\"20px\"},\"headline-lg\":{\"fontFamily\":\"Geist\",\"fontSize\":\"30px\",\"fontWeight\":\"600\",\"lineHeight\":\"38px\",\"letterSpacing\":\"-0.02em\"},\"headline-xl-mobile\":{\"fontFamily\":\"Geist\",\"fontSize\":\"28px\",\"fontWeight\":\"600\",\"lineHeight\":\"34px\",\"letterSpacing\":\"-0.01em\"},\"label-telemetry-lg\":{\"fontFamily\":\"JetBrains Mono\",\"fontSize\":\"28px\",\"fontWeight\":\"600\",\"lineHeight\":\"32px\",\"letterSpacing\":\"0.02em\"},\"body-lg\":{\"fontFamily\":\"Geist\",\"fontSize\":\"16px\",\"fontWeight\":\"400\",\"lineHeight\":\"24px\"},\"label-telemetry-md\":{\"fontFamily\":\"JetBrains Mono\",\"fontSize\":\"16px\",\"fontWeight\":\"500\",\"lineHeight\":\"20px\",\"letterSpacing\":\"0.04em\"},\"label-telemetry-sm\":{\"fontFamily\":\"JetBrains Mono\",\"fontSize\":\"12px\",\"fontWeight\":\"500\",\"lineHeight\":\"16px\",\"letterSpacing\":\"0.06em\"},\"headline-xl\":{\"fontFamily\":\"Geist\",\"fontSize\":\"40px\",\"fontWeight\":\"600\",\"lineHeight\":\"48px\",\"letterSpacing\":\"-0.02em\"},\"label-hud-unit\":{\"fontFamily\":\"JetBrains Mono\",\"fontSize\":\"10px\",\"fontWeight\":\"400\",\"lineHeight\":\"12px\",\"letterSpacing\":\"0.08em\"},\"headline-md\":{\"fontFamily\":\"Geist\",\"fontSize\":\"22px\",\"fontWeight\":\"500\",\"lineHeight\":\"28px\",\"letterSpacing\":\"-0.01em\"},\"body-sm\":{\"fontFamily\":\"Geist\",\"fontSize\":\"12px\",\"fontWeight\":\"400\",\"lineHeight\":\"16px\"},\"headline-lg-mobile\":{\"fontFamily\":\"Geist\",\"fontSize\":\"24px\",\"fontWeight\":\"600\",\"lineHeight\":\"30px\",\"letterSpacing\":\"-0.01em\"}},\"spacing\":{\"gutter\":\"1rem\",\"space-md\":\"0.875rem\",\"space-xl\":\"2rem\",\"margin-desktop\":\"1.75rem\",\"margin\":\"1rem\",\"space-lg\":\"1.25rem\",\"space-sm\":\"0.5rem\",\"space-xs\":\"0.25rem\",\"gutter-desktop\":\"1.5rem\"},\"headlineFontFamily\":\"Geist\",\"bodyFontFamily\":\"Geist\",\"labelFontFamily\":\"JetBrains Mono\"}},\"version\":\"1\"}}],\"theme\":{}}},{\"text\":\"I have designed the **Marine OS Bridge Nautical Co-Pilot** desktop screen (`Marine OS Bridge \u2014 Nautical Co-Pilot & Reloncav\u00ed Chart`), tailored for high-precision maritime navigation with a tactical dark glassmorphism aesthetic (`#070B14`).\\n\\n### Key Design Decisions & Layout Breakdown:\\n1. **Left 64px Icon Rail:** Compact docked vertical navigation with vessel status, active Nautical Chart mode, Bathymetry, AIS, Weather, Anchor watch, and emergency Disengage trigger at the base.\\n2. **Top Bridge Status & DMS Coordinates Pill:** Prominent illuminated pill displaying `41\u00b0 28.302' S \u2022 072\u00b0 56.214' W` with live `GNSS RTK 3D (\u00b10.02m)` satellite telemetry lock alongside the MFD station indicator.\\n3. **Full-Screen Seno de Reloncav\u00ed Vector Chart:**\\n   - Vector bathymetry contour lines (5m, 10m, 20m, 50m soundings), coastline topography (Isla Tenglo & Puerto Montt approaches).\\n   - Dynamic vessel heading vector with speed projection line (`HDG 192\u00b0T`, SOG 6.8 kn), safe passage corridor, and waypoints (`WP 03 // HUAPILAC CHN`).\\n   - Real-time AIS target tracking (`M/V CHAITEN`, fishing vessel `DON PEDRO`) and marine hazard sectors (`Bajo Ingl\u00e9s 8.4m Shoal` with Fl.R/Fl.G buoy markers).\\n   - Floating hydrographic map toggles (`Bathy HD`, `AIS Live`, `Currents`, `Corridors`).\\n4. **Bottom 4-Metric Telemetry HUD:**\\n   - High-contrast telemetry cards: **SOG** (6.8 kn), **COG** (194\u00b0 MAG), **PROFUNDIDAD** (11.4m safe clearance), and **VIENTO REAL** (14.2 kn SSW).\\n   - Secondary vessel bus monitor for Rudder (`02\u00b0 PORT`), Engine RPM (`2,150 RPM`), Battery (`13.4V 94%`), and Bilge status (`DRY`).\\n5. **Right Collapsible Open-Meteo & Anchor Watch Drawer:**\\n   - Real-time Reloncav\u00ed meteorological telemetry (Wind gusts 14\u201322 kt, 0.4m chop swell, 1018.4 hPa barometer, +1.8m flood tide).\\n   - Precision radar scope swing envelope displaying 45m safe radius, 18.2m drift, 42.5m chain rode payout, and 1.4 kN load tension.\\n   - Recommended sheltered caletas with AI shelter matching scores (`Caleta La Arena` 98% shelter, 9.9/10 score).\\n   - Quick operational triggers: **Plot Route & Set Swing Area**, Weigh Anchor, and Test Alarm.\"},{\"suggestion\":\"Collapse the right drawer to show maximum chart area\"},{\"suggestion\":\"Add night red-illumination mode (Night Vision Bridge mode)\"},{\"suggestion\":\"Simulate an anchor dragging warning alarm state\"}]}",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {
+        "outputComponents": [
+          {
+            "design": {
+              "screens": [
+                {
+                  "designSystem": {
+                    "designSystem": {
+                      "displayName": "Marine OS Bridge",
+                      "styleGuidelines": "## Brand & Style\n\nThe design system embodies the high-stakes precision, calm focus, and effortless tactical elegance of an ultra-modern bridge control station. Drawing direct inspiration from aviation glass cockpits, Apple Maps Cartography, and military-grade marine telemetry, the interface blends tactical utility with Cupertino-grade polish.\n\n### Target Audience & Operational Mindset\nEngineered for circumnavigators, offshore skippers, and high-performance marine pilots operating under demanding sea states. The operational mindset prioritizes split-second scanability, zero optical distraction, and dark-adapted night-vision preservation. \n\n### Design Philosophy\n- **Dark Cockpit Discipline:** Illumination is strictly reserved for critical telemetry, route tracking, and active status. Static surfaces recede into deep oceanic depths to eliminate glare on the bridge glass.\n- **Glassmorphic Precision HUD:** Telemetry layers float seamlessly over rich bathymetric and vector hydrographic charts using deep frosted acrylic blurs (`backdrop-filter: blur(24px)`), hairline specular rims, and directional depth cues.\n- **Aerospace Tactility:** Critical controls (engine throttles, anchor deployment, radar sweep locks) balance featherlight digital gestures with deliberate, reassuring mechanical feedback.\n\n## Layout & Spacing\n\nThe bridge layout operates on a full-bleed, edge-to-edge chart canvas paired with floating modular instrument arrays. \n\n### Grid & Layout Structure\n- **Canvas:** Fullscreen fluid mapping canvas with dynamic hardware safe zones (conforming to marine chartplotter displays and ruggedized iPad bridge docks).\n- **Desktop / Helm Displays (12-inch to 24-inch MFDs):** 12-column dynamic overlay grid. Floating telemetry ribbons pin to the top header (`margin-desktop`), chart inspection panels pin to the right edge with a fixed width of `360px`, and engine/autopilot docks dock to the bottom.\n- **Mobile / Handheld Co-Pilot (6-inch to 8-inch screens):** Single-column stacked HUD. Critical SOG (Speed Over Ground) and Heading remain locked in a compact top bar; route waypoint cards collapse into bottom bottom-sheet drawers.\n\n### Spacing Discipline\nAll component padding and gaps conform strictly to 4px and 8px rhythmic increments. Tight spacing (`space-xs`, `space-sm`) is utilized within clustered telemetry pairs (e.g., Heading value to Unit descriptor), while generous spacing (`space-lg`, `space-xl`) isolates separate mission-critical touch targets to prevent accidental touches in heavy chop.\n\n## Elevation & Depth\n\nVisual hierarchy is maintained through high-performance optical glassmorphism, progressive luminance layering, and neon luminescence rather than standard opaque drop-shadows.\n\n### Layer Stack Architecture\n1. **Cartographic Base Layer (Level 0):** Vector hydrographic chart, bathymetric gradient shading, AIS vessel layers.\n2. **Backdrop Blur Underlay (Level 1):** `backdrop-filter: blur(28px) saturate(180%)`, filled with `#0D1624` at `75%` opacity. Employs a 1px continuous inner border (`rgba(255, 255, 255, 0.08)`).\n3. **Floating HUD Instruments (Level 2):** Elevated cards filled with `#121F33` at `82%` opacity. Subtle diffuse ambient glow tinted with the primary phosphor tone (`box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(0, 245, 255, 0.15)`).\n4. **Critical Interactive Flyouts & Warnings (Level 3):** Modal alarms and steerage course corrections. High-contrast perimeter with active pulsing edge halo (`rgba(255, 69, 58, 0.3)` for hazards).\n\n### Specular Edge Lighting\nPanels feature an off-axis top specular highlight (`border-t: 1px solid rgba(255, 255, 255, 0.16)`) mimicking ambient sunlight or wheelhouse red-lighting skimming across an aerospace glass gauge.\n\n## Components\n\n### 1. Telemetry HUD Capsules (Floating Readout Pills)\n- **Structure:** Pill-shaped glass container containing sensor icon, dynamic scalar value, and uppercase unit tag.\n- **States:** Active Normal (Cyan glow border), Stabilized (Emerald border), Drift Alert (Amber pulse), Sensor Loss (Muted red outline with intermittent strobe).\n- **Behavior:** Tap toggles between primary and secondary metrics (e.g., True Wind Speed to Apparent Wind Speed).\n\n### 2. Autopilot Tactile Aerospace Toggles\n- **Structure:** Physical switch simulation recessed in an inset dark-slate bed (`#080E18`). The active switch rocker features a subtle brushed texture with an illuminated LED pip in phosphor cyan.\n- **Micro-interaction:** Spring-damped haptic flip with instant vector recalculation readout on the chart line.\n\n### 3. Circular Anchor Watch Radar\n- **Display:** Concentric range rings (0.01nm, 0.05nm, 0.1nm) rendered with 1px dotted hairpins in Emerald (`#10B981`) at 30% opacity.\n- **Swing Radius Sector:** Dynamic arc showing vessel swing envelope based on chain scope and real-time wind/tide current arrows.\n- **Drift Warning:** Breaching the safe radius threshold shifts the perimeter ring from Emerald to Safety Amber, then flashes Hazard Coral upon anchor dragging detection.\n\n### 4. Interactive Route Waypoint Cards\n- **Structure:** Frosted glass panel with route ETA, Distance To Go (DTG), Time To Go (TTG), and Cross-Track Error (XTE).\n- **Hierarchy:** Monospaced values dominate at `label-telemetry-lg`; secondary descriptions sit in `body-sm`.\n\n### 5. Tactical Action Buttons\n- **Primary:** High-luminance fill (`#00F5FF`) with jet black typography (`#080E18`), bold weight, with an outer 4px cyan neon diffusion glow on hover or active engagement.\n- **Hazard / Override (e.g., Disengage Autopilot, Mark MOB):** Hazard Coral background (`#FF453A`) with stark white text, accompanied by confirmation hold-to-activate circular fill timer.\n- **Ghost Tactical:** Transparent background, `1px` rim border (`rgba(255, 255, 255, 0.14)`), white text, shifting to cyan highlight on tap.\n\n### 6. Bathymetric Depth Slider & Cross-Section\n- **Structure:** Vertical slider with active depth sounder visualization, color-coding critical depth contours (under 6ft in hazard coral, 6-15ft in amber, 15ft+ in deep navy to emerald).",
+                      "theme": {
+                        "bodyFont": "GEIST",
+                        "bodyFontFamily": "Geist",
+                        "colorMode": "DARK",
+                        "colorVariant": "FIDELITY",
+                        "customColor": "#00f5ff",
+                        "designMd": "---\nname: Marine OS Bridge\ncolors:\n  surface: '#0a1421'\n  surface-dim: '#0a1421'\n  surface-bright: '#313949'\n  surface-container-lowest: '#060e1c'\n  surface-container-low: '#131c2a'\n  surface-container: '#17202e'\n  surface-container-high: '#222a39'\n  surface-container-highest: '#2c3544'\n  on-surface: '#dae3f7'\n  on-surface-variant: '#b9caca'\n  inverse-surface: '#dae3f7'\n  inverse-on-surface: '#283140'\n  outline: '#849495'\n  outline-variant: '#3a494a'\n  surface-tint: '#00dce5'\n  primary: '#e9feff'\n  on-primary: '#003739'\n  primary-container: '#00f5ff'\n  on-primary-container: '#006c71'\n  inverse-primary: '#00696e'\n  secondary: '#4edea3'\n  on-secondary: '#003824'\n  secondary-container: '#00a572'\n  on-secondary-container: '#00311f'\n  tertiary: '#fff8f5'\n  on-tertiary: '#482900'\n  tertiary-container: '#ffd6ad'\n  on-tertiary-container: '#8c5400'\n  error: '#ffb4ab'\n  on-error: '#690005'\n  error-container: '#93000a'\n  on-error-container: '#ffdad6'\n  primary-fixed: '#63f7ff'\n  primary-fixed-dim: '#00dce5'\n  on-primary-fixed: '#002021'\n  on-primary-fixed-variant: '#004f53'\n  secondary-fixed: '#6ffbbe'\n  secondary-fixed-dim: '#4edea3'\n  on-secondary-fixed: '#002113'\n  on-secondary-fixed-variant: '#005236'\n  tertiary-fixed: '#ffddbb'\n  tertiary-fixed-dim: '#ffb868'\n  on-tertiary-fixed: '#2b1700'\n  on-tertiary-fixed-variant: '#673d00'\n  background: '#0a1421'\n  on-background: '#dae3f7'\n  surface-variant: '#2c3544'\ntypography:\n  headline-xl:\n    fontFamily: Geist\n    fontSize: 40px\n    fontWeight: '600'\n    lineHeight: 48px\n    letterSpacing: -0.02em\n  headline-xl-mobile:\n    fontFamily: Geist\n    fontSize: 28px\n    fontWeight: '600'\n    lineHeight: 34px\n    letterSpacing: -0.01em\n  headline-lg:\n    fontFamily: Geist\n    fontSize: 30px\n    fontWeight: '600'\n    lineHeight: 38px\n    letterSpacing: -0.02em\n  headline-lg-mobile:\n    fontFamily: Geist\n    fontSize: 24px\n    fontWeight: '600'\n    lineHeight: 30px\n    letterSpacing: -0.01em\n  headline-md:\n    fontFamily: Geist\n    fontSize: 22px\n    fontWeight: '500'\n    lineHeight: 28px\n    letterSpacing: -0.01em\n  body-lg:\n    fontFamily: Geist\n    fontSize: 16px\n    fontWeight: '400'\n    lineHeight: 24px\n  body-md:\n    fontFamily: Geist\n    fontSize: 14px\n    fontWeight: '400'\n    lineHeight: 20px\n  body-sm:\n    fontFamily: Geist\n    fontSize: 12px\n    fontWeight: '400'\n    lineHeight: 16px\n  label-telemetry-lg:\n    fontFamily: JetBrains Mono\n    fontSize: 28px\n    fontWeight: '600'\n    lineHeight: 32px\n    letterSpacing: 0.02em\n  label-telemetry-md:\n    fontFamily: JetBrains Mono\n    fontSize: 16px\n    fontWeight: '500'\n    lineHeight: 20px\n    letterSpacing: 0.04em\n  label-telemetry-sm:\n    fontFamily: JetBrains Mono\n    fontSize: 12px\n    fontWeight: '500'\n    lineHeight: 16px\n    letterSpacing: 0.06em\n  label-hud-unit:\n    fontFamily: JetBrains Mono\n    fontSize: 10px\n    fontWeight: '400'\n    lineHeight: 12px\n    letterSpacing: 0.08em\nrounded:\n  sm: 0.25rem\n  DEFAULT: 0.5rem\n  md: 0.75rem\n  lg: 1rem\n  xl: 1.5rem\n  full: 9999px\nspacing:\n  gutter: 1rem\n  gutter-desktop: 1.5rem\n  margin: 1rem\n  margin-desktop: 1.75rem\n  space-xs: 0.25rem\n  space-sm: 0.5rem\n  space-md: 0.875rem\n  space-lg: 1.25rem\n  space-xl: 2rem\n---\n\n## Brand & Style\n\nThe design system embodies the high-stakes precision, calm focus, and effortless tactical elegance of an ultra-modern bridge control station. Drawing direct inspiration from aviation glass cockpits, Apple Maps Cartography, and military-grade marine telemetry, the interface blends tactical utility with Cupertino-grade polish.\n\n### Target Audience & Operational Mindset\nEngineered for circumnavigators, offshore skippers, and high-performance marine pilots operating under demanding sea states. The operational mindset prioritizes split-second scanability, zero optical distraction, and dark-adapted night-vision preservation. \n\n### Design Philosophy\n- **Dark Cockpit Discipline:** Illumination is strictly reserved for critical telemetry, route tracking, and active status. Static surfaces recede into deep oceanic depths to eliminate glare on the bridge glass.\n- **Glassmorphic Precision HUD:** Telemetry layers float seamlessly over rich bathymetric and vector hydrographic charts using deep frosted acrylic blurs (`backdrop-filter: blur(24px)`), hairline specular rims, and directional depth cues.\n- **Aerospace Tactility:** Critical controls (engine throttles, anchor deployment, radar sweep locks) balance featherlight digital gestures with deliberate, reassuring mechanical feedback.\n\n## Colors\n\nThe palette is anchored in abyssal navy and carbon depths, contrasted with electric phosphor accents tuned for both direct-sun daylight and red-light night-running operations.\n\n### Oceanic Abyss (Neutrals & Substrates)\n- **Base Canvas (`#080E18`):** Deep oceanic void. Used for bottom canvas and nocturnal chart underlays.\n- **Surface Level 1 / Deck (`#0D1624`):** Base structural container and docking sidebar surfaces.\n- **Surface Level 2 / HUD Glass (`#121F33` with 65\u201380% opacity):** Translucent HUD cards, floating status pills, and radar sector overlays.\n- **Surface Level 3 / Highlight (`#1C2D47`):** Active toggles, elevated cards, and segmented control backgrounds.\n- **Specular Rim Border (`rgba(255, 255, 255, 0.08)` to `rgba(0, 245, 255, 0.2)`): Ultra-crisp 1px hairline edges separating glass panels.\n\n### Telemetry Accents & Semantic Roles\n- **Phosphor Neon Cyan (`#00F5FF`):** Primary tracking accent. Used for cross-track error vectors, active waypoints, AIS target leads, and current vessel course vector.\n- **Radar Emerald (`#10B981`):** System normal, clear fairway, green navigation lateral marks, active sonar ping, and optimum fuel burn.\n- **Safety Amber (`#FF9F0A`):** Cautionary alerts, shallow water depth contour warnings, AIS CPA (Closest Point of Approach) proximity notices, and swing radius drift.\n- **Hazard Coral (`#FF453A`):** Critical alerts, collision hazard, shoal stranding warning, MOB (Man Overboard), and port navigation lateral marks.\n\n## Typography\n\nThe typographical hierarchy is bifurcated cleanly between **Geist** (for clear navigation prompts, structural metadata, system alerts, and prose) and **JetBrains Mono** (for high-velocity tabular telemetry readouts).\n\n### Telemetry Readouts (SOG, COG, Depth, Bearing)\nAll speed, position coordinates, heading degrees, wind vectors, and distance indicators must render strictly in **JetBrains Mono** with tabular numeric lining enabled (`font-feature-settings: 'tnum' 1, 'zero' 1`). This eliminates jitter during dynamic sensor recalculations (10Hz updates).\n\n### Display Hierarchy\n- Telemetry units (e.g., `KTS`, `DEG M`, `FT`, `NM`) sit immediately adjacent or subscripted to numeric readouts using `label-hud-unit` in uppercase at 60% opacity.\n- Waypoint naming and cartographic labels use `body-md` in medium weight with subtle atmospheric drop-shadows to ensure legibility across complex isobar chart backgrounds.\n\n## Layout & Spacing\n\nThe bridge layout operates on a full-bleed, edge-to-edge chart canvas paired with floating modular instrument arrays. \n\n### Grid & Layout Structure\n- **Canvas:** Fullscreen fluid mapping canvas with dynamic hardware safe zones (conforming to marine chartplotter displays and ruggedized iPad bridge docks).\n- **Desktop / Helm Displays (12-inch to 24-inch MFDs):** 12-column dynamic overlay grid. Floating telemetry ribbons pin to the top header (`margin-desktop`), chart inspection panels pin to the right edge with a fixed width of `360px`, and engine/autopilot docks dock to the bottom.\n- **Mobile / Handheld Co-Pilot (6-inch to 8-inch screens):** Single-column stacked HUD. Critical SOG (Speed Over Ground) and Heading remain locked in a compact top bar; route waypoint cards collapse into bottom bottom-sheet drawers.\n\n### Spacing Discipline\nAll component padding and gaps conform strictly to 4px and 8px rhythmic increments. Tight spacing (`space-xs`, `space-sm`) is utilized within clustered telemetry pairs (e.g., Heading value to Unit descriptor), while generous spacing (`space-lg`, `space-xl`) isolates separate mission-critical touch targets to prevent accidental touches in heavy chop.\n\n## Elevation & Depth\n\nVisual hierarchy is maintained through high-performance optical glassmorphism, progressive luminance layering, and neon luminescence rather than standard opaque drop-shadows.\n\n### Layer Stack Architecture\n1. **Cartographic Base Layer (Level 0):** Vector hydrographic chart, bathymetric gradient shading, AIS vessel layers.\n2. **Backdrop Blur Underlay (Level 1):** `backdrop-filter: blur(28px) saturate(180%)`, filled with `#0D1624` at `75%` opacity. Employs a 1px continuous inner border (`rgba(255, 255, 255, 0.08)`).\n3. **Floating HUD Instruments (Level 2):** Elevated cards filled with `#121F33` at `82%` opacity. Subtle diffuse ambient glow tinted with the primary phosphor tone (`box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(0, 245, 255, 0.15)`).\n4. **Critical Interactive Flyouts & Warnings (Level 3):** Modal alarms and steerage course corrections. High-contrast perimeter with active pulsing edge halo (`rgba(255, 69, 58, 0.3)` for hazards).\n\n### Specular Edge Lighting\nPanels feature an off-axis top specular highlight (`border-t: 1px solid rgba(255, 255, 255, 0.16)`) mimicking ambient sunlight or wheelhouse red-lighting skimming across an aerospace glass gauge.\n\n## Shapes\n\nThe design system uses a balanced rounded geometry (Level 2: `0.5rem` base, `1rem` for floating instruments, `1.5rem` for major deck trays), balancing the organic fluidity of marine hydrodynamics with Apple-grade precision squircle ergonomics.\n\n### Specialized Geometry\n- **Floating HUD Telemetry Capsules:** Full pill silhouettes (`rounded-full`) used exclusively for self-contained, real-time status monitors (e.g., GPS Fix, Autopilot Active, Tide Phase).\n- **Radar & Sector Sweeps:** Strict concentric circles (`aspect-ratio: 1/1; border-radius: 50%`) with radial degree tick marks etched along outer radii.\n- **Instrument Cards:** Base radius of `1rem` (`rounded-lg`) on floating cards, maintaining consistent corner curves with chart viewport framing.\n\n## Components\n\n### 1. Telemetry HUD Capsules (Floating Readout Pills)\n- **Structure:** Pill-shaped glass container containing sensor icon, dynamic scalar value, and uppercase unit tag.\n- **States:** Active Normal (Cyan glow border), Stabilized (Emerald border), Drift Alert (Amber pulse), Sensor Loss (Muted red outline with intermittent strobe).\n- **Behavior:** Tap toggles between primary and secondary metrics (e.g., True Wind Speed to Apparent Wind Speed).\n\n### 2. Autopilot Tactile Aerospace Toggles\n- **Structure:** Physical switch simulation recessed in an inset dark-slate bed (`#080E18`). The active switch rocker features a subtle brushed texture with an illuminated LED pip in phosphor cyan.\n- **Micro-interaction:** Spring-damped haptic flip with instant vector recalculation readout on the chart line.\n\n### 3. Circular Anchor Watch Radar\n- **Display:** Concentric range rings (0.01nm, 0.05nm, 0.1nm) rendered with 1px dotted hairpins in Emerald (`#10B981`) at 30% opacity.\n- **Swing Radius Sector:** Dynamic arc showing vessel swing envelope based on chain scope and real-time wind/tide current arrows.\n- **Drift Warning:** Breaching the safe radius threshold shifts the perimeter ring from Emerald to Safety Amber, then flashes Hazard Coral upon anchor dragging detection.\n\n### 4. Interactive Route Waypoint Cards\n- **Structure:** Frosted glass panel with route ETA, Distance To Go (DTG), Time To Go (TTG), and Cross-Track Error (XTE).\n- **Hierarchy:** Monospaced values dominate at `label-telemetry-lg`; secondary descriptions sit in `body-sm`.\n\n### 5. Tactical Action Buttons\n- **Primary:** High-luminance fill (`#00F5FF`) with jet black typography (`#080E18`), bold weight, with an outer 4px cyan neon diffusion glow on hover or active engagement.\n- **Hazard / Override (e.g., Disengage Autopilot, Mark MOB):** Hazard Coral background (`#FF453A`) with stark white text, accompanied by confirmation hold-to-activate circular fill timer.\n- **Ghost Tactical:** Transparent background, `1px` rim border (`rgba(255, 255, 255, 0.14)`), white text, shifting to cyan highlight on tap.\n\n### 6. Bathymetric Depth Slider & Cross-Section\n- **Structure:** Vertical slider with active depth sounder visualization, color-coding critical depth contours (under 6ft in hazard coral, 6-15ft in amber, 15ft+ in deep navy to emerald).",
+                        "font": "GEIST",
+                        "headlineFont": "GEIST",
+                        "headlineFontFamily": "Geist",
+                        "labelFont": "JETBRAINS_MONO",
+                        "labelFontFamily": "JetBrains Mono",
+                        "namedColors": {
+                          "background": "#0a1421",
+                          "error": "#ffb4ab",
+                          "error_container": "#93000a",
+                          "inverse_on_surface": "#283140",
+                          "inverse_primary": "#00696e",
+                          "inverse_surface": "#dae3f7",
+                          "on_background": "#dae3f7",
+                          "on_error": "#690005",
+                          "on_error_container": "#ffdad6",
+                          "on_primary": "#003739",
+                          "on_primary_container": "#006c71",
+                          "on_primary_fixed": "#002021",
+                          "on_primary_fixed_variant": "#004f53",
+                          "on_secondary": "#003824",
+                          "on_secondary_container": "#00311f",
+                          "on_secondary_fixed": "#002113",
+                          "on_secondary_fixed_variant": "#005236",
+                          "on_surface": "#dae3f7",
+                          "on_surface_variant": "#b9caca",
+                          "on_tertiary": "#482900",
+                          "on_tertiary_container": "#8c5400",
+                          "on_tertiary_fixed": "#2b1700",
+                          "on_tertiary_fixed_variant": "#673d00",
+                          "outline": "#849495",
+                          "outline_variant": "#3a494a",
+                          "primary": "#e9feff",
+                          "primary_container": "#00f5ff",
+                          "primary_fixed": "#63f7ff",
+                          "primary_fixed_dim": "#00dce5",
+                          "secondary": "#4edea3",
+                          "secondary_container": "#00a572",
+                          "secondary_fixed": "#6ffbbe",
+                          "secondary_fixed_dim": "#4edea3",
+                          "surface": "#0a1421",
+                          "surface_bright": "#313949",
+                          "surface_container": "#17202e",
+                          "surface_container_high": "#222a39",
+                          "surface_container_highest": "#2c3544",
+                          "surface_container_low": "#131c2a",
+                          "surface_container_lowest": "#060e1c",
+                          "surface_dim": "#0a1421",
+                          "surface_tint": "#00dce5",
+                          "surface_variant": "#2c3544",
+                          "tertiary": "#fff8f5",
+                          "tertiary_container": "#ffd6ad",
+                          "tertiary_fixed": "#ffddbb",
+                          "tertiary_fixed_dim": "#ffb868"
+                        },
+                        "overrideNeutralColor": "#0d1624",
+                        "overridePrimaryColor": "#00f5ff",
+                        "overrideSecondaryColor": "#10b981",
+                        "overrideTertiaryColor": "#ff9f0a",
+                        "roundness": "ROUND_EIGHT",
+                        "spacing": {
+                          "gutter": "1rem",
+                          "gutter-desktop": "1.5rem",
+                          "margin": "1rem",
+                          "margin-desktop": "1.75rem",
+                          "space-lg": "1.25rem",
+                          "space-md": "0.875rem",
+                          "space-sm": "0.5rem",
+                          "space-xl": "2rem",
+                          "space-xs": "0.25rem"
+                        },
+                        "spacingScale": 2,
+                        "typography": {
+                          "body-lg": {
+                            "fontFamily": "Geist",
+                            "fontSize": "16px",
+                            "fontWeight": "400",
+                            "lineHeight": "24px"
+                          },
+                          "body-md": {
+                            "fontFamily": "Geist",
+                            "fontSize": "14px",
+                            "fontWeight": "400",
+                            "lineHeight": "20px"
+                          },
+                          "body-sm": {
+                            "fontFamily": "Geist",
+                            "fontSize": "12px",
+                            "fontWeight": "400",
+                            "lineHeight": "16px"
+                          },
+                          "headline-lg": {
+                            "fontFamily": "Geist",
+                            "fontSize": "30px",
+                            "fontWeight": "600",
+                            "letterSpacing": "-0.02em",
+                            "lineHeight": "38px"
+                          },
+                          "headline-lg-mobile": {
+                            "fontFamily": "Geist",
+                            "fontSize": "24px",
+                            "fontWeight": "600",
+                            "letterSpacing": "-0.01em",
+                            "lineHeight": "30px"
+                          },
+                          "headline-md": {
+                            "fontFamily": "Geist",
+                            "fontSize": "22px",
+                            "fontWeight": "500",
+                            "letterSpacing": "-0.01em",
+                            "lineHeight": "28px"
+                          },
+                          "headline-xl": {
+                            "fontFamily": "Geist",
+                            "fontSize": "40px",
+                            "fontWeight": "600",
+                            "letterSpacing": "-0.02em",
+                            "lineHeight": "48px"
+                          },
+                          "headline-xl-mobile": {
+                            "fontFamily": "Geist",
+                            "fontSize": "28px",
+                            "fontWeight": "600",
+                            "letterSpacing": "-0.01em",
+                            "lineHeight": "34px"
+                          },
+                          "label-hud-unit": {
+                            "fontFamily": "JetBrains Mono",
+                            "fontSize": "10px",
+                            "fontWeight": "400",
+                            "letterSpacing": "0.08em",
+                            "lineHeight": "12px"
+                          },
+                          "label-telemetry-lg": {
+                            "fontFamily": "JetBrains Mono",
+                            "fontSize": "28px",
+                            "fontWeight": "600",
+                            "letterSpacing": "0.02em",
+                            "lineHeight": "32px"
+                          },
+                          "label-telemetry-md": {
+                            "fontFamily": "JetBrains Mono",
+                            "fontSize": "16px",
+                            "fontWeight": "500",
+                            "letterSpacing": "0.04em",
+                            "lineHeight": "20px"
+                          },
+                          "label-telemetry-sm": {
+                            "fontFamily": "JetBrains Mono",
+                            "fontSize": "12px",
+                            "fontWeight": "500",
+                            "letterSpacing": "0.06em",
+                            "lineHeight": "16px"
+                          }
+                        }
+                      }
+                    },
+                    "name": "assets/444d03447c814cb293de9377867198a3",
+                    "version": "1"
+                  },
+                  "deviceType": "DESKTOP",
+                  "generatedBy": "figaro_agent",
+                  "height": "2048",
+                  "htmlCode": {
+                    "downloadUrl": "https://stitch.googleapis.com/v1/projects/7713357630640363437/files/baa2283a231e4cadb015678c742fcd33:download",
+                    "mimeType": "text/html",
+                    "name": "projects/7713357630640363437/files/baa2283a231e4cadb015678c742fcd33"
+                  },
+                  "id": "79c92d8cfb0840d1a8f2c7d873a15cc6",
+                  "name": "projects/7713357630640363437/screens/79c92d8cfb0840d1a8f2c7d873a15cc6",
+                  "prompt": "Design a professional desktop Marine OS Bridge Nautical Co-Pilot screen:\n- Theme & Aesthetic: Dark marine glassmorphism (palette: deep oceanic midnight #070B14, glass containers #0d1829 with 40-70% opacity, backdrop blur, cyan/teal neon accents #00f5ff, warning amber #f59e0b, emerald #10b981, crisp typography with monospace/telemetry Geist/JetBrains style for readings, crisp SVG nautical cartography lines).\n- Left Docked 64px Icon Rail: Compact vertical navigation with vessel icon at top, active Chart/Nav icon, Radar, AIS Targets, Weather, Anchor Watch, Autopilot toggle at bottom with red DISENGAGE pill.\n- Top Navigation & Telemetry Bar:\n  - Brand mark 'AURA MARINE OS' with bridge status 'BRIDGE MFD 01 \u2022 SENO DE RELONCAV\u00cd'\n  - Prominent Center Pill with DMS Coordinates: '41\u00b0 28.302\\' S \u2022 072\u00b0 56.214\\' W' with GNSS RTK 3D FIX status indicator (green dot, diff 0.02m)\n  - Navigation tabs (CHART active with cyan underline, RADAR, ANCHOR, VESSEL)\n  - Right controls: SIMULATOR toggle, satellite sync status, notifications alert, and drawer toggle button.\n- Main Area - Full-screen Seno de Reloncav\u00ed Nautical Vector Chart:\n  - Rich hydrographic chart visualization: Bathymetry depth contours (5m, 10m, 20m, 50m, 100m soundings), coastline of Isla Tenglo / Canal de Tenglo / Seno de Reloncav\u00ed / Puerto Montt approach.\n  - Own ship 'SV PATAGONIA' (or 'SV ALBATROS') styled with heading vector (HDG 192\u00b0T, 10m line), speed prediction cone, SOG 6.8 kn.\n  - AIS active targets: e.g. 'M/V CHAITEN' (Cargo, SOG 12.4 kn, CPA 1.8 nm), 'DON PEDRO' (Fishing, SOG 3.1 kn).\n  - Navigational hazards & marks: 'Bajo Ingl\u00e9s (8.4m Shoal)' caution sector with red/amber buoy markers (Fl.R.3s '4', Fl.G.4s '3').\n  - Planned route line with cyan dashed waypoints ('WP 03 // HUAPILAC').\n  - Map overlay floating controls: Quick toggles for [Bathy HD], [AIS Live], [Streamlines / Currents], [Corridors], zoom +/- buttons.\n- Bottom 4-Number Telemetry HUD:\n  - Docked or floating glass HUD bar along bottom:\n    1. SOG (Speed Over Ground): '6.8 kn' with trend micro-bar 'VEL STABLE +0.2'\n    2. COG (Course Over Ground): '194\u00b0 MAG' (HDG TRUE 192\u00b0T)\n    3. PROFUNDIDAD (Depth): '11.4 m' with 'CLEARANCE: SAFE' status indicator\n    4. VIENTO REAL (TWS): '14.2 kn' with wind direction arrow '\u2197 SSW / 205\u00b0T'\n  - Secondary lower sub-strip: Rudder angle (02\u00b0 P), Engine (2,150 RPM), Battery (13.4V 94%), Bilge (DRY).\n- Right Collapsible Open-Meteo Anchorage & Anchor Watch Drawer:\n  - Header: 'ANCHORAGE & ANCHOR WATCH' with 'SYS ARMED' green pill and close/collapse toggle.\n  - Top Watch Mode Selector: Tabs for [Smart Match] and [Radar Scope].\n  - Open-Meteo Live Hydro & Meteo card for Reloncav\u00ed:\n    - Wind gusts: 14-22 kt SSW\n    - Swell Ht: 0.4 m chop\n    - Barometer: 1018 hPa (rising)\n    - Tide Cycle: +1.8 m Flood\n  - Anchor Watch Radar Scope widget:\n    - Concentric ring swing circle visualization (45m max, 30m safe radius, drop point, current vessel drift 18.2m / 45.0m, chain payout 42.5m rode, load tension 1.4 kN).\n  - Recommended Sheltered Caletas (Anchorage list):\n    - Caleta La Arena (98% Shelter, Score 9.9/10, Dist 4.8 nm, Mud/Sand)\n    - Estero Reloncav\u00ed / Poyo (94% Shelter, Score 9.3/10, Dist 11.2 nm, Clay)\n    - Isla Tenglo South Cove (89% Match, Score 8.7/10, Dist 2.1 nm, Sand/Shell)\n  - Primary CTA button: 'Plot Route & Set Swing Area' (cyan luminous button) with quick 'Weigh Anchor' / 'Test Alarm' secondary triggers.\n- Ensure flawless responsive spacing, tactical contrast, high-tech maritime typography, and crisp visual hierarchy throughout.",
+                  "screenMetadata": {
+                    "agentType": "PRO_AGENT",
+                    "status": "COMPLETE"
+                  },
+                  "screenType": "DESIGN",
+                  "screenshot": {
+                    "downloadUrl": "https://stitch.googleapis.com/v1/projects/7713357630640363437/files/ef08a6cff0e64bdeb20f747ff6efa509:download",
+                    "name": "projects/7713357630640363437/files/ef08a6cff0e64bdeb20f747ff6efa509"
+                  },
+                  "theme": {
+                    "bodyFont": "GEIST",
+                    "bodyFontFamily": "Geist",
+                    "colorMode": "DARK",
+                    "colorVariant": "FIDELITY",
+                    "customColor": "#00f5ff",
+                    "font": "GEIST",
+                    "headlineFont": "GEIST",
+                    "headlineFontFamily": "Geist",
+                    "labelFont": "JETBRAINS_MONO",
+                    "labelFontFamily": "JetBrains Mono",
+                    "namedColors": {
+                      "background": "#0a1421",
+                      "error": "#ffb4ab",
+                      "error_container": "#93000a",
+                      "inverse_on_surface": "#283140",
+                      "inverse_primary": "#00696e",
+                      "inverse_surface": "#dae3f7",
+                      "on_background": "#dae3f7",
+                      "on_error": "#690005",
+                      "on_error_container": "#ffdad6",
+                      "on_primary": "#003739",
+                      "on_primary_container": "#006c71",
+                      "on_primary_fixed": "#002021",
+                      "on_primary_fixed_variant": "#004f53",
+                      "on_secondary": "#003824",
+                      "on_secondary_container": "#00311f",
+                      "on_secondary_fixed": "#002113",
+                      "on_secondary_fixed_variant": "#005236",
+                      "on_surface": "#dae3f7",
+                      "on_surface_variant": "#b9caca",
+                      "on_tertiary": "#482900",
+                      "on_tertiary_container": "#8c5400",
+                      "on_tertiary_fixed": "#2b1700",
+                      "on_tertiary_fixed_variant": "#673d00",
+                      "outline": "#849495",
+                      "outline_variant": "#3a494a",
+                      "primary": "#e9feff",
+                      "primary_container": "#00f5ff",
+                      "primary_fixed": "#63f7ff",
+                      "primary_fixed_dim": "#00dce5",
+                      "secondary": "#4edea3",
+                      "secondary_container": "#00a572",
+                      "secondary_fixed": "#6ffbbe",
+                      "secondary_fixed_dim": "#4edea3",
+                      "surface": "#0a1421",
+                      "surface_bright": "#313949",
+                      "surface_container": "#17202e",
+                      "surface_container_high": "#222a39",
+                      "surface_container_highest": "#2c3544",
+                      "surface_container_low": "#131c2a",
+                      "surface_container_lowest": "#060e1c",
+                      "surface_dim": "#0a1421",
+                      "surface_tint": "#00dce5",
+                      "surface_variant": "#2c3544",
+                      "tertiary": "#fff8f5",
+                      "tertiary_container": "#ffd6ad",
+                      "tertiary_fixed": "#ffddbb",
+                      "tertiary_fixed_dim": "#ffb868"
+                    },
+                    "overrideNeutralColor": "#0d1624",
+                    "overridePrimaryColor": "#00f5ff",
+                    "overrideSecondaryColor": "#10b981",
+                    "overrideTertiaryColor": "#ff9f0a",
+                    "roundness": "ROUND_EIGHT",
+                    "spacing": {
+                      "gutter": "1rem",
+                      "gutter-desktop": "1.5rem",
+                      "margin": "1rem",
+                      "margin-desktop": "1.75rem",
+                      "space-lg": "1.25rem",
+                      "space-md": "0.875rem",
+                      "space-sm": "0.5rem",
+                      "space-xl": "2rem",
+                      "space-xs": "0.25rem"
+                    },
+                    "spacingScale": 2,
+                    "typography": {
+                      "body-lg": {
+                        "fontFamily": "Geist",
+                        "fontSize": "16px",
+                        "fontWeight": "400",
+                        "lineHeight": "24px"
+                      },
+                      "body-md": {
+                        "fontFamily": "Geist",
+                        "fontSize": "14px",
+                        "fontWeight": "400",
+                        "lineHeight": "20px"
+                      },
+                      "body-sm": {
+                        "fontFamily": "Geist",
+                        "fontSize": "12px",
+                        "fontWeight": "400",
+                        "lineHeight": "16px"
+                      },
+                      "headline-lg": {
+                        "fontFamily": "Geist",
+                        "fontSize": "30px",
+                        "fontWeight": "600",
+                        "letterSpacing": "-0.02em",
+                        "lineHeight": "38px"
+                      },
+                      "headline-lg-mobile": {
+                        "fontFamily": "Geist",
+                        "fontSize": "24px",
+                        "fontWeight": "600",
+                        "letterSpacing": "-0.01em",
+                        "lineHeight": "30px"
+                      },
+                      "headline-md": {
+                        "fontFamily": "Geist",
+                        "fontSize": "22px",
+                        "fontWeight": "500",
+                        "letterSpacing": "-0.01em",
+                        "lineHeight": "28px"
+                      },
+                      "headline-xl": {
+                        "fontFamily": "Geist",
+                        "fontSize": "40px",
+                        "fontWeight": "600",
+                        "letterSpacing": "-0.02em",
+                        "lineHeight": "48px"
+                      },
+                      "headline-xl-mobile": {
+                        "fontFamily": "Geist",
+                        "fontSize": "28px",
+                        "fontWeight": "600",
+                        "letterSpacing": "-0.01em",
+                        "lineHeight": "34px"
+                      },
+                      "label-hud-unit": {
+                        "fontFamily": "JetBrains Mono",
+                        "fontSize": "10px",
+                        "fontWeight": "400",
+                        "letterSpacing": "0.08em",
+                        "lineHeight": "12px"
+                      },
+                      "label-telemetry-lg": {
+                        "fontFamily": "JetBrains Mono",
+                        "fontSize": "28px",
+                        "fontWeight": "600",
+                        "letterSpacing": "0.02em",
+                        "lineHeight": "32px"
+                      },
+                      "label-telemetry-md": {
+                        "fontFamily": "JetBrains Mono",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "letterSpacing": "0.04em",
+                        "lineHeight": "20px"
+                      },
+                      "label-telemetry-sm": {
+                        "fontFamily": "JetBrains Mono",
+                        "fontSize": "12px",
+                        "fontWeight": "500",
+                        "letterSpacing": "0.06em",
+                        "lineHeight": "16px"
+                      }
+                    }
+                  },
+                  "title": "Marine OS Bridge \u2014 Nautical Co-Pilot & Reloncav\u00ed Chart",
+                  "width": "2560"
+                }
+              ],
+              "theme": {}
+            }
+          },
+          {
+            "text": "I have designed the **Marine OS Bridge Nautical Co-Pilot** desktop screen (`Marine OS Bridge \u2014 Nautical Co-Pilot & Reloncav\u00ed Chart`), tailored for high-precision maritime navigation with a tactical dark glassmorphism aesthetic (`#070B14`).\n\n### Key Design Decisions & Layout Breakdown:\n1. **Left 64px Icon Rail:** Compact docked vertical navigation with vessel status, active Nautical Chart mode, Bathymetry, AIS, Weather, Anchor watch, and emergency Disengage trigger at the base.\n2. **Top Bridge Status & DMS Coordinates Pill:** Prominent illuminated pill displaying `41\u00b0 28.302' S \u2022 072\u00b0 56.214' W` with live `GNSS RTK 3D (\u00b10.02m)` satellite telemetry lock alongside the MFD station indicator.\n3. **Full-Screen Seno de Reloncav\u00ed Vector Chart:**\n   - Vector bathymetry contour lines (5m, 10m, 20m, 50m soundings), coastline topography (Isla Tenglo & Puerto Montt approaches).\n   - Dynamic vessel heading vector with speed projection line (`HDG 192\u00b0T`, SOG 6.8 kn), safe passage corridor, and waypoints (`WP 03 // HUAPILAC CHN`).\n   - Real-time AIS target tracking (`M/V CHAITEN`, fishing vessel `DON PEDRO`) and marine hazard sectors (`Bajo Ingl\u00e9s 8.4m Shoal` with Fl.R/Fl.G buoy markers).\n   - Floating hydrographic map toggles (`Bathy HD`, `AIS Live`, `Currents`, `Corridors`).\n4. **Bottom 4-Metric Telemetry HUD:**\n   - High-contrast telemetry cards: **SOG** (6.8 kn), **COG** (194\u00b0 MAG), **PROFUNDIDAD** (11.4m safe clearance), and **VIENTO REAL** (14.2 kn SSW).\n   - Secondary vessel bus monitor for Rudder (`02\u00b0 PORT`), Engine RPM (`2,150 RPM`), Battery (`13.4V 94%`), and Bilge status (`DRY`).\n5. **Right Collapsible Open-Meteo & Anchor Watch Drawer:**\n   - Real-time Reloncav\u00ed meteorological telemetry (Wind gusts 14\u201322 kt, 0.4m chop swell, 1018.4 hPa barometer, +1.8m flood tide).\n   - Precision radar scope swing envelope displaying 45m safe radius, 18.2m drift, 42.5m chain rode payout, and 1.4 kN load tension.\n   - Recommended sheltered caletas with AI shelter matching scores (`Caleta La Arena` 98% shelter, 9.9/10 score).\n   - Quick operational triggers: **Plot Route & Set Swing Area**, Weigh Anchor, and Test Alarm."
+          },
+          {
+            "suggestion": "Collapse the right drawer to show maximum chart area"
+          },
+          {
+            "suggestion": "Add night red-illumination mode (Night Vision Bridge mode)"
+          },
+          {
+            "suggestion": "Simulate an anchor dragging warning alarm state"
+          }
+        ],
+        "projectId": "7713357630640363437",
+        "sessionId": "375123954722702849"
+      }
+    }
+  },
+  "screens": {
+    "id": 2,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{}",
+          "type": "text"
+        }
+      ],
+      "structuredContent": {}
+    }
+  }
+}

@@ -1,0 +1,276 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   IALA MARITIME SIGNALING & NAVAL PSYCHOLOGY COLOR SYSTEM
+   - midnight-ocean: Abyssal Navy (#040B16 / #0A192F), Lifebuoy Orange (#FF5722),
+     Starboard Green (#00E676), Port Red (#FF2D55), Tactical Aqua (#00E5FF)
+   - daylight-high-contrast: Ice Mist (#F0F4F8 / #E1E7EE), Deep Navy (#0A192F),
+     Solar Lifebuoy Orange (#D94A1A)
+   - night-red-shift: Biological Scotopic Preservation (#000000 + #FF0000)
+============================================================================ */
+:root,
+[data-theme="midnight-ocean"] {
+  --bg-primary: #040b16;
+  --bg-secondary: #0a192f;
+  --bg-glass: rgba(10, 25, 47, 0.85);
+  --text-primary: #f0f4f8;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --accent-primary: #ff5722;
+  --accent-contrast: #ffffff;
+  --telemetry-aqua: #00e5ff;
+  --status-ok: #00e676;
+  --status-warn: #ff9f0a;
+  --status-danger: #ff2d55;
+}
+
+/* Daylight High-Contrast: Glare-proof Ice Mist (#F0F4F8), Deep Navy (#0A192F), Solar Orange (#D94A1A) */
+[data-theme="daylight-high-contrast"] {
+  --bg-primary: #f0f4f8;
+  --bg-secondary: #e1e7ee;
+  --bg-glass: rgba(240, 244, 248, 0.94);
+  --text-primary: #0a192f;
+  --text-secondary: #1e293b;
+  --text-muted: #475569;
+  --border-subtle: rgba(10, 25, 47, 0.18);
+  --accent-primary: #d94a1a;
+  --accent-contrast: #ffffff;
+  --telemetry-aqua: #0284c7;
+  --status-ok: #059669;
+  --status-warn: #d97706;
+  --status-danger: #dc2626;
+}
+
+/* Night Red-Shift: Strict OLED #000000 + pure #FF0000 red — ZERO white pixels */
+[data-theme="night-red-shift"] {
+  --bg-primary: #000000;
+  --bg-secondary: #050000;
+  --bg-glass: rgba(0, 0, 0, 0.96);
+  --text-primary: #ff0000;
+  --text-secondary: #cc0000;
+  --text-muted: #990000;
+  --border-subtle: rgba(255, 0, 0, 0.38);
+  --accent-primary: #ff0000;
+  --accent-contrast: #000000;
+  --telemetry-aqua: #ff0000;
+  --status-ok: #ff0000;
+  --status-warn: #ff0000;
+  --status-danger: #ff0000;
+}
+
+html,
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+/* Strict tabular numerals for telemetry (SOG, COG, RPM, Coordinates, Horometer) — CLS = 0 */
+.font-mono,
+[data-telemetry="true"] {
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* Global Marine Tactile Ergonomics: all touch buttons and inputs enforce >= 56px / 64px height */
+@layer base {
+  button,
+  [role="button"] {
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+}
+
+/* Tactical Naval Glassmorphic HUD Surface */
+.marine-card {
+  background-color: var(--bg-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="daylight-high-contrast"] .marine-card {
+  box-shadow: 0 10px 30px rgba(10, 25, 47, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="night-red-shift"] .marine-card {
+  background-color: #000000 !important;
+  box-shadow: 0 0 28px rgba(255, 0, 0, 0.14);
+}
+
+.marine-pill {
+  background-color: var(--bg-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+.marine-btn {
+  min-height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  padding: 0.75rem 1.15rem;
+  border-radius: 0.875rem;
+  border: 1px solid var(--border-subtle);
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  touch-action: manipulation;
+}
+
+.marine-btn-lg {
+  min-height: 64px;
+}
+
+.marine-btn:active {
+  transform: scale(0.98);
+}
+
+/* Primary CTA Button: Lifebuoy Orange (#FF5722 / #D94A1A) with crisp #FFFFFF text (WCAG AA) */
+.marine-btn-primary {
+  background-color: var(--accent-primary);
+  color: var(--accent-contrast);
+  border-color: transparent;
+  box-shadow: 0 4px 22px rgba(255, 87, 34, 0.35);
+}
+
+[data-theme="daylight-high-contrast"] .marine-btn-primary {
+  background-color: #d94a1a;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(217, 74, 26, 0.32);
+}
+
+[data-theme="night-red-shift"] .marine-btn-primary {
+  background-color: #ff0000 !important;
+  color: #000000 !important;
+  box-shadow: 0 0 18px rgba(255, 0, 0, 0.45);
+}
+
+.marine-btn-secondary {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+.marine-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="daylight-high-contrast"] .marine-btn-secondary {
+  background-color: #e1e7ee;
+  color: #0a192f;
+  border-color: rgba(10, 25, 47, 0.2);
+}
+
+/* Inputs & Selects — strict 56px-64px min-height for marine tactile ergonomics */
+input:not([type="checkbox"]):not([type="range"]):not([type="file"]),
+select,
+textarea {
+  min-height: 56px;
+  max-width: 100%;
+  background-color: rgba(4, 11, 22, 0.82);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+}
+
+/* Fixed-size shimmer skeleton for CLS = 0 */
+.marine-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 87, 34, 0.16) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: marineShimmer 1.4s infinite linear;
+  border-radius: 0.75rem;
+}
+
+[data-theme="night-red-shift"] .marine-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.08) 25%,
+    rgba(255, 0, 0, 0.28) 50%,
+    rgba(255, 0, 0, 0.08) 75%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes marineShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+[data-theme="daylight-high-contrast"] input:not([type="checkbox"]):not([type="range"]):not([type="file"]),
+[data-theme="daylight-high-contrast"] select,
+[data-theme="daylight-high-contrast"] textarea {
+  background-color: #f0f4f8;
+  color: #0a192f;
+  border: 1px solid rgba(10, 25, 47, 0.24);
+}
+
+/* Strict Night Red-Shift enforcement: ZERO white pixels in night mode */
+[data-theme="night-red-shift"] *,
+[data-theme="night-red-shift"] ::before,
+[data-theme="night-red-shift"] ::after {
+  border-color: rgba(255, 0, 0, 0.35);
+}
+
+[data-theme="night-red-shift"] .text-white,
+[data-theme="night-red-shift"] .text-slate-100,
+[data-theme="night-red-shift"] .text-slate-200 {
+  color: #ff0000 !important;
+}
+
+[data-theme="night-red-shift"] input,
+[data-theme="night-red-shift"] select,
+[data-theme="night-red-shift"] textarea {
+  background-color: #000000 !important;
+  color: #ff0000 !important;
+  border-color: rgba(255, 0, 0, 0.55) !important;
+}
+
+/* MapLibre Night Red-Shift filter */
+[data-theme="night-red-shift"] .maplibregl-canvas {
+  filter: grayscale(100%) brightness(42%) sepia(100%) hue-rotate(-50deg) saturate(700%) contrast(1.5);
+}
+
+/* Clean MapLibre controls in dark mode */
+.maplibregl-ctrl-group {
+  background: rgba(10, 25, 47, 0.88) !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+}
+
+.maplibregl-ctrl-group button {
+  filter: invert(1);
+}
+
+[data-theme="daylight-high-contrast"] .maplibregl-ctrl-group {
+  background: rgba(240, 244, 248, 0.95) !important;
+  border: 1px solid rgba(10, 25, 47, 0.2) !important;
+}
+
+[data-theme="daylight-high-contrast"] .maplibregl-ctrl-group button {
+  filter: none;
+}
