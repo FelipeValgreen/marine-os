@@ -59,6 +59,26 @@ const nextConfig = {
         permanent: false,
       },
       {
+        source: "/fleet",
+        destination: "/?section=fleet",
+        permanent: false,
+      },
+      {
+        source: "/crew",
+        destination: "/?section=crew",
+        permanent: false,
+      },
+      {
+        source: "/integrations",
+        destination: "/?section=integrations",
+        permanent: false,
+      },
+      {
+        source: "/settings",
+        destination: "/?section=integrations",
+        permanent: false,
+      },
+      {
         source: "/qr",
         destination: "/?section=gemelo",
         permanent: false,

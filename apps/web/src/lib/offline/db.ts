@@ -202,7 +202,23 @@ export interface UserPreferencesRecord {
   tooltip_gps_seen: boolean;
   tooltip_zarpe_pdf_seen: boolean;
   completed_lessons: string[];
+  /** Vessel currently operated by the user (Fleet Manager). Falls back to the demo vessel. */
+  active_vessel_id?: string;
   updated_at: string;
+}
+
+export type MarketplaceOrderStatus =
+  | "quoted_offline"
+  | "confirmed"
+  | "dispatched"
+  | "in_transit"
+  | "delivered"
+  | "cancelled";
+
+export interface MarketplaceOrderStatusEvent {
+  status: MarketplaceOrderStatus;
+  at: string;
+  note?: string;
 }
 
 export interface MarketplaceOrderRecord {
@@ -214,8 +230,77 @@ export interface MarketplaceOrderRecord {
   arrival_port: string;
   supplier_name: string;
   estimated_price_usd: number;
-  status: "quoted_offline" | "dispatched";
+  status: MarketplaceOrderStatus;
+  status_history?: MarketplaceOrderStatusEvent[];
+  tracking_code?: string;
   created_at: string;
+  updated_at?: string;
+}
+
+export type IntegrationTestStatus = "untested" | "ok" | "warning" | "error";
+
+export interface IntegrationTestResult {
+  status: IntegrationTestStatus;
+  message: string;
+  tested_at: string | null;
+}
+
+export interface SignalKIntegrationConfig {
+  enabled: boolean;
+  protocol: "http" | "https";
+  host: string;
+  port: number;
+  last_test: IntegrationTestResult;
+}
+
+export interface DirectemarIntegrationConfig {
+  enabled: boolean;
+  environment: "sandbox" | "production";
+  username: string;
+  /** Stored only on-device. Never enqueued to sync_queue in clear text. */
+  api_key: string;
+  vessel_registration: string;
+  last_test: IntegrationTestResult;
+}
+
+export interface SatelliteIntegrationConfig {
+  enabled: boolean;
+  provider: "none" | "iridium_go" | "garmin_inreach";
+  /** Iridium GO! local Wi-Fi host (default 192.168.10.1). */
+  iridium_host: string;
+  /** Iridium IMEI or Garmin inReach IMEI. */
+  device_imei: string;
+  /** Garmin MapShare identifier (share.garmin.com/<id>). */
+  mapshare_id: string;
+  emergency_contact: string;
+  last_test: IntegrationTestResult;
+}
+
+export interface IntegrationSettingsRecord {
+  id: string;
+  signalk: SignalKIntegrationConfig;
+  directemar: DirectemarIntegrationConfig;
+  satellite: SatelliteIntegrationConfig;
+  updated_at: string;
+}
+
+export interface CrewContactRecord {
+  id: string;
+  full_name: string;
+  document_type: string;
+  document_number: string;
+  nationality: string;
+  default_role: "skipper" | "crew" | "guest";
+  license_type?: string;
+  license_expiry?: string;
+  phone?: string;
+  email?: string;
+  notes?: string;
+  ocr_verified: boolean;
+  voyages_count: number;
+  last_embarked_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserProfileAccount {
@@ -236,6 +321,8 @@ export interface UserProfileAccount {
   vhfOperatorCert: string;
   loggedMilesNm: number;
   avatarInitials: string;
+  /** Optional downscaled JPEG data URL (stored locally in IndexedDB). */
+  avatarDataUrl?: string;
   updated_at?: string;
 }
 
@@ -310,6 +397,8 @@ export class MarineOSDatabase extends Dexie {
   user_profiles!: Table<UserProfileAccount, string>;
   user_preferences!: Table<UserPreferencesRecord, string>;
   marketplace_orders!: Table<MarketplaceOrderRecord, string>;
+  integration_settings!: Table<IntegrationSettingsRecord, string>;
+  crew_contacts!: Table<CrewContactRecord, string>;
 
   constructor() {
     super("MarineOSLocalFirstDB");
@@ -331,10 +420,130 @@ export class MarineOSDatabase extends Dexie {
       user_preferences: "id",
       marketplace_orders: "id, voyage_id, vessel_id, arrival_port, created_at",
     });
+    // v6: Integration Hub settings + Crew Address Book (Dexie merges with v5 schema)
+    this.version(6).stores({
+      integration_settings: "id",
+      crew_contacts: "id, document_number, full_name, license_expiry",
+    });
   }
 }
 
 export const db = new MarineOSDatabase();
+
+// ===========================================================================
+// INTEGRATION HUB DEFAULTS
+// ===========================================================================
+export const INTEGRATION_SETTINGS_ID = "default";
+
+const UNTESTED: IntegrationTestResult = {
+  status: "untested",
+  message: "Sin probar",
+  tested_at: null,
+};
+
+export function createDefaultIntegrationSettings(): IntegrationSettingsRecord {
+  return {
+    id: INTEGRATION_SETTINGS_ID,
+    signalk: {
+      enabled: false,
+      protocol: "http",
+      host: "",
+      port: 3000,
+      last_test: { ...UNTESTED },
+    },
+    directemar: {
+      enabled: false,
+      environment: "sandbox",
+      username: "",
+      api_key: "",
+      vessel_registration: "",
+      last_test: { ...UNTESTED },
+    },
+    satellite: {
+      enabled: false,
+      provider: "none",
+      iridium_host: "192.168.10.1",
+      device_imei: "",
+      mapshare_id: "",
+      emergency_contact: "",
+      last_test: { ...UNTESTED },
+    },
+    updated_at: new Date().toISOString(),
+  };
+}
+
+/** Returns stored integration settings merged over defaults (tolerates partial records). */
+export async function getIntegrationSettings(): Promise<IntegrationSettingsRecord> {
+  const defaults = createDefaultIntegrationSettings();
+  const stored = await db.integration_settings.get(INTEGRATION_SETTINGS_ID);
+  if (!stored) return defaults;
+  return {
+    ...defaults,
+    ...stored,
+    signalk: { ...defaults.signalk, ...stored.signalk },
+    directemar: { ...defaults.directemar, ...stored.directemar },
+    satellite: { ...defaults.satellite, ...stored.satellite },
+  };
+}
+
+// ===========================================================================
+// CREW ADDRESS BOOK HELPERS
+// ===========================================================================
+export function normalizeDocumentNumber(doc: string): string {
+  return doc.replace(/[^0-9a-zA-Z]/g, "").toUpperCase();
+}
+
+export function crewContactIdFor(documentNumber: string): string {
+  return `crew-contact-${normalizeDocumentNumber(documentNumber)}`;
+}
+
+/**
+ * Upserts a crew member into the frequent-crew address book, keyed by normalized
+ * document number so re-saving the same person updates instead of duplicating.
+ */
+export async function saveCrewContactFromVoyageCrew(
+  member: Pick<
+    VoyageCrewRecord,
+    | "full_name"
+    | "document_type"
+    | "document_number"
+    | "nationality"
+    | "role"
+    | "license_type"
+    | "license_expiry"
+    | "ocr_verified"
+  >
+): Promise<CrewContactRecord> {
+  const id = crewContactIdFor(member.document_number);
+  const now = new Date().toISOString();
+  const existing = await db.crew_contacts.get(id);
+  const record: CrewContactRecord = {
+    id,
+    full_name: member.full_name.trim(),
+    document_type: member.document_type,
+    document_number: member.document_number.trim(),
+    nationality: member.nationality,
+    default_role: member.role,
+    license_type: member.license_type,
+    license_expiry: member.license_expiry,
+    phone: existing?.phone,
+    email: existing?.email,
+    notes: existing?.notes,
+    ocr_verified: member.ocr_verified || existing?.ocr_verified || false,
+    voyages_count: existing?.voyages_count ?? 0,
+    last_embarked_at: existing?.last_embarked_at,
+    created_at: existing?.created_at ?? now,
+    updated_at: now,
+  };
+  await db.crew_contacts.put(record);
+  await enqueueOfflineMutation({
+    table_name: "crew_contacts",
+    operation: "UPSERT",
+    record_id: id,
+    payload: record as unknown as Record<string, unknown>,
+  });
+  return record;
+}
 
 export const DEMO_IDS = {
   ORG_ID: "11111111-1111-1111-1111-111111111111",

@@ -274,3 +274,37 @@ textarea {
 [data-theme="daylight-high-contrast"] .maplibregl-ctrl-group button {
   filter: none;
 }
+
+/* Tactical Semaphore & Status Tint Utilities */
+.mo-tint-ok {
+  background-color: rgba(0, 230, 118, 0.12);
+  border-color: rgba(0, 230, 118, 0.45);
+  color: var(--status-ok);
+}
+
+.mo-tint-warn {
+  background-color: rgba(255, 159, 10, 0.12);
+  border-color: rgba(255, 159, 10, 0.45);
+  color: var(--status-warn);
+}
+
+.mo-tint-danger {
+  background-color: rgba(255, 45, 85, 0.15);
+  border-color: rgba(255, 45, 85, 0.55);
+  color: var(--status-danger);
+}
+
+.mo-tint-muted {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+}
+
+[data-theme="night-red-shift"] .mo-tint-ok,
+[data-theme="night-red-shift"] .mo-tint-warn,
+[data-theme="night-red-shift"] .mo-tint-danger,
+[data-theme="night-red-shift"] .mo-tint-muted {
+  background-color: rgba(255, 0, 0, 0.12) !important;
+  border-color: rgba(255, 0, 0, 0.5) !important;
+  color: #ff0000 !important;
+}

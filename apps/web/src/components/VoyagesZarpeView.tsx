@@ -13,12 +13,16 @@ import {
   Sparkles,
   RadioTower,
   QrCode,
+  BookmarkPlus,
+  Users,
 } from "lucide-react";
 import {
   db,
   DEMO_IDS,
   enqueueOfflineMutation,
+  saveCrewContactFromVoyageCrew,
   type VoyageCrewRecord,
+  type CrewContactRecord,
 } from "@/lib/offline/db";
 import { useMarineContext } from "@/components/ThemeProvider";
 import { computeSHA256Hex } from "@/lib/nautical";
@@ -86,6 +90,35 @@ export function VoyagesZarpeView({
     sha256Hash: string;
     tokenBadge?: string;
   } | null>(null);
+
+  const savedContacts = useLiveQuery(() => db.crew_contacts.toArray(), [], []);
+  const [saveToAddressBook, setSaveToAddressBook] = useState(true);
+  const [showDirectoryPicker, setShowDirectoryPicker] = useState(false);
+
+  const handleLoadFromDirectory = (c: CrewContactRecord) => {
+    setFullName(c.full_name);
+    setDocType(c.document_type);
+    setDocNumber(c.document_number);
+    setNationality(c.nationality);
+    setRole(c.default_role);
+    if (c.license_type) setLicenseType(c.license_type);
+    if (c.license_expiry) setLicenseExpiry(c.license_expiry);
+    setShowDirectoryPicker(false);
+    pushToast({
+      title: "Datos Cargados desde Libreta",
+      subtitle: `${c.full_name} (${c.document_number})`,
+      tone: "cyan",
+    });
+  };
+
+  const handleSaveExistingToDirectory = async (m: VoyageCrewRecord) => {
+    await saveCrewContactFromVoyageCrew(m);
+    pushToast({
+      title: "Guardado en Libreta de Tripulación",
+      subtitle: `${m.full_name} disponible para futuros zarpes`,
+      tone: "emerald",
+    });
+  };
 
   const handleRunMultimodalOCR = async (
     presetType: "felipe" | "skipper" | "crew" | "passport"
@@ -197,9 +230,15 @@ export function VoyagesZarpeView({
       payload: newMember as unknown as Record<string, unknown>,
     });
 
+    if (saveToAddressBook) {
+      await saveCrewContactFromVoyageCrew(newMember);
+    }
+
     pushToast({
       title: `Tripulante Inscrito: ${newMember.full_name}`,
-      subtitle: "Guardado en IndexedDB y encolado en sync_queue",
+      subtitle: saveToAddressBook
+        ? "Guardado en Rol de Zarpe y en Libreta de Tripulación"
+        : "Guardado en IndexedDB y encolado en sync_queue",
       tone: "emerald",
     });
 
@@ -621,6 +660,43 @@ export function VoyagesZarpeView({
             </button>
           </div>
 
+          {/* Frequent Crew Address Book Quick Picker */}
+          {savedContacts && savedContacts.length > 0 && (
+            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                  <span>Libreta de Tripulación Frecuente ({savedContacts.length})</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowDirectoryPicker(!showDirectoryPicker)}
+                  className="text-xs font-mono text-[var(--accent-primary)] hover:underline"
+                >
+                  {showDirectoryPicker ? "Cerrar" : "Cargar Tripulante"}
+                </button>
+              </div>
+
+              {showDirectoryPicker && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 max-h-48 overflow-y-auto pr-1">
+                  {savedContacts.map((contact) => (
+                    <button
+                      key={contact.id}
+                      type="button"
+                      onClick={() => handleLoadFromDirectory(contact)}
+                      className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-left font-mono text-xs transition"
+                    >
+                      <div className="font-semibold truncate">{contact.full_name}</div>
+                      <div className="text-[10px] opacity-70 truncate">
+                        {contact.document_type}: {contact.document_number} • {contact.default_role}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {ocrNotes && (
             <div className="p-3.5 rounded-xl bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/25 font-mono text-xs text-[var(--accent-primary)]">
               {ocrNotes}
@@ -741,6 +817,21 @@ export function VoyagesZarpeView({
               </label>
             </div>
 
+            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={saveToAddressBook}
+                  onChange={(e) => setSaveToAddressBook(e.target.checked)}
+                  className="w-4 h-4 shrink-0"
+                />
+                <span className="text-xs font-mono opacity-85 flex items-center gap-1.5">
+                  <BookmarkPlus className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                  <span>Guardar en Libreta de Tripulación Frecuente</span>
+                </span>
+              </label>
+            </div>
+
             <button
               type="submit"
               data-testid="submit-crew-member-btn"
@@ -785,11 +876,22 @@ export function VoyagesZarpeView({
                   </div>
                 </div>
 
-                <div className="flex flex-col items-start sm:items-end gap-1">
-                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#00E676]">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    {member.ocr_verified ? "OCR VALIDADO" : "MANUAL"}
-                  </span>
+                <div className="flex flex-col items-start sm:items-end gap-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-[#00E676]">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      {member.ocr_verified ? "OCR VALIDADO" : "MANUAL"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleSaveExistingToDirectory(member)}
+                      title="Guardar en Libreta de Tripulación Frecuente"
+                      className="px-2 py-0.5 rounded text-[10px] font-mono border border-white/10 hover:bg-white/10 text-[var(--accent-primary)] inline-flex items-center gap-1"
+                    >
+                      <BookmarkPlus className="w-3 h-3" />
+                      <span>Guardar</span>
+                    </button>
+                  </div>
                   {member.license_expiry && (
                     <span className="text-[11px] font-mono opacity-60">
                       Vence: {member.license_expiry}

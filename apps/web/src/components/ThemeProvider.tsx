@@ -27,6 +27,9 @@ import {
   Search,
   PanelLeftClose,
   PanelLeftOpen,
+  Users,
+  Sliders,
+  Anchor,
 } from "lucide-react";
 import {
   db,
@@ -56,8 +59,11 @@ export type MarineSection =
   | "bridge"
   | "vessel"
   | "voyages"
-  | "handover"
+  | "fleet"
+  | "crew"
   | "logbook"
+  | "integrations"
+  | "handover"
   | "academy";
 
 export interface ToastNotification {
@@ -135,24 +141,45 @@ const NAV_ITEMS: {
     icon: FileCheck2,
   },
   {
-    id: "handover",
-    label: "Handover • Sello SHA-256",
-    shortLabel: "Handover",
+    id: "fleet",
+    label: "Fleet • Gestor de Flota",
+    shortLabel: "Flota",
     shortcut: "⌘4",
-    icon: ShieldCheck,
+    icon: Anchor,
+  },
+  {
+    id: "crew",
+    label: "Crew • Libreta Tripulación",
+    shortLabel: "Tripulantes",
+    shortcut: "⌘5",
+    icon: Users,
   },
   {
     id: "logbook",
     label: "Pasaporte & Bitácora Voz",
     shortLabel: "Passport",
-    shortcut: "⌘5",
+    shortcut: "⌘6",
     icon: BookOpen,
+  },
+  {
+    id: "integrations",
+    label: "Integraciones • NMEA & Sat",
+    shortLabel: "Hub",
+    shortcut: "⌘7",
+    icon: Sliders,
+  },
+  {
+    id: "handover",
+    label: "Handover • Sello SHA-256",
+    shortLabel: "Handover",
+    shortcut: "⌘8",
+    icon: ShieldCheck,
   },
   {
     id: "academy",
     label: "Marine Academy 🛟",
     shortLabel: "Academy",
-    shortcut: "⌘6",
+    shortcut: "⌘9",
     icon: LifeBuoy,
   },
 ];
@@ -214,9 +241,25 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const sec = params.get("section") as MarineSection | null;
     if (
       sec &&
-      ["bridge", "gemelo", "voyages", "inspections", "logbook", "academy"].includes(sec)
+      [
+        "bridge",
+        "vessel",
+        "gemelo",
+        "voyages",
+        "fleet",
+        "crew",
+        "logbook",
+        "passport",
+        "integrations",
+        "handover",
+        "inspections",
+        "academy",
+      ].includes(sec)
     ) {
-      setActiveSectionState(sec);
+      if (sec === ("gemelo" as unknown)) setActiveSectionState("vessel");
+      else if (sec === ("inspections" as unknown)) setActiveSectionState("handover");
+      else if (sec === ("passport" as unknown)) setActiveSectionState("logbook");
+      else setActiveSectionState(sec);
     }
   }, [pathname]);
 
@@ -962,12 +1005,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         {!isLoginRoute && (
           <nav
             aria-label="Mobile Bottom Navigation"
-            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t grid grid-cols-6 ${
+            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t flex items-center overflow-x-auto no-scrollbar px-1 py-0.5 justify-start sm:justify-center gap-1 ${
               isNight
                 ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
                 : isDaylight
                 ? "bg-[#F0F4F8]/95 backdrop-blur-2xl border-slate-300 text-[#0A192F]"
-                : "backdrop-blur-2xl bg-black/80 border-white/10 text-slate-200"
+                : "backdrop-blur-2xl bg-black/85 border-white/10 text-slate-200"
             }`}
           >
             {NAV_ITEMS.map((item) => {
@@ -978,18 +1021,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   key={item.id}
                   type="button"
                   onClick={() => setActiveSection(item.id)}
-                  className={`min-h-[64px] flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition ${
+                  className={`min-h-[60px] min-w-[62px] px-2 flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold shrink-0 transition rounded-xl ${
                     isCurrent
                       ? isNight
-                        ? "text-[#FF0000] font-black"
+                        ? "text-[#FF0000] font-black bg-[#FF0000]/15"
                         : isDaylight
-                        ? "text-[#D94A1A] font-black"
-                        : "text-[var(--accent-primary)] font-black"
-                      : "opacity-65"
+                        ? "text-[#D94A1A] font-black bg-[#D94A1A]/10"
+                        : "text-[var(--accent-primary)] font-black bg-white/10"
+                      : "opacity-65 hover:opacity-100"
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.shortLabel}</span>
+                  <Icon className="w-4 h-4" />
+                  <span className="truncate max-w-[64px]">{item.shortLabel}</span>
                 </button>
               );
             })}

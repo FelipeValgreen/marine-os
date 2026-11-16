@@ -19,6 +19,9 @@ import {
   CornerDownLeft,
   X,
   PlusCircle,
+  Users,
+  Sliders,
+  Anchor,
 } from "lucide-react";
 import { db, DEMO_IDS, enqueueOfflineMutation } from "@/lib/offline/db";
 import { triggerHapticFeedback, formatNauticalCoordsDMS } from "@/lib/nautical";
@@ -225,6 +228,45 @@ export function CommandCenter({
         icon: FileCheck2,
         action: () => {
           onNavigateSection("voyages");
+          onClose();
+        },
+      },
+      {
+        id: "cmd-fleet",
+        title: "Gestor de Flota & Barcos (Fleet Manager)",
+        subtitle: "Administrar barcos, cambiar nave activa y calados",
+        category: "NAVEGACIÓN",
+        keywords: "flota fleet barcos veleros embarcaciones eslora manga",
+        shortcut: "G F",
+        icon: Anchor,
+        action: () => {
+          onNavigateSection("fleet");
+          onClose();
+        },
+      },
+      {
+        id: "cmd-crew",
+        title: "Libreta de Tripulación Frecuente (Crew Directory)",
+        subtitle: "Directorio de tripulantes, semáforo de licencias e inyección rápida",
+        category: "NAVEGACIÓN",
+        keywords: "tripulacion tripulantes crew libreta directorio rut licencias",
+        shortcut: "G C",
+        icon: Users,
+        action: () => {
+          onNavigateSection("crew");
+          onClose();
+        },
+      },
+      {
+        id: "cmd-integrations",
+        title: "Integration Hub (NMEA 2000, DIRECTEMAR, Satelital)",
+        subtitle: "Configurar IP Gateway Signal K, e-Zarpe API y satélite Iridium",
+        category: "NAVEGACIÓN",
+        keywords: "integraciones hub nmea signalk directemar satelite iridium garmin config ip",
+        shortcut: "G I",
+        icon: Sliders,
+        action: () => {
+          onNavigateSection("integrations");
           onClose();
         },
       },
