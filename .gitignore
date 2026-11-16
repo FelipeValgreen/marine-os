@@ -28,3 +28,7 @@ __pycache__/
 
 # OS metadata
 .DS_Store
+
+# Supabase CLI temp files
+supabase/.temp/
+**/.temp/

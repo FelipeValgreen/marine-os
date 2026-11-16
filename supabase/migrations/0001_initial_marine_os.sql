@@ -1,9 +1,9 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "postgis";
 CREATE EXTENSION IF NOT EXISTS "vector";
 
 CREATE TABLE organizations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     tax_id TEXT,
     country_code CHAR(2) DEFAULT 'CL',
@@ -12,7 +12,7 @@ CREATE TABLE organizations (
 );
 
 CREATE TABLE vessels (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     registration_number TEXT UNIQUE,
@@ -29,7 +29,7 @@ CREATE TABLE vessels (
 );
 
 CREATE TABLE vessel_systems_qr (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     vessel_id UUID REFERENCES vessels(id) ON DELETE CASCADE,
     qr_slug TEXT UNIQUE NOT NULL,
     system_name TEXT NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE vessel_systems_qr (
 );
 
 CREATE TABLE inventory_items (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     vessel_id UUID REFERENCES vessels(id) ON DELETE CASCADE,
     qr_node_id UUID REFERENCES vessel_systems_qr(id) ON DELETE SET NULL,
     item_name TEXT NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE inventory_items (
 );
 
 CREATE TABLE anchorages_spatial (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     country_code CHAR(2),
     location GEOMETRY(Point, 4326) NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE anchorages_spatial (
 CREATE INDEX idx_anchorages_location ON anchorages_spatial USING GIST (location);
 
 CREATE TABLE voyages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     vessel_id UUID REFERENCES vessels(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     status TEXT CHECK (status IN ('draft', 'checkin_pending', 'active', 'completed')) DEFAULT 'draft',
@@ -77,14 +77,14 @@ CREATE TABLE voyages (
     estimated_arrival_at TIMESTAMPTZ,
     route_geom GEOMETRY(LineString, 4326),
     gpx_raw_url TEXT,
-    magic_link_token TEXT UNIQUE DEFAULT encode(gen_random_bytes(16), 'hex'),
+    magic_link_token TEXT UNIQUE DEFAULT replace(gen_random_uuid()::text, '-', ''),
     security_deposit_amount NUMERIC(10,2),
     security_deposit_status TEXT DEFAULT 'pending',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE voyage_crew (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     voyage_id UUID REFERENCES voyages(id) ON DELETE CASCADE,
     role TEXT CHECK (role IN ('skipper', 'crew', 'guest')) DEFAULT 'crew',
     full_name TEXT NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE voyage_crew (
 );
 
 CREATE TABLE handover_inspections (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     voyage_id UUID REFERENCES voyages(id) ON DELETE CASCADE,
     inspection_type TEXT CHECK (inspection_type IN ('checkin', 'checkout')) NOT NULL,
     checklist_data JSONB NOT NULL,
@@ -111,7 +111,7 @@ CREATE TABLE handover_inspections (
 );
 
 CREATE TABLE vessel_manual_chunks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     vessel_id UUID REFERENCES vessels(id) ON DELETE CASCADE,
     manual_title TEXT NOT NULL,
     page_number INTEGER,
