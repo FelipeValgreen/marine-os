@@ -15,6 +15,7 @@ import {
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, DEMO_IDS } from "@/lib/offline/db";
 import { useMarineContext } from "@/components/ThemeProvider";
+import { getApiBaseUrl } from "@/lib/api";
 
 export interface CopilotTelemetryContext {
   lat: number;
@@ -184,7 +185,7 @@ export function MarineCopilot({
     const queryText = customQuery ?? question;
     if (!queryText.trim()) return;
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const API_URL = getApiBaseUrl();
     setLoading(true);
     try {
       if (!isOffline) {

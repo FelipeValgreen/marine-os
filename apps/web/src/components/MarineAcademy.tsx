@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { getApiBaseUrl } from "@/lib/api";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   LifeBuoy,
@@ -135,7 +136,7 @@ export function MarineAcademy({
     const qText = customQuery ?? supportQuestion;
     if (!qText.trim()) return;
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const API_URL = getApiBaseUrl();
     setSupportLoading(true);
     try {
       if (!isOffline) {

@@ -1,4 +1,5 @@
 import Dexie, { type Table } from "dexie";
+import { getApiBaseUrl } from "@/lib/api";
 
 export interface OrganizationRecord {
   id: string;
@@ -871,7 +872,7 @@ export async function enqueueOfflineMutation(params: {
   return item;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = getApiBaseUrl();
 
 /**
  * Flushes pending `sync_queue` items to FastAPI `/api/v1/sync/batch` when online.

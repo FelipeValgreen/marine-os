@@ -153,7 +153,9 @@ function evaluateLicenseExpirySemaphore(expiryDateStr: string): {
   };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { getApiBaseUrl } from "@/lib/api";
+
+const API_URL = getApiBaseUrl();
 
 export default function MarineOSHomePage() {
   const {

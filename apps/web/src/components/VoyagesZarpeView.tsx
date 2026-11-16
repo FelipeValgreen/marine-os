@@ -24,8 +24,9 @@ import { useMarineContext } from "@/components/ThemeProvider";
 import { computeSHA256Hex } from "@/lib/nautical";
 import { ContextualTooltip } from "@/components/ContextualTooltip";
 import { CryptoStampOverlay } from "@/components/CryptoStampOverlay";
+import { getApiBaseUrl } from "@/lib/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = getApiBaseUrl();
 
 export function VoyagesZarpeView({
   magicToken = DEMO_IDS.MAGIC_TOKEN,

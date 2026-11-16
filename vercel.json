@@ -1,0 +1,36 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "marine-os-api": {
+      "root": "apps/api",
+      "framework": "fastapi",
+      "buildCommand": "pip install -r requirements.txt"
+    },
+    "web": {
+      "root": "apps/web",
+      "framework": "nextjs",
+      "bindings": [
+        { 
+          "type": "service", 
+          "service": "marine-os-api", 
+          "format": "url", 
+          "env": "INTERNAL_MARINE_API_URL" 
+        }
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "marine-os-api"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "web"
+      }
+    }
+  ]
+}
