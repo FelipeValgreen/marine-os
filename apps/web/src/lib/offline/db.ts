@@ -285,6 +285,30 @@ export interface IntegrationSettingsRecord {
   updated_at: string;
 }
 
+export type CommunityReportType =
+  | "anchorage_hazard"
+  | "holding_ground"
+  | "shelter_tip"
+  | "navigation_warning";
+
+export interface CommunityReportRecord {
+  id: string;
+  author_name: string;
+  author_license?: string;
+  vessel_name: string;
+  anchorage_slug?: string;
+  lat: number;
+  lon: number;
+  report_type: CommunityReportType;
+  title: string;
+  content: string;
+  wind_conditions?: string;
+  chain_payout_m?: number;
+  seabed_type?: string;
+  upvotes: number;
+  created_at: string;
+}
+
 export interface CrewContactRecord {
   id: string;
   full_name: string;
@@ -402,6 +426,7 @@ export class MarinOSDatabase extends Dexie {
   integration_settings!: Table<IntegrationSettingsRecord, string>;
   crew_contacts!: Table<CrewContactRecord, string>;
   frequent_crew!: Table<CrewContactRecord, string>;
+  community_reports!: Table<CommunityReportRecord, string>;
 
   constructor() {
     super("MarinOSLocalFirstDB");
@@ -431,6 +456,10 @@ export class MarinOSDatabase extends Dexie {
     // v7: frequent_crew table
     this.version(7).stores({
       frequent_crew: "id, document_number, full_name, license_expiry",
+    });
+    // v8: community_reports table (Waze Náutico)
+    this.version(8).stores({
+      community_reports: "id, anchorage_slug, report_type, author_name, created_at",
     });
   }
 }
@@ -1116,6 +1145,84 @@ export async function ensureDemoSeedData(): Promise<void> {
                 { lat: -42.3590, lon: -73.5110, sog_kn: 7.4, cog_deg: 252, depth_m: 19.5, timestamp: "11:45 UTC" },
                 { lat: -42.3810, lon: -73.6510, sog_kn: 3.1, cog_deg: 248, depth_m: 5.8, timestamp: "13:10 UTC" },
               ],
+            },
+          ]);
+        }
+
+        const reportsCount = await db.community_reports.count();
+        if (reportsCount === 0) {
+          await db.community_reports.bulkPut([
+            {
+              id: "report-mechuque-garreo",
+              author_name: "Cap. Roberto Valenzuela",
+              author_license: "Capitán Deportivo Alta Mar",
+              vessel_name: "SV Patagonia Sur",
+              anchorage_slug: "caleta-mechuque",
+              lat: -42.3125,
+              lon: -73.2680,
+              report_type: "anchorage_hazard",
+              title: "Alerta de Garreo con Viento Norte",
+              content:
+                "Fondo de arena dura garreando con ráfagas Norte de 28kt. Tiré 60m de cadena con ancla Rocna 25kg. Tenedero inestable con marea vaciante.",
+              wind_conditions: "28 kn N / NW",
+              chain_payout_m: 60,
+              seabed_type: "Arena dura / Cascajo",
+              upvotes: 18,
+              created_at: new Date(Date.now() - 86400000).toISOString(),
+            },
+            {
+              id: "report-la-arena-holding",
+              author_name: "Cap. Francisco Morales",
+              author_license: "Patrón Deportivo Costero",
+              vessel_name: "SY Caleuche",
+              anchorage_slug: "caleta-la-arena",
+              lat: -41.6917,
+              lon: -72.6417,
+              report_type: "holding_ground",
+              title: "Excelente Tenedero Fango & Abrigo W",
+              content:
+                "Excelente tenedero fango blando, agarre instantáneo con 35m de cadena. Abrigo total contra vientos del Oeste y Suroeste. Muelle artesanal tiene agua dulce.",
+              wind_conditions: "18 kn WSW",
+              chain_payout_m: 35,
+              seabed_type: "Fango compacto",
+              upvotes: 24,
+              created_at: new Date(Date.now() - 172800000).toISOString(),
+            },
+            {
+              id: "report-tenglo-shoal",
+              author_name: "Patrona Marcela Silva",
+              author_license: "Patrón Deportivo de Bahía",
+              vessel_name: "M/Y Reloncaví Express",
+              anchorage_slug: "isla-tenglo-sur",
+              lat: -41.5120,
+              lon: -72.9580,
+              report_type: "navigation_warning",
+              title: "Restricción de Calado en Bajamar de Sicigia",
+              content:
+                "Ojo con el banco de arena saliendo del Canal Tenglo hacia el sur. En bajamar la sonda marcó 1.8m. Embarcaciones con calado >1.8m esperar media marea.",
+              wind_conditions: "12 kn S",
+              chain_payout_m: 20,
+              seabed_type: "Arena y conchuela",
+              upvotes: 31,
+              created_at: new Date(Date.now() - 259200000).toISOString(),
+            },
+            {
+              id: "report-poyo-puelche",
+              author_name: "Cap. Álvaro Gómez",
+              author_license: "Capitán Alta Mar",
+              vessel_name: "SV Viento Austral",
+              anchorage_slug: "estero-reloncavi-poyo",
+              lat: -41.7820,
+              lon: -72.5410,
+              report_type: "shelter_tip",
+              title: "Abrigo Seguro para Racha Puelche",
+              content:
+                "Fondeadero protegido contra rachas catabáticas del Puelche (este). Agua calma como una taza. Fondo de arcilla tenaz. Mantener distancia de 50m de boyas de cultivo.",
+              wind_conditions: "22 kn E (Puelche)",
+              chain_payout_m: 45,
+              seabed_type: "Arcilla volcánica",
+              upvotes: 15,
+              created_at: new Date(Date.now() - 345600000).toISOString(),
             },
           ]);
         }

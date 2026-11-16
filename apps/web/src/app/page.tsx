@@ -34,6 +34,11 @@ import {
   Truck,
   PackageCheck,
   Package,
+  Share2,
+  CheckCircle2,
+  MessageCircle,
+  Copy,
+  Check,
 } from "lucide-react";
 import {
   db,
@@ -216,6 +221,49 @@ export default function MarineOSHomePage() {
   const [logbookTab, setLogbookTab] = useState<"entries" | "marketplace">("entries");
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   const [profileFormData, setProfileFormData] = useState<Partial<UserProfileAccount>>({});
+
+  // Split-Bill & Social Trophy Passport State
+  const [isSharingPassport, setIsSharingPassport] = useState<boolean>(false);
+  const [copiedShareLink, setCopiedShareLink] = useState<boolean>(false);
+  const [settledCrewIds, setSettledCrewIds] = useState<Record<string, boolean>>({});
+
+  const handleToggleCrewSettlement = (memberId: string) => {
+    setSettledCrewIds((prev) => ({
+      ...prev,
+      [memberId]: !prev[memberId],
+    }));
+  };
+
+  const handleSendWhatsAppSplitReminder = (payerName: string, amountUsd: number) => {
+    const clpEstimate = Math.round(amountUsd * 950).toLocaleString("es-CL");
+    const msg = `⚓ *MarinOS FinOps • División de Gastos de Travesía*\n\nHola tripulación! El total de gastos registrados para la travesía a bordo del ${vessel?.name || "SV Albatros"} da un saldo de:\n👉 *$${amountUsd} USD* (~$${clpEstimate} CLP) por tripulante.\n\nPor favor transferir a *${payerName}*.\nDetalles en MarinOS: ${typeof window !== "undefined" ? window.location.origin : "https://marinos.app"}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    if (typeof window !== "undefined") {
+      window.open(url, "_blank");
+    }
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(msg).catch(() => {});
+    }
+    pushToast({
+      title: "Recordatorio de Gastos Generado",
+      subtitle: "Mensaje copiado y abriendo WhatsApp...",
+      tone: "emerald",
+    });
+  };
+
+  const handleCopyTrophyText = () => {
+    const text = `🏆 *Pasaporte Náutico Digital • MarinOS*\nCapitán: ${activeAccount.name}\nLicencia: ${activeAccount.licenseType}\nMillas Registradas: ${totalSeaTimeMilesNm} MN\nEmbarcación: ${vessel?.name || "SV Albatros"}\nInsignias: Cruce Golfo de Ancud • Veterano de Chiloé (1500+ MN) • Fondeo Seguro (10+ Noches) • DIRECTEMAR Verified.\nVerificado con hash SHA-256 en MarinOS Local-First.`;
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text).catch(() => {});
+      setCopiedShareLink(true);
+      setTimeout(() => setCopiedShareLink(false), 2500);
+    }
+    pushToast({
+      title: "Trofeo Digital Copiado",
+      subtitle: "Texto listo para Instagram Stories o WhatsApp",
+      tone: "cyan",
+    });
+  };
 
   const handleOpenEditProfile = () => {
     setProfileFormData({
@@ -2226,6 +2274,28 @@ export default function MarineOSHomePage() {
                             {activeAccount.vhfOperatorCert}
                           </span>
                         </div>
+
+                        {/* Insignias de Logros (Gamificación y Prestigio Náutico) */}
+                        <div className="space-y-1.5 pt-2">
+                          <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold flex items-center gap-1.5">
+                            <Award className="w-3.5 h-3.5" />
+                            <span>INSIGNIAS DE LOGROS • PRESTIGIO NÁUTICO</span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 font-semibold shadow-sm">
+                              <span>🌊</span> Cruce Golfo de Ancud
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/30 font-semibold shadow-sm">
+                              <span>⚓</span> Veterano de Chiloé: 1500+ MN
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30 font-semibold shadow-sm">
+                              <span>🛡️</span> Fondeo Seguro: 10 Noches
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 text-white border border-white/20 font-semibold shadow-sm">
+                              <span>🇨🇱</span> DIRECTEMAR Verificado
+                            </span>
+                          </div>
+                        </div>
                       </div>
 
                       {/* Simulated Vector QR Code for Port Authority Verification */}
@@ -2350,6 +2420,15 @@ export default function MarineOSHomePage() {
                     {/* Wallet Interactive Controls (Test Semaphore & License Tier Offline in IndexedDB) */}
                     <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          data-testid="share-passport-trophy-btn"
+                          onClick={() => setIsSharingPassport(true)}
+                          className="marine-btn text-xs px-3.5 bg-gradient-to-r from-[var(--accent-primary)] to-[#FF7043] text-white font-semibold shadow-lg shadow-[var(--accent-primary)]/20 hover:brightness-110"
+                        >
+                          <Share2 className="w-4 h-4" />
+                          <span>Compartir mi Perfil / Logbook</span>
+                        </button>
                         <button
                           type="button"
                           data-testid="edit-passport-profile-btn"
@@ -2736,6 +2815,105 @@ export default function MarineOSHomePage() {
                               </div>
                             </div>
                           ))}
+                        </div>
+
+                        {/* División Automática de Gastos (Split-Bill FinOps) */}
+                        <div className="pt-4 border-t border-white/10 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="text-xs font-mono uppercase tracking-wider text-[var(--accent-primary)] font-semibold flex items-center gap-1.5">
+                              <MessageCircle className="w-3.5 h-3.5" />
+                              <span>División de Gastos (Split-Bill FinOps)</span>
+                            </div>
+                            <span className="text-[10px] font-mono opacity-65">
+                              {crewList.length} tripulantes a bordo
+                            </span>
+                          </div>
+
+                          <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono pb-2 border-b border-white/10">
+                              <div>
+                                <div className="text-[10px] uppercase opacity-60">CUOTA EXACTA POR PERSONA</div>
+                                <div className="text-lg font-bold text-[#00E676] mt-0.5">
+                                  ${perPersonUsd} USD{" "}
+                                  <span className="text-xs opacity-75 font-normal">
+                                    (~${(perPersonUsd * 950).toLocaleString("es-CL")} CLP)
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="text-left sm:text-right text-[11px] opacity-80 sm:border-l sm:border-white/10 sm:pl-3">
+                                <div>Cada tripulante debe transferir a:</div>
+                                <div className="font-bold text-white text-xs mt-0.5">
+                                  {expenses[0]?.paid_by || activeAccount.name}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Crew breakdown table/list */}
+                            <div className="space-y-1.5">
+                              {crewList.map((c) => {
+                                const isPayer = c.full_name === (expenses[0]?.paid_by || activeAccount.name);
+                                const isSettled = Boolean(settledCrewIds[c.id]);
+                                return (
+                                  <div
+                                    key={c.id}
+                                    className="flex items-center justify-between text-xs font-mono py-1.5 px-2.5 rounded-lg bg-white/[0.02] border border-white/5"
+                                  >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span
+                                        className={`w-2 h-2 rounded-full shrink-0 ${
+                                          isPayer
+                                            ? "bg-[#00E676]"
+                                            : isSettled
+                                            ? "bg-[#00E676]"
+                                            : "bg-[var(--accent-primary)]"
+                                        }`}
+                                      />
+                                      <span className="truncate font-medium">{c.full_name}</span>
+                                      <span className="text-[10px] opacity-50 uppercase">
+                                        ({c.role})
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      {isPayer ? (
+                                        <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E676]/15 text-[#00E676] font-semibold border border-[#00E676]/30">
+                                          Pagó el Total
+                                        </span>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleToggleCrewSettlement(c.id)}
+                                          className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors flex items-center gap-1 ${
+                                            isSettled
+                                              ? "bg-[#00E676]/20 text-[#00E676] border border-[#00E676]/40"
+                                              : "bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/30"
+                                          }`}
+                                        >
+                                          {isSettled ? (
+                                            <>
+                                              <CheckCircle2 className="w-3 h-3 text-[#00E676]" />
+                                              <span>Transferido</span>
+                                            </>
+                                          ) : (
+                                            <span>Cobrar: ${perPersonUsd} USD</span>
+                                          )}
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            <button
+                              type="button"
+                              data-testid="whatsapp-split-bill-btn"
+                              onClick={() => handleSendWhatsAppSplitReminder(expenses[0]?.paid_by || activeAccount.name, perPersonUsd)}
+                              className="w-full mt-2 marine-btn text-xs py-2.5 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-black font-bold rounded-xl shadow-lg transition-transform active:scale-[0.99]"
+                            >
+                              <MessageCircle className="w-4 h-4 fill-black" />
+                              <span>Enviar recordatorio por WhatsApp</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -3179,6 +3357,154 @@ export default function MarineOSHomePage() {
                         </button>
                       </div>
                     </form>
+                  </div>
+                </div>
+              )}
+              {/* Modal Trofeo Digital & Pasaporte Náutico Compartible (Instagram Stories / Red Social) */}
+              {isSharingPassport && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in"
+                  onClick={() => setIsSharingPassport(false)}
+                >
+                  <div
+                    className="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl bg-[#040B16] border-2 border-[var(--accent-primary)]/50 p-6 sm:p-7 shadow-2xl shadow-[var(--accent-primary)]/20 relative space-y-5"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                      <div className="flex items-center gap-2">
+                        <Award className="w-5 h-5 text-[var(--accent-primary)]" />
+                        <span className="font-mono text-xs uppercase tracking-widest text-[var(--accent-primary)] font-bold">
+                          TROFEO DIGITAL NÁUTICO • MARINOS
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsSharingPassport(false)}
+                        className="p-1 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {/* Instagram Story Format Card (Digital Trophy) */}
+                    <div className="relative rounded-2xl p-5 bg-gradient-to-b from-[#0A192F] via-[#040B16] to-[#02050B] border border-white/20 shadow-inner overflow-hidden space-y-4 text-center">
+                      {/* Decorative Background Elements */}
+                      <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-[var(--accent-primary)]/15 blur-2xl pointer-events-none" />
+                      <div className="absolute -bottom-12 -left-12 w-32 h-32 rounded-full bg-[#00E5FF]/15 blur-2xl pointer-events-none" />
+
+                      {/* Top Badge */}
+                      <div className="flex justify-center">
+                        <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 uppercase">
+                          BITÁCORA OFICIAL CERTIFICADA
+                        </span>
+                      </div>
+
+                      {/* Captain Avatar & Name */}
+                      <div className="flex flex-col items-center space-y-2">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[var(--accent-primary)] to-[#00E5FF] p-1 shadow-lg shadow-[var(--accent-primary)]/30">
+                          <div className="w-full h-full rounded-full bg-[#040B16] flex items-center justify-center font-bold text-2xl text-white font-mono">
+                            {activeAccount.name.slice(0, 2).toUpperCase()}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="text-xl font-bold tracking-tight text-white">
+                            {activeAccount.name}
+                          </h4>
+                          <div className="text-xs font-mono text-[var(--accent-primary)] mt-0.5">
+                            {activeAccount.licenseType}
+                          </div>
+                          <div className="text-[11px] font-mono opacity-60">
+                            Reg. {activeAccount.licenseNumber} • {activeAccount.documentType} {activeAccount.documentNumber}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Big Sea Time Counter */}
+                      <div className="py-3 px-4 rounded-xl bg-white/[0.04] border border-white/10 space-y-1">
+                        <div className="text-[10px] font-mono uppercase tracking-widest opacity-60">
+                          TOTAL SEA TIME ACUMULADO
+                        </div>
+                        <div className="text-3xl font-extrabold font-mono text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[var(--accent-primary)]">
+                          {totalSeaTimeMilesNm.toFixed(1)} MN
+                        </div>
+                        <div className="text-[11px] font-mono opacity-70">
+                          Embarcación habitual: SV Albatros (14.2m LOA)
+                        </div>
+                      </div>
+
+                      {/* Achievement Badges Trophy Showcase */}
+                      <div className="space-y-2 text-left">
+                        <div className="text-[10px] font-mono uppercase tracking-widest opacity-60 text-center">
+                          INSIGNIAS DE EXPEDICIÓN GANADAS
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
+                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-2">
+                            <span className="text-base">🌊</span>
+                            <div>
+                              <div className="font-bold text-white text-[10px]">Cruce Golfo Ancud</div>
+                              <div className="text-[9px] opacity-60">Océano Abierto</div>
+                            </div>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-2">
+                            <span className="text-base">⚓</span>
+                            <div>
+                              <div className="font-bold text-white text-[10px]">Veterano Chiloé</div>
+                              <div className="text-[9px] opacity-60">1500+ MN Navegadas</div>
+                            </div>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-2">
+                            <span className="text-base">🛡️</span>
+                            <div>
+                              <div className="font-bold text-white text-[10px]">Fondeo Seguro</div>
+                              <div className="text-[9px] opacity-60">10 Noches Sin Garreo</div>
+                            </div>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-2">
+                            <span className="text-base">🇨🇱</span>
+                            <div>
+                              <div className="font-bold text-white text-[10px]">DIRECTEMAR</div>
+                              <div className="text-[9px] opacity-60">Firma Criptográfica</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Cryptographic Seal */}
+                      <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[9px] font-mono opacity-60">
+                        <span>MARINOS DECENTRALIZED LEDGER</span>
+                        <span>HASH: SHA256-e8f491c2</span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="space-y-2 pt-2">
+                      <button
+                        type="button"
+                        data-testid="copy-trophy-text-btn"
+                        onClick={handleCopyTrophyText}
+                        className="w-full marine-btn marine-btn-primary min-h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-[var(--accent-primary)]/20"
+                      >
+                        {copiedShareLink ? (
+                          <>
+                            <Check className="w-4 h-4 text-black" />
+                            <span>¡Copiado para Instagram / WhatsApp!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4" />
+                            <span>Copiar Trofeo para Compartir</span>
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsSharingPassport(false)}
+                        className="w-full marine-btn marine-btn-secondary min-h-11 text-xs"
+                      >
+                        Cerrar
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

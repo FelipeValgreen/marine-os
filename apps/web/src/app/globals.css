@@ -308,3 +308,42 @@ textarea {
   border-color: rgba(255, 0, 0, 0.5) !important;
   color: #ff0000 !important;
 }
+
+/* Waze Náutico: Tactical Glassmorphic Map Popup */
+.marinos-tactical-popup .maplibregl-popup-content {
+  background: rgba(4, 11, 22, 0.94) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 87, 34, 0.45) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75) !important;
+  padding: 12px 14px !important;
+  color: #ffffff !important;
+}
+
+.marinos-tactical-popup .maplibregl-popup-close-button {
+  color: #ffffff !important;
+  padding: 6px 10px !important;
+  font-size: 16px !important;
+  right: 4px !important;
+  top: 4px !important;
+}
+
+.marinos-tactical-popup .maplibregl-popup-close-button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+}
+
+.marinos-tactical-popup .maplibregl-popup-tip {
+  border-top-color: rgba(4, 11, 22, 0.94) !important;
+}
+
+[data-theme="night-red-shift"] .marinos-tactical-popup .maplibregl-popup-content {
+  background: #000000 !important;
+  border-color: #ff1e1e !important;
+  color: #ff0000 !important;
+}
+
+[data-theme="night-red-shift"] .marinos-tactical-popup .maplibregl-popup-tip {
+  border-top-color: #000000 !important;
+}

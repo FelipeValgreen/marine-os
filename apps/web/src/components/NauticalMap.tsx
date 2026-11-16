@@ -3,8 +3,14 @@
 import React, { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { useLiveQuery } from "dexie-react-hooks";
 import type { GPXWaypoint } from "@/lib/nautical";
-import type { AnchorageSpatialRecord, TrackPoint } from "@/lib/offline/db";
+import {
+  db,
+  type AnchorageSpatialRecord,
+  type TrackPoint,
+  type CommunityReportRecord,
+} from "@/lib/offline/db";
 
 interface NauticalMapProps {
   waypoints: GPXWaypoint[];
@@ -17,6 +23,7 @@ interface NauticalMapProps {
   isNight: boolean;
   fullScreen?: boolean;
   trackPoints?: TrackPoint[];
+  communityReports?: CommunityReportRecord[];
   onSelectAnchorage?: (anchorage: AnchorageSpatialRecord) => void;
 }
 
@@ -64,10 +71,14 @@ export function NauticalMap({
   isDragging = false,
   fullScreen = false,
   trackPoints = [],
+  communityReports,
   onSelectAnchorage,
 }: NauticalMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+
+  const liveReports = useLiveQuery(() => db.community_reports.toArray(), [], []);
+  const effectiveReports = communityReports || liveReports || [];
 
   const addNauticalOverlays = (map: maplibregl.Map) => {
     if (!map.getSource("openseamap-seamarks")) {
@@ -222,6 +233,58 @@ export function NauticalMap({
       });
     }
 
+    if (!map.getSource("community-pins-source")) {
+      map.addSource("community-pins-source", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: effectiveReports.map((r) => ({
+            type: "Feature" as const,
+            properties: {
+              id: r.id,
+              author_name: r.author_name,
+              vessel_name: r.vessel_name,
+              title: r.title,
+              content: r.content,
+              report_type: r.report_type,
+              wind_conditions: r.wind_conditions || "",
+              chain_payout_m: r.chain_payout_m || 0,
+              seabed_type: r.seabed_type || "",
+              upvotes: r.upvotes,
+              created_at: r.created_at,
+            },
+            geometry: {
+              type: "Point" as const,
+              coordinates: [r.lon, r.lat],
+            },
+          })),
+        },
+      });
+
+      map.addLayer({
+        id: "community-pins-halo",
+        type: "circle",
+        source: "community-pins-source",
+        paint: {
+          "circle-radius": 15,
+          "circle-color": "#FF5722",
+          "circle-opacity": 0.28,
+        },
+      });
+
+      map.addLayer({
+        id: "community-pins-layer",
+        type: "circle",
+        source: "community-pins-source",
+        paint: {
+          "circle-radius": 7.5,
+          "circle-color": "#FF5722",
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#FFFFFF",
+        },
+      });
+    }
+
     if (!map.getSource("swing-circle")) {
       map.addSource("swing-circle", {
         type: "geojson",
@@ -318,6 +381,74 @@ export function NauticalMap({
         const found = anchorages.find((a) => a.slug === slug);
         if (found) onSelectAnchorage(found);
       });
+
+      map.on("mouseenter", "community-pins-layer", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", "community-pins-layer", () => {
+        map.getCanvas().style.cursor = "";
+      });
+
+      map.on("click", "community-pins-layer", (e) => {
+        const feature = e.features?.[0];
+        if (!feature) return;
+        const p = feature.properties as Record<string, string | number>;
+        const geom = feature.geometry as GeoJSON.Point;
+        const coordinates = geom.coordinates.slice() as [number, number];
+
+        const popupHtml = `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #FFFFFF; min-width: 250px; max-width: 320px; padding: 4px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
+              <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; color: #FF5722; background: rgba(255, 87, 34, 0.16); border: 1px solid rgba(255, 87, 34, 0.45); border-radius: 999px; padding: 2px 8px;">
+                ⚓ REPORTE DE CAPITÁN
+              </span>
+              <span style="font-size: 10px; font-family: monospace; opacity: 0.65;">
+                ${p.created_at ? new Date(String(p.created_at)).toLocaleDateString('es-CL', { month: 'short', day: 'numeric' }) : 'Reciente'}
+              </span>
+            </div>
+
+            <div style="font-weight: 700; font-size: 13px; line-height: 1.3; margin-bottom: 4px; color: #FFFFFF;">
+              ${p.title}
+            </div>
+
+            <div style="font-size: 11px; font-family: monospace; color: #00E5FF; margin-bottom: 8px;">
+              👤 ${p.author_name} • ⛵ ${p.vessel_name}
+            </div>
+
+            <p style="font-size: 12px; line-height: 1.45; opacity: 0.92; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+              "${p.content}"
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; font-family: monospace; margin-bottom: 8px;">
+              <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
+                <div style="opacity: 0.55;">VIENTO</div>
+                <div style="font-weight: bold; color: #FF9F0A;">${p.wind_conditions || 'Calma'}</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
+                <div style="opacity: 0.55;">CADENA & FONDO</div>
+                <div style="font-weight: bold; color: #00E676;">${p.chain_payout_m ? p.chain_payout_m + 'm ' : ''}${p.seabed_type || 'Arena'}</div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px; font-size: 10px; font-family: monospace;">
+              <span style="color: #00E676; font-weight: bold;">
+                ▲ ${p.upvotes || 18} confirmaciones
+              </span>
+              <span style="color: #FF5722; font-weight: 600;">WAZE NÁUTICO MARINOS</span>
+            </div>
+          </div>
+        `;
+
+        new maplibregl.Popup({
+          className: "marinos-tactical-popup",
+          closeButton: true,
+          closeOnClick: true,
+          maxWidth: "340px",
+        })
+          .setLngLat(coordinates)
+          .setHTML(popupHtml)
+          .addTo(map);
+      });
     });
 
     mapRef.current = map;
@@ -407,6 +538,35 @@ export function NauticalMap({
       );
     }
 
+    const reportsSource = map.getSource("community-pins-source") as
+      | maplibregl.GeoJSONSource
+      | undefined;
+    if (reportsSource) {
+      reportsSource.setData({
+        type: "FeatureCollection",
+        features: effectiveReports.map((r) => ({
+          type: "Feature" as const,
+          properties: {
+            id: r.id,
+            author_name: r.author_name,
+            vessel_name: r.vessel_name,
+            title: r.title,
+            content: r.content,
+            report_type: r.report_type,
+            wind_conditions: r.wind_conditions || "",
+            chain_payout_m: r.chain_payout_m || 0,
+            seabed_type: r.seabed_type || "",
+            upvotes: r.upvotes,
+            created_at: r.created_at,
+          },
+          geometry: {
+            type: "Point" as const,
+            coordinates: [r.lon, r.lat],
+          },
+        })),
+      });
+    }
+
     if (map.getLayer("swing-circle-fill")) {
       map.setPaintProperty(
         "swing-circle-fill",
@@ -429,6 +589,7 @@ export function NauticalMap({
     swingRadiusMeters,
     isDragging,
     trackPoints,
+    effectiveReports,
   ]);
 
   useEffect(() => {

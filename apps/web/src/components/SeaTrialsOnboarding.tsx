@@ -34,10 +34,10 @@ export function SeaTrialsOnboarding({
     step === 1
       ? 25
       : step === 2
-      ? 50
-      : step === 3
-      ? 75
-      : 100;
+        ? 50
+        : step === 3
+          ? 75
+          : 100;
 
   const handleStep1SaveVessel = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,9 +109,8 @@ export function SeaTrialsOnboarding({
   return (
     <div
       data-testid="sea-trials-onboarding-modal"
-      className={`fixed inset-0 z-[70] w-screen h-screen overflow-y-auto flex items-center justify-center p-4 sm:p-8 select-none ${
-        isNight ? "bg-black text-[#FF0000]" : "bg-[#040B16]/95 backdrop-blur-2xl text-slate-100"
-      }`}
+      className={`fixed inset-0 z-[70] w-screen h-screen overflow-y-auto flex items-center justify-center p-4 sm:p-8 select-none ${isNight ? "bg-black text-[#FF0000]" : "bg-[#040B16]/95 backdrop-blur-2xl text-slate-100"
+        }`}
     >
       <div className="w-full max-w-xl marine-card p-6 sm:p-8 space-y-6">
         {/* Top Gamified Progress Header (Duolingo Style) */}
@@ -140,11 +139,10 @@ export function SeaTrialsOnboarding({
           {/* Animated Progress Bar */}
           <div className="w-full h-3 rounded-full bg-white/10 overflow-hidden">
             <div
-              className={`h-full transition-all duration-500 ${
-                isNight
-                  ? "bg-[#FF0000]"
-                  : "bg-gradient-to-r from-[var(--accent-primary)] to-[var(--status-ok)]"
-              }`}
+              className={`h-full transition-all duration-500 ${isNight
+                ? "bg-[#FF0000]"
+                : "bg-gradient-to-r from-[var(--accent-primary)] to-[var(--status-ok)]"
+                }`}
               style={{ width: `${progressPct}%` }}
             />
           </div>
