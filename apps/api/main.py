@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import ocr, weather, zarpe, bosun, sync, signalk
 
 app = FastAPI(
-    title="Marine OS API — Nautical Copilot & Edge-Sync Backend",
+    title="MarinOS API — Nautical Copilot & Edge-Sync Backend",
     version="1.0.0",
-    description="Cloud-Ready FastAPI Backend for Marine OS: Multimodal OCR, Open-Meteo Marine GRIB Anchorage Matcher, Official Zarpe PDF & DIRECTEMAR E-Zarpe API, Signal K NMEA 2000 Bridge, and Predictive Bosun RAG.",
+    description="Cloud-Ready FastAPI Backend for MarinOS: Multimodal OCR, Open-Meteo Marine GRIB Anchorage Matcher, Official Zarpe PDF & DIRECTEMAR E-Zarpe API, Signal K NMEA 2000 Bridge, and Predictive Bosun RAG.",
 )
 
 app.add_middleware(

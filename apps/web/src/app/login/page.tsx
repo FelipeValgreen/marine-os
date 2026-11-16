@@ -125,7 +125,7 @@ export default function MarineOSLoginPage() {
             THE LINEAR OF THE SEA • 100% OFFLINE-FIRST
           </div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight leading-snug">
-            Sistema Operativo Náutico &amp; Pasaporte Digital
+            MarinOS • Sistema Operativo Náutico &amp; Pasaporte Digital
           </h1>
           <p className="text-xs sm:text-sm opacity-75 leading-relaxed">
             Sincroniza tu{" "}

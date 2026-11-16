@@ -35,7 +35,7 @@ def build_zarpe_pdf_bytes(payload: Dict[str, Any]) -> bytes:
 
     lines = [
         "REPUBLICA DE CHILE - AUTORIDAD MARITIMA / DIRECTEMAR",
-        "DECLARACION GENERAL DE ZARPE Y ROL DE TRIPULACION (MARINE OS DIGITAL)",
+        "DECLARACION GENERAL DE ZARPE Y ROL DE TRIPULACION (MARINOS DIGITAL)",
         "======================================================================",
         f"Embarcacion      : {vessel_name}   | Matricula: {registration}",
         f"Travesia         : {voyage_title}",
@@ -63,7 +63,7 @@ def build_zarpe_pdf_bytes(payload: Dict[str, Any]) -> bytes:
         "chalecos salvavidas, pirotecnia al dia, radio VHF operativa y despacho conforme.",
         "",
         f"HASH DE INTEGRIDAD SHA-256: {verification_hash}",
-        f"EMITIDO POR MARINE OS EDGE-SYNC: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC",
+        f"EMITIDO POR MARINOS EDGE-SYNC: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC",
     ])
 
     content_ops = ["BT", "/F1 10 Tf", "45 760 Td", "14 TL"]

@@ -2,7 +2,7 @@
   "name": "marine-os-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "Marine OS — Local-First PWA Operational Middleware & Nautical Copilot",
+  "description": "MarinOS — Local-First PWA Operational Middleware & Nautical Copilot",
   "scripts": {
     "build": "npm --prefix apps/web run build",
     "dev:web": "npm --prefix apps/web run dev",

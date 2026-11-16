@@ -1,6 +1,6 @@
 {
-  "name": "Marine OS — Copiloto Náutico & Gemelo Digital Offline-First",
-  "short_name": "Marine OS",
+  "name": "MarinOS — Copiloto Náutico & Gemelo Digital Offline-First",
+  "short_name": "MarinOS",
   "description": "Sistema Operativo Local-First para Veleros, Catamaranes y Flotas de Chárter",
   "start_url": "/",
   "display": "standalone",

@@ -35,7 +35,13 @@ export function CrewDirectory({
   const { pushToast, setActiveSection } = useMarineContext();
 
   const contacts = useLiveQuery(
-    () => db.crew_contacts.orderBy("full_name").toArray(),
+    async () => {
+      const freq = db.frequent_crew
+        ? await db.frequent_crew.orderBy("full_name").toArray()
+        : [];
+      if (freq && freq.length > 0) return freq;
+      return db.crew_contacts.orderBy("full_name").toArray();
+    },
     [],
     []
   );
@@ -95,7 +101,7 @@ export function CrewDirectory({
       phone: contact.phone || "",
       email: contact.email || "",
       notes: contact.notes || "",
-      ocr_verified: contact.ocr_verified,
+      ocr_verified: Boolean(contact.ocr_verified),
     });
     setIsModalOpen(true);
   };
@@ -135,8 +141,11 @@ export function CrewDirectory({
     };
 
     await db.crew_contacts.put(record);
+    if (db.frequent_crew) {
+      await db.frequent_crew.put(record);
+    }
     await enqueueOfflineMutation({
-      table_name: "crew_contacts",
+      table_name: "frequent_crew",
       operation: "UPSERT",
       record_id: id,
       payload: record as unknown as Record<string, unknown>,
@@ -153,8 +162,11 @@ export function CrewDirectory({
 
   const handleDeleteContact = async (id: string) => {
     await db.crew_contacts.delete(id);
+    if (db.frequent_crew) {
+      await db.frequent_crew.delete(id);
+    }
     await enqueueOfflineMutation({
-      table_name: "crew_contacts",
+      table_name: "frequent_crew",
       operation: "UPDATE",
       record_id: id,
       payload: { deleted: true, deleted_at: new Date().toISOString() },
@@ -200,7 +212,7 @@ export function CrewDirectory({
       nationality: contact.nationality,
       license_type: contact.license_type,
       license_expiry: contact.license_expiry,
-      ocr_verified: contact.ocr_verified,
+      ocr_verified: Boolean(contact.ocr_verified),
       waiver_signed_at: now,
       created_at: now,
     };

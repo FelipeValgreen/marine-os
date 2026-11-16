@@ -417,7 +417,7 @@ export function DamageControl() {
                     >
                       <div className="flex items-center justify-between font-mono text-xs">
                         <span className="text-[var(--accent-primary)] font-bold">
-                          MARINE OS MARKETPLACE • ENTREGA EN MUELLE
+                          MARINOS MARKETPLACE • ENTREGA EN MUELLE
                         </span>
                         <span className="text-[#00E676] font-bold">
                           USD ${currentNode.estimatedPriceUsd}

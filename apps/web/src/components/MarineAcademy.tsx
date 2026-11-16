@@ -102,7 +102,7 @@ export function MarineAcademy({
     "¿Cómo agrego un gasto con OCR y cómo se divide entre la tripulación?"
   );
   const [supportAnswer, setSupportAnswer] = useState<string>(
-    "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINE OS?\n1. Ve a la sección 'Pasaporte Náutico & Bitácora' (ícono de libro en el rail izquierdo).\n2. En la tarjeta 'Gastos de Travesía & OCR Boletas', pulsa 'OCR Boleta Diésel' o 'OCR Víveres'.\n3. El sistema extrae automáticamente el monto en CLP/USD, número de boleta y divide el total equitativamente entre los tripulantes inscritos, guardándolo primero en IndexedDB."
+    "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINOS?\n1. Ve a la sección 'Pasaporte Náutico & Bitácora' (ícono de libro en el rail izquierdo).\n2. En la tarjeta 'Gastos de Travesía & OCR Boletas', pulsa 'OCR Boleta Diésel' o 'OCR Víveres'.\n3. El sistema extrae automáticamente el monto en CLP/USD, número de boleta y divide el total equitativamente entre los tripulantes inscritos, guardándolo primero en IndexedDB."
   );
   const [supportLoading, setSupportLoading] = useState<boolean>(false);
 
@@ -162,7 +162,7 @@ export function MarineAcademy({
     const q = qText.toLowerCase();
     if (q.includes("gpx") || q.includes("ruta") || q.includes("mapa")) {
       setSupportAnswer(
-        "¿CÓMO IMPORTAR UNA RUTA .GPX A LA CARTA NÁUTICA?\n1. En la vista Bridge, abre el panel derecho 'Fondeo & Clima'.\n2. En el pie del panel, toca el botón 'Cargar .GPX' y selecciona tu archivo .gpx.\n3. Marine OS traza instantáneamente los waypoints en color Phosphor Cyan (#00E5FF)."
+        "¿CÓMO IMPORTAR UNA RUTA .GPX A LA CARTA NÁUTICA?\n1. En la vista Bridge, abre el panel derecho 'Fondeo & Clima'.\n2. En el pie del panel, toca el botón 'Cargar .GPX' y selecciona tu archivo .gpx.\n3. MarinOS traza instantáneamente los waypoints en color Phosphor Cyan (#00E5FF)."
       );
     } else if (q.includes("offline") || q.includes("internet")) {
       setSupportAnswer(
@@ -174,7 +174,7 @@ export function MarineAcademy({
       );
     } else {
       setSupportAnswer(
-        "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINE OS?\n1. Ve a 'Pasaporte Náutico & Bitácora'.\n2. En 'Gastos de Travesía & OCR Boletas', pulsa 'OCR Boleta Diésel' o 'OCR Víveres'.\n3. El gasto se guarda en IndexedDB y se divide entre toda la tripulación."
+        "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINOS?\n1. Ve a 'Pasaporte Náutico & Bitácora'.\n2. En 'Gastos de Travesía & OCR Boletas', pulsa 'OCR Boleta Diésel' o 'OCR Víveres'.\n3. El gasto se guarda en IndexedDB y se divide entre toda la tripulación."
       );
     }
     setSupportLoading(false);
@@ -330,7 +330,7 @@ export function MarineAcademy({
               </div>
               <h2 className="text-lg font-semibold flex items-center gap-2 mt-0.5">
                 <Sparkles className="w-5 h-5 text-[var(--accent-primary)]" />
-                <span>Chat de Soporte IA (Cómo usar Marine OS)</span>
+                <span>Chat de Soporte IA (Cómo usar MarinOS)</span>
               </h2>
               <p className="text-xs opacity-75 mt-1">
                 Pre-configurado para resolver dudas paso a paso sobre cada

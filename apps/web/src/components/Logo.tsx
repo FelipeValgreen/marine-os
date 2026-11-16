@@ -9,9 +9,9 @@ interface LogoProps {
 }
 
 /**
- * Marine OS Brand Emblem & Wordmark ("The Linear of the Sea")
+ * MarinOS Brand Emblem & Wordmark ("The Linear of the Sea")
  * Geometric abstraction combining a tactical nautical compass rose and an albatross wing profile,
- * paired with heavy lowercase geometric typography.
+ * paired with heavy geometric typography.
  * Uses Lifebuoy Orange (`var(--accent-primary)`) for high-visibility IALA maritime signaling.
  */
 export function Logo({
@@ -28,7 +28,7 @@ export function Logo({
   return (
     <div
       className={`inline-flex items-center gap-2.5 select-none ${className}`}
-      aria-label="marine.os"
+      aria-label="MarinOS"
     >
       {/* Geometric Compass + Albatross Vector Mark with Lifebuoy Orange Accent */}
       <div
@@ -86,14 +86,14 @@ export function Logo({
         </svg>
       </div>
 
-      {/* Heavy Lowercase Wordmark */}
+      {/* Heavy Wordmark "MarinOS" */}
       {!collapsed && (
         <div className="flex flex-col leading-none">
           <div
-            className={`${textSize} font-black tracking-[-0.04em] lowercase flex items-center gap-0.5`}
+            className={`${textSize} font-black tracking-[-0.04em] flex items-center gap-0.5`}
           >
-            <span>marine</span>
-            <span className="text-[var(--accent-primary)]">.os</span>
+            <span>Marin</span>
+            <span className="text-[var(--accent-primary)]">OS</span>
           </div>
           <span className="font-mono text-[9px] uppercase tracking-[0.18em] opacity-65 mt-0.5">
             iala tactical

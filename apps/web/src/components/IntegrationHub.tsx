@@ -335,7 +335,7 @@ export function IntegrationHub() {
                     <span>Mixed Content en Producción</span>
                   </div>
                   <p className="opacity-85 text-[11px]">
-                    Si accedes a Marine OS por HTTPS en Vercel, el navegador bloquea peticiones a IPs HTTP locales. Para conectar el NMEA 2000 real usa Marine OS en red local o configura HTTPS en el gateway.
+                    Si accedes a MarinOS por HTTPS en Vercel, el navegador bloquea peticiones a IPs HTTP locales. Para conectar el NMEA 2000 real usa MarinOS en red local o configura HTTPS en el gateway.
                   </p>
                 </div>
               )}

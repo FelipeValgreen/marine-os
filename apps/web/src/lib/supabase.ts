@@ -3,7 +3,7 @@ import type { UserProfileAccount } from "@/lib/offline/db";
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  "https://marine-os-demo.supabase.co";
+  "https://marinos-demo.supabase.co";
 const SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
@@ -43,7 +43,7 @@ export const DEFAULT_GOOGLE_AUTHENTICATED_PROFILE: UserProfileAccount = {
 export const OFFLINE_GUEST_PROFILE: UserProfileAccount = {
   id: "acc-guest-offline",
   name: "Patrón Invitado (Modo Offline)",
-  email: "offline@marine-os.local",
+  email: "offline@marinos.local",
   authProvider: "offline_guest",
   shortLabel: "Invitado Offline",
   role: "skipper",
@@ -67,7 +67,7 @@ export const OFFLINE_GUEST_PROFILE: UserProfileAccount = {
 export async function authenticateWithGoogleOrHydrateLocal(): Promise<UserProfileAccount> {
   const hasRealCloudProject =
     Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
-    !SUPABASE_URL.includes("marine-os-demo.supabase.co");
+    !SUPABASE_URL.includes("marinos-demo.supabase.co");
 
   if (hasRealCloudProject && typeof window !== "undefined" && navigator.onLine) {
     try {

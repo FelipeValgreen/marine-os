@@ -253,7 +253,7 @@ export function FleetManager() {
                     {formData.id ? "Editar Embarcación" : "Registrar Nueva Embarcación"}
                   </h2>
                   <div className="text-xs font-mono opacity-70">
-                    {formData.id ? `ID: ${formData.id}` : "Flota Marine OS"}
+                    {formData.id ? `ID: ${formData.id}` : "Flota MarinOS"}
                   </div>
                 </div>
               </div>

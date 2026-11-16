@@ -35,9 +35,9 @@ class BosunQueryRequest(BaseModel):
 APP_SUPPORT_KNOWLEDGE_BASE: List[Dict[str, Any]] = [
     {
         "keywords": ["gasto", "boleta", "dividir", "finanza", "diesel", "supermercado", "ocr"],
-        "title": "Guía Marine OS — División de Gastos con OCR",
+        "title": "Guía MarinOS — División de Gastos con OCR",
         "answer": (
-            "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINE OS?\n"
+            "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINOS?\n"
             "1. Ve a la sección **Pasaporte Náutico & Bitácora** (ícono de libro en el rail izquierdo).\n"
             "2. En la tarjeta **'Gastos de Travesía & OCR Boletas'**, pulsa **'OCR Boleta Diésel'** o **'OCR Víveres'**.\n"
             "3. El sistema extrae automáticamente el monto en CLP/USD, número de boleta y divide el total equitativamente entre los tripulantes inscritos, guardándolo primero en `IndexedDB` (`expenses` + `sync_queue`)."
@@ -45,17 +45,17 @@ APP_SUPPORT_KNOWLEDGE_BASE: List[Dict[str, Any]] = [
     },
     {
         "keywords": ["gpx", "ruta", "importar", "navionics", "opencpn", "mapa", "carta"],
-        "title": "Guía Marine OS — Importación de Rutas .GPX",
+        "title": "Guía MarinOS — Importación de Rutas .GPX",
         "answer": (
             "¿CÓMO IMPORTAR UNA RUTA .GPX A LA CARTA NÁUTICA?\n"
             "1. En la vista **Bridge (Mapa Full-Screen)**, abre el panel derecho **'Fondeo & Clima'**.\n"
             "2. En el pie del panel, toca el botón **'Cargar .GPX'** y selecciona cualquier archivo `.gpx` exportado desde Navionics, OpenCPN o Orca.\n"
-            "3. Marine OS traza instantáneamente los waypoints en color Aqua Táctico (`#00E5FF`) y calcula la distancia total en millas náuticas."
+            "3. MarinOS traza instantáneamente los waypoints en color Aqua Táctico (`#00E5FF`) y calcula la distancia total en millas náuticas."
         ),
     },
     {
         "keywords": ["offline", "sin internet", "indexeddb", "dexie", "sincronizar", "cola", "sync"],
-        "title": "Guía Marine OS — Arquitectura Local-First & Modo Offline",
+        "title": "Guía MarinOS — Arquitectura Local-First & Modo Offline",
         "answer": (
             "¿CÓMO FUNCIONA EL MODO OFFLINE EN ALTA MAR?\n"
             "1. Toda operación (Check-in/out, Zarpe, Inventario, Bitácora, Grabación de Rutas) se guarda primero en **`IndexedDB` (`Dexie.js`)** en tu dispositivo.\n"
@@ -65,7 +65,7 @@ APP_SUPPORT_KNOWLEDGE_BASE: List[Dict[str, Any]] = [
     },
     {
         "keywords": ["zarpe", "pdf", "magic link", "whatsapp", "tripulante", "directemar"],
-        "title": "Guía Marine OS — Magic Link y PDF de Zarpe Oficial",
+        "title": "Guía MarinOS — Magic Link y PDF de Zarpe Oficial",
         "answer": (
             "¿CÓMO GENERAR EL ZARPE OFICIAL Y COMPartir EL MAGIC LINK?\n"
             "1. Entra a la sección **Voyages & Zarpe** desde el rail lateral.\n"
@@ -175,7 +175,7 @@ async def ask_bosun_rag(req: BosunQueryRequest):
                 "related_qr_slug": "yanmar-4jh57",
                 "inventory_match": "Centro de Soporte Marine Academy",
             },
-            "predictive_alert": "Soporte Interactivo Marine OS activo 100% Online y Offline.",
+            "predictive_alert": "Soporte Interactivo MarinOS activo 100% Online y Offline.",
         }
 
     best_match = MANUAL_KNOWLEDGE_BASE[0]

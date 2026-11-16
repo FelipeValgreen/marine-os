@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Marine OS — Apple Maps Nautical & Orca Co-Pilot",
+  title: "MarinOS — Apple Maps Nautical & Orca Co-Pilot",
   description:
     "PWA Offline-First para veleros, catamaranes y flotas de chárter: Bridge GPS, Gemelo Digital, Zarpe OCR, Handover Wizard SHA-256 y Bitácora con Replay.",
   manifest: "/manifest.json",

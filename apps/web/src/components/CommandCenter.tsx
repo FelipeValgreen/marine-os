@@ -233,10 +233,10 @@ export function CommandCenter({
       },
       {
         id: "cmd-fleet",
-        title: "Gestor de Flota & Barcos (Fleet Manager)",
-        subtitle: "Administrar barcos, cambiar nave activa y calados",
+        title: "Configurar mi Velero (Fleet & Vessel Manager)",
+        subtitle: "Administrar barcos, cambiar nave activa, calados y horómetro",
         category: "NAVEGACIÓN",
-        keywords: "flota fleet barcos veleros embarcaciones eslora manga",
+        keywords: "configurar mi velero flota fleet barcos veleros embarcaciones eslora manga calado horometro",
         shortcut: "G F",
         icon: Anchor,
         action: () => {
@@ -566,7 +566,7 @@ export function CommandCenter({
           <span>
             ↑↓ Navegar • ↵ Ejecutar • ESC Cerrar • 100% Local-First IndexedDB
           </span>
-          <span>MARINE.OS COMMAND CENTER (⌘K)</span>
+          <span>MARINOS COMMAND CENTER (⌘K)</span>
         </div>
       </div>
     </div>

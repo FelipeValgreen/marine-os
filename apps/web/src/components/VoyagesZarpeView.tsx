@@ -91,9 +91,75 @@ export function VoyagesZarpeView({
     tokenBadge?: string;
   } | null>(null);
 
-  const savedContacts = useLiveQuery(() => db.crew_contacts.toArray(), [], []);
+  const savedContacts = useLiveQuery(
+    async () => {
+      const freq = db.frequent_crew ? await db.frequent_crew.toArray() : [];
+      if (freq && freq.length > 0) return freq;
+      return db.crew_contacts.toArray();
+    },
+    [],
+    []
+  );
   const [saveToAddressBook, setSaveToAddressBook] = useState(true);
   const [showDirectoryPicker, setShowDirectoryPicker] = useState(false);
+
+  const handleBatchInjectFrequentCrew = async () => {
+    const contacts = savedContacts || [];
+    if (contacts.length === 0) {
+      pushToast({
+        title: "Agenda vacía",
+        subtitle: "No hay tripulantes guardados en la libreta frecuente",
+        tone: "amber",
+      });
+      return;
+    }
+    let addedCount = 0;
+    const now = new Date().toISOString();
+    const targetVoyageId = voyage?.id || DEMO_IDS.VOYAGE_ID;
+    for (const contact of contacts) {
+      const alreadyOnBoard = crewList?.some(
+        (m) => m.document_number === contact.document_number
+      );
+      if (!alreadyOnBoard) {
+        const newMember: VoyageCrewRecord = {
+          id: crypto.randomUUID(),
+          voyage_id: targetVoyageId,
+          full_name: contact.full_name,
+          document_type: contact.document_type || "RUT",
+          document_number: contact.document_number,
+          nationality: contact.nationality || "CL",
+          role: contact.default_role || "crew",
+          license_type: contact.license_type || "Tripulante General",
+          license_number: contact.license_number || "",
+          license_expiry: contact.license_expiry || "",
+          ocr_verified: true,
+          waiver_signed_at: null,
+          created_at: now,
+        };
+        await db.voyage_crew.put(newMember);
+        await enqueueOfflineMutation({
+          table_name: "voyage_crew",
+          operation: "INSERT",
+          record_id: newMember.id,
+          payload: newMember as unknown as Record<string, unknown>,
+        });
+        addedCount++;
+      }
+    }
+    if (addedCount > 0) {
+      pushToast({
+        title: "Tripulación Cargada desde Agenda",
+        subtitle: `Se agregaron ${addedCount} tripulante(s) al rol de zarpe`,
+        tone: "emerald",
+      });
+    } else {
+      pushToast({
+        title: "Tripulación ya a bordo",
+        subtitle: "Todos los contactos de la agenda ya estaban en el rol de zarpe",
+        tone: "amber",
+      });
+    }
+  };
 
   const handleLoadFromDirectory = (c: CrewContactRecord) => {
     setFullName(c.full_name);
@@ -323,7 +389,7 @@ export function VoyagesZarpeView({
     const shareUrl =
       typeof window !== "undefined"
         ? `${window.location.origin}/trip/${magicToken}`
-        : `https://marine-os.local/trip/${magicToken}`;
+        : `https://marinos.local/trip/${magicToken}`;
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(shareUrl).catch(() => { });
     }
@@ -618,14 +684,26 @@ export function VoyagesZarpeView({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Multimodal OCR + Waiver Onboarding Form */}
         <div className="lg:col-span-6 marine-card p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="flex flex-wrap items-center justify-between border-b border-white/10 pb-3 gap-2">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <ScanLine className="w-5 h-5 text-[var(--accent-primary)]" />
               <span>Escáner OCR de Documentos y Licencias</span>
             </h2>
-            <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
-              LOA {vessel?.loa_meters || 12.43}m
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                data-testid="load-from-agenda-btn"
+                onClick={handleBatchInjectFrequentCrew}
+                className="marine-btn marine-btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5 text-[var(--accent-primary)] border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10"
+                title="Carga en 1 clic a todos los tripulantes guardados en la libreta frecuente"
+              >
+                <Users className="w-3.5 h-3.5 shrink-0" />
+                <span>Cargar desde Agenda</span>
+              </button>
+              <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                LOA {vessel?.loa_meters || 12.43}m
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">

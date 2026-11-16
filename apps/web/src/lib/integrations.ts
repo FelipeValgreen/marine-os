@@ -86,7 +86,7 @@ export async function testSignalKGateway(
   if (isMixedContentBlocked(cfg.protocol)) {
     return result(
       "warning",
-      "Configuración guardada, pero el navegador bloquea http:// desde una página https:// (mixed content). Usa el gateway con HTTPS o abre Marine OS desde la red local del barco."
+      "Configuración guardada, pero el navegador bloquea http:// desde una página https:// (mixed content). Usa el gateway con HTTPS o abre MarinOS desde la red local del barco."
     );
   }
   try {
@@ -153,7 +153,7 @@ const RAD_TO_DEG = 180 / Math.PI;
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
 /**
- * Maps a Signal K `vessels/self` document (SI units) onto Marine OS telemetry.
+ * Maps a Signal K `vessels/self` document (SI units) onto MarinOS telemetry.
  * Speeds m/s → kn, angles rad → deg, temperatures K → °C, pressure Pa → kPa, SoC ratio → %.
  */
 export function parseSignalKSelf(doc: unknown): ParsedSignalKTelemetry {
@@ -284,7 +284,7 @@ export async function testSatelliteLink(
   if (isMixedContentBlocked("http")) {
     return result(
       "warning",
-      "Configuración guardada. El navegador bloquea http://192.168.10.1 desde https://; prueba desde la Wi-Fi del Iridium GO! con Marine OS local."
+      "Configuración guardada. El navegador bloquea http://192.168.10.1 desde https://; prueba desde la Wi-Fi del Iridium GO! con MarinOS local."
     );
   }
   try {

@@ -184,7 +184,8 @@ const NAV_ITEMS: {
   },
 ];
 
-const AUTH_STORAGE_KEY = "marine-os-authenticated-profile-id";
+const AUTH_STORAGE_KEY = "marinos-authenticated-profile-id";
+const THEME_STORAGE_KEY = "marinos-theme";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<MarineTheme>("midnight-ocean");
@@ -301,7 +302,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setIsSeeded(true);
 
       if (typeof window !== "undefined") {
-        const savedProfileId = window.localStorage.getItem(AUTH_STORAGE_KEY);
+        const savedProfileId =
+          window.localStorage.getItem(AUTH_STORAGE_KEY) ||
+          window.localStorage.getItem("marine-os-authenticated-profile-id");
         if (savedProfileId === "logged_out") {
           setIsAuthenticated(false);
           setAuthChecked(true);
@@ -329,9 +332,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     initLocalFirstAndAuth();
 
     if (typeof window !== "undefined") {
-      const savedTheme = window.localStorage.getItem(
-        "marine-os-theme"
-      ) as MarineTheme | null;
+      const savedTheme = (window.localStorage.getItem(THEME_STORAGE_KEY) ||
+        window.localStorage.getItem("marine-os-theme")) as MarineTheme | null;
       if (
         savedTheme === "midnight-ocean" ||
         savedTheme === "daylight-high-contrast" ||
@@ -439,7 +441,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const setTheme = (nextTheme: MarineTheme) => {
     setThemeState(nextTheme);
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("marine-os-theme", nextTheme);
+      window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
       document.documentElement.setAttribute("data-theme", nextTheme);
     }
   };
@@ -632,7 +634,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         =================================================================== */}
         {!isLoginRoute && (
           <aside
-            aria-label="Marine OS Navigation Rail"
+            aria-label="MarinOS Navigation Rail"
             className={`hidden lg:flex fixed top-0 left-0 bottom-0 z-50 flex-col justify-between py-3.5 border-r transition-all duration-200 ${
               sidebarCollapsed ? "w-16 items-center" : "w-60 px-3"
             } ${
@@ -653,7 +655,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setActiveSection("bridge")}
-                  title="marine.os — SV Albatros (CB-4582)"
+                  title="MarinOS — SV Albatros (CB-4582)"
                   className="min-h-14 flex items-center justify-center rounded-xl px-1"
                 >
                   <Logo collapsed={sidebarCollapsed} size="sm" />

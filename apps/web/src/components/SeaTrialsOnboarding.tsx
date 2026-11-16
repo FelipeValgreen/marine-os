@@ -119,7 +119,7 @@ export function SeaTrialsOnboarding({
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[var(--accent-primary)]">
               <Sparkles className="w-4 h-4" />
-              <span>PRUEBAS DE MAR • ENTRENAMIENTO TÁCTICO</span>
+              <span>MARINOS • PRUEBAS DE MAR TÁCTICAS</span>
             </div>
 
             <div className="flex items-center gap-2">

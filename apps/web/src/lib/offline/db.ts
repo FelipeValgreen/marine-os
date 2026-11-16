@@ -93,6 +93,7 @@ export interface VoyageCrewRecord {
   document_number: string;
   nationality: string;
   license_type?: string;
+  license_number?: string;
   license_expiry?: string;
   ocr_verified: boolean;
   waiver_signed_at: string | null;
@@ -292,15 +293,16 @@ export interface CrewContactRecord {
   nationality: string;
   default_role: "skipper" | "crew" | "guest";
   license_type?: string;
+  license_number?: string;
   license_expiry?: string;
   phone?: string;
   email?: string;
   notes?: string;
-  ocr_verified: boolean;
-  voyages_count: number;
+  ocr_verified?: boolean;
+  voyages_count?: number;
   last_embarked_at?: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 export interface UserProfileAccount {
@@ -380,7 +382,7 @@ export const PRECONFIGURED_ACCOUNTS: UserProfileAccount[] = [
   },
 ];
 
-export class MarineOSDatabase extends Dexie {
+export class MarinOSDatabase extends Dexie {
   organizations!: Table<OrganizationRecord, string>;
   vessels!: Table<VesselRecord, string>;
   vessel_systems_qr!: Table<VesselSystemQRRecord, string>;
@@ -399,9 +401,10 @@ export class MarineOSDatabase extends Dexie {
   marketplace_orders!: Table<MarketplaceOrderRecord, string>;
   integration_settings!: Table<IntegrationSettingsRecord, string>;
   crew_contacts!: Table<CrewContactRecord, string>;
+  frequent_crew!: Table<CrewContactRecord, string>;
 
   constructor() {
-    super("MarineOSLocalFirstDB");
+    super("MarinOSLocalFirstDB");
     this.version(5).stores({
       organizations: "id, name, country_code, plan_tier",
       vessels: "id, org_id, registration_number, name",
@@ -425,10 +428,16 @@ export class MarineOSDatabase extends Dexie {
       integration_settings: "id",
       crew_contacts: "id, document_number, full_name, license_expiry",
     });
+    // v7: frequent_crew table
+    this.version(7).stores({
+      frequent_crew: "id, document_number, full_name, license_expiry",
+    });
   }
 }
 
-export const db = new MarineOSDatabase();
+export const MarineOSDatabase = MarinOSDatabase;
+export const db = new MarinOSDatabase();
+export type FrequentCrewRecord = CrewContactRecord;
 
 // ===========================================================================
 // INTEGRATION HUB DEFAULTS
@@ -536,8 +545,11 @@ export async function saveCrewContactFromVoyageCrew(
     updated_at: now,
   };
   await db.crew_contacts.put(record);
+  if (db.frequent_crew) {
+    await db.frequent_crew.put(record);
+  }
   await enqueueOfflineMutation({
-    table_name: "crew_contacts",
+    table_name: "frequent_crew",
     operation: "UPSERT",
     record_id: id,
     payload: record as unknown as Record<string, unknown>,
@@ -907,6 +919,62 @@ export async function ensureDemoSeedData(): Promise<void> {
               created_at: now,
             },
           ]);
+
+          // 7b. Seed Initial Frequent Crew / Contacts (Agenda de Tripulación Frecuente)
+          const initialFrequentCrew: CrewContactRecord[] = [
+            {
+              id: "contact-felipe-valverde",
+              full_name: "Cap. Felipe Valverde",
+              document_type: "RUT",
+              document_number: "13.452.890-1",
+              nationality: "Chilena",
+              license_type: "Capitán Deportivo de Alta Mar (DIRECTEMAR)",
+              license_number: "ARM-CL-94821",
+              license_expiry: "2031-06-30",
+              default_role: "skipper",
+              notes: "Capitán y Armador SV Albatros",
+              ocr_verified: true,
+              voyages_count: 14,
+              created_at: now,
+              updated_at: now,
+            },
+            {
+              id: "contact-rodrigo-soto",
+              full_name: "Skipper Rodrigo Soto",
+              document_type: "RUT",
+              document_number: "16.781.234-K",
+              nationality: "Chilena",
+              license_type: "Capitán Deportivo Costero (DIRECTEMAR)",
+              license_number: "ARM-CL-77412",
+              license_expiry: "2029-11-15",
+              default_role: "skipper",
+              notes: "Patrón de relevo y oficial de guardia",
+              ocr_verified: true,
+              voyages_count: 8,
+              created_at: now,
+              updated_at: now,
+            },
+            {
+              id: "contact-cami-vargas",
+              full_name: "Cami Vargas",
+              document_type: "RUT",
+              document_number: "19.832.104-5",
+              nationality: "Chilena",
+              license_type: "Patrón Deportivo de Bahía (DIRECTEMAR)",
+              license_number: "ARM-CL-66019",
+              license_expiry: "2027-02-10",
+              default_role: "crew",
+              notes: "Proel y navegante táctico",
+              ocr_verified: true,
+              voyages_count: 5,
+              created_at: now,
+              updated_at: now,
+            },
+          ];
+          await db.crew_contacts.bulkPut(initialFrequentCrew);
+          if (db.frequent_crew) {
+            await db.frequent_crew.bulkPut(initialFrequentCrew);
+          }
 
           // 8. Vessel Manual Chunks for local offline RAG
           await db.vessel_manual_chunks.bulkPut([

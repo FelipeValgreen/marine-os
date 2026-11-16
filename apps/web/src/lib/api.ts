@@ -1,5 +1,5 @@
 /**
- * Marine OS — Unified API URL Resolver
+ * MarinOS — Unified API URL Resolver
  * Resolves the base URL for FastAPI backend endpoints:
  * - If NEXT_PUBLIC_API_URL is explicitly set, uses it (even if empty string for relative paths).
  * - On client-side in production (non-localhost), defaults to "" (same-origin relative path)

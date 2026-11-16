@@ -233,7 +233,7 @@ export function parseGPX(gpxXml: string): GPXParseResult {
  */
 export function getDefaultChiloeGPX(): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Marine OS Nautical Copilot">
+<gpx version="1.1" creator="MarinOS Nautical Copilot">
   <rte>
     <name>Seno de Reloncaví: Puerto Montt a Caleta Mechuque</name>
     <rtept lat="-41.4717" lon="-72.9369"><name>WP1 Canal Tenglo / Puerto Montt</name><desc>Zarpe Seno de Reloncaví</desc></rtept>
