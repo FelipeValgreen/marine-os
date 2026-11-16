@@ -22,6 +22,15 @@ class SyncBatchRequest(BaseModel):
     items: List[SyncQueueItemPayload]
 
 
+@router.get("/status")
+async def get_sync_status():
+    return {
+        "status": "ready",
+        "protocol": "LWW-SHA256",
+        "server_time": datetime.utcnow().isoformat() + "Z",
+    }
+
+
 @router.post("/batch")
 async def sync_offline_queue(req: SyncBatchRequest):
     """
