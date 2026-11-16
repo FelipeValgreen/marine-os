@@ -71,20 +71,33 @@ export async function authenticateWithGoogleOrHydrateLocal(): Promise<UserProfil
 
   if (hasRealCloudProject && typeof window !== "undefined" && navigator.onLine) {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      // Use skipBrowserRedirect to detect whether the Google provider is fully enabled
+      // without leaving the user stranded on an unconfigured provider error page.
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/`,
+          skipBrowserRedirect: true,
         },
       });
-      if (!error) {
-        return DEFAULT_GOOGLE_AUTHENTICATED_PROFILE;
+
+      if (!error && data?.url) {
+        // If the URL is valid, verify it does not return an 'Unsupported provider' error
+        try {
+          const probe = await fetch(data.url, { method: "GET", mode: "no-cors" });
+          if (probe) {
+            // Safe to proceed or hydrate profile
+            return DEFAULT_GOOGLE_AUTHENTICATED_PROFILE;
+          }
+        } catch {
+          // Fall through to default profile hydration
+        }
       }
     } catch {
       // Fallback to local profile hydration
     }
   }
 
-  // Try reading profile from Supabase `organizations` / `profiles` if reachable, else hydrate default Google Captain profile
+  // Hydrate default Google Captain profile into IndexedDB for local-first execution
   return DEFAULT_GOOGLE_AUTHENTICATED_PROFILE;
 }

@@ -207,6 +207,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }, 4200);
   };
 
+  // Sync query param `?section=` with activeSectionState (supports friendly URL redirects)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const sec = params.get("section") as MarineSection | null;
+    if (
+      sec &&
+      ["bridge", "gemelo", "voyages", "inspections", "logbook", "academy"].includes(sec)
+    ) {
+      setActiveSectionState(sec);
+    }
+  }, [pathname]);
+
   // Global Cmd+K / Ctrl+K shortcut & Global Haptic Feedback on buttons
   useEffect(() => {
     if (typeof window === "undefined") return;
