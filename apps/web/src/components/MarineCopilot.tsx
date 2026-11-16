@@ -78,9 +78,8 @@ export function MarineCopilot({
   }>({
     answer: `[TELEMETRÍA CONTEXTUAL EN VIVO: POS ${vesselContext.dms_coords} • Viento ${vesselContext.wind_speed_kn.toFixed(
       1
-    )} kn • Calado ${vesselContext.draft_meters}m • Horómetro ${
-      vesselContext.engine_hours
-    }h]\n\nDIAGNÓSTICO YANMAR 4JH57: 1) Verificar grifo de fondo de agua salada abierto (palanca vertical bajo escalera del salón). 2) Limpiar filtro de agua de mar Vetus. 3) Tienes 2 unidades de 'Impulsor Bomba Agua Yanmar + Empaquetadura' vinculadas al nodo QR yanmar-4jh57.`,
+    )} kn • Calado ${vesselContext.draft_meters}m • Horómetro ${vesselContext.engine_hours
+      }h]\n\nDIAGNÓSTICO YANMAR 4JH57: 1) Verificar grifo de fondo de agua salada abierto (palanca vertical bajo escalera del salón). 2) Limpiar filtro de agua de mar Vetus. 3) Tienes 2 unidades de 'Impulsor Bomba Agua Yanmar + Empaquetadura' vinculadas al nodo QR yanmar-4jh57.`,
     manual_title: "Manual Técnico Yanmar 4JH57 Common Rail (Sección 4.2)",
     page_number: 48,
     related_qr_slug: "yanmar-4jh57",
@@ -151,8 +150,7 @@ export function MarineCopilot({
     ctx.font = "12px monospace";
     ctx.fillText(`GPS: ${vesselContext.dms_coords}`, 22, 78);
     ctx.fillText(
-      `VIENTO: ${vesselContext.wind_speed_kn.toFixed(1)} KN | CALADO: ${
-        vesselContext.draft_meters
+      `VIENTO: ${vesselContext.wind_speed_kn.toFixed(1)} KN | CALADO: ${vesselContext.draft_meters
       }M`,
       22,
       104
@@ -243,27 +241,25 @@ export function MarineCopilot({
         q.includes("racor") || q.includes("combustible")
           ? c.manual_title.toLowerCase().includes("racor")
           : q.includes("baño") || q.includes("jabsco")
-          ? c.manual_title.toLowerCase().includes("jabsco")
-          : q.includes("ancla") || q.includes("molinete")
-          ? c.manual_title.toLowerCase().includes("molinete")
-          : c.manual_title.toLowerCase().includes("yanmar")
+            ? c.manual_title.toLowerCase().includes("jabsco")
+            : q.includes("ancla") || q.includes("molinete")
+              ? c.manual_title.toLowerCase().includes("molinete")
+              : c.manual_title.toLowerCase().includes("yanmar")
       ) || manualChunks[0];
 
     const ukc = (vesselContext.depth_m - vesselContext.draft_meters).toFixed(2);
     const contextHeader = `[CONTEXTO OFFLINE INYECTADO: POS ${vesselContext.dms_coords} • Viento ${vesselContext.wind_speed_kn.toFixed(
       1
-    )}kn • UKC ${ukc}m (Calado ${vesselContext.draft_meters}m) • Horómetro ${
-      vesselContext.engine_hours
-    }h]`;
+    )}kn • UKC ${ukc}m (Calado ${vesselContext.draft_meters}m) • Horómetro ${vesselContext.engine_hours
+      }h]`;
     const visionNote = attachedImageBase64
       ? `\n[VISIÓN MULTIMODAL OFFLINE: Evidencia '${attachedImageLabel}' vinculada al diagnóstico]`
       : "";
 
     setResponse({
-      answer: `${contextHeader}${visionNote}\n\n${
-        match?.content ||
+      answer: `${contextHeader}${visionNote}\n\n${match?.content ||
         "Verificar grifo de fondo abierto y revisar impulsor Yanmar 4JH57."
-      }`,
+        }`,
       manual_title:
         match?.manual_title || "Manual Técnico Yanmar 4JH57 Common Rail",
       page_number: match?.page_number || 48,
