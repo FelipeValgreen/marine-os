@@ -240,11 +240,10 @@ export function MarineAcademy({
                 return (
                   <div
                     key={lesson.id}
-                    className={`p-4 rounded-2xl border transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                      isSelected
-                        ? "bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]/50"
-                        : "bg-white/[0.03] border-white/10 hover:bg-white/[0.06]"
-                    }`}
+                    className={`p-4 rounded-2xl border transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${isSelected
+                      ? "bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]/50"
+                      : "bg-white/[0.03] border-white/10 hover:bg-white/[0.06]"
+                      }`}
                   >
                     <div className="flex items-start gap-3.5 min-w-0">
                       <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[var(--accent-primary)] shrink-0 mt-0.5">
@@ -277,11 +276,10 @@ export function MarineAcademy({
                     <button
                       type="button"
                       onClick={() => setActiveLesson(lesson)}
-                      className={`marine-btn text-xs px-4 shrink-0 ${
-                        isSelected
-                          ? "marine-btn-primary"
-                          : "marine-btn-secondary"
-                      }`}
+                      className={`marine-btn text-xs px-4 shrink-0 ${isSelected
+                        ? "marine-btn-primary"
+                        : "marine-btn-secondary"
+                        }`}
                     >
                       <Play className="w-4 h-4" />
                       <span>Ver Clase</span>
