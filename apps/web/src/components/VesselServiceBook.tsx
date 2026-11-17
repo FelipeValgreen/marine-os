@@ -215,10 +215,8 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
     <div data-testid="vessel-service-book" className="space-y-6">
       {/* Top Value Proposition & Resale Multiplier Header */}
       <div className="marine-card p-6 sm:p-7 relative overflow-hidden">
-        {/* Subtle backdrop glow */}
-        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[var(--accent-primary)]/10 blur-3xl pointer-events-none" />
 
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-white/10 pb-5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-white/5 pb-5">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 uppercase">
@@ -246,7 +244,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
               type="button"
               data-testid="add-service-record-btn"
               onClick={() => setIsAddingService(true)}
-              className="marine-btn marine-btn-primary text-xs sm:text-sm px-4 py-2.5 flex items-center gap-2 shadow-lg shadow-[var(--accent-primary)]/20"
+              className="marine-btn marine-btn-primary text-xs sm:text-sm px-4 py-2.5 flex items-center gap-2 shadow-none"
             >
               <Plus className="w-4 h-4" />
               <span>Registrar Servicio Técnico</span>
@@ -256,7 +254,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
 
         {/* Executive Metrics Strip */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 font-mono text-xs">
-          <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/10">
+          <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5">
             <div className="text-[10px] opacity-60 flex items-center gap-1">
               <FileCheck2 className="w-3.5 h-3.5 text-[#00E5FF]" />
               <span>INTERVENCIONES TOTALES</span>
@@ -267,7 +265,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
             <div className="text-[10px] opacity-50 mt-0.5">Selladas con SHA-256</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/10">
+          <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5">
             <div className="text-[10px] opacity-60 flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
               <span>HORÓMETRO ÚLTIMO SERVICIO</span>
@@ -280,7 +278,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/10">
+          <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5">
             <div className="text-[10px] opacity-60 flex items-center gap-1">
               <Wrench className="w-3.5 h-3.5 text-[#00E676]" />
               <span>PRÓXIMO HITO OFICIAL</span>
@@ -291,7 +289,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/10">
+          <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5">
             <div className="text-[10px] opacity-60 flex items-center gap-1">
               <DollarSign className="w-3.5 h-3.5 text-[#FF9F0A]" />
               <span>INVERSIÓN EN MANTENCIÓN</span>
@@ -318,12 +316,12 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
               key={tab.id}
               type="button"
               onClick={() => setFilterType(tab.id)}
-              className={`px-3 py-1.5 rounded-xl border text-xs transition-colors ${
+              className={`px-3 py-1.5 rounded-xl border text-xs transition-colors shadow-none ${
                 filterType === tab.id
                   ? isNight
-                    ? "bg-[#FF0000] text-black border-[#FF0000] font-bold"
-                    : "bg-[var(--accent-primary)] text-white border-[var(--accent-primary)] font-bold shadow-md shadow-[var(--accent-primary)]/20"
-                  : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white"
+                    ? "bg-red-950/40 text-red-500 border-b-2 border-b-red-500 border-transparent font-bold shadow-none"
+                    : "bg-[#1a2332] text-[var(--accent-primary)] border-b-2 border-b-[var(--accent-primary)] border-transparent font-bold shadow-none"
+                  : "bg-white/[0.03] border-transparent text-white/70 hover:bg-white/[0.06] hover:text-white"
               }`}
             >
               {tab.label}
@@ -367,7 +365,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                   {/* Card Container */}
                   <div className="marine-card p-5 sm:p-6 space-y-4 transition-all hover:border-white/20 hover:shadow-xl">
                     {/* Header Row */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span
@@ -406,7 +404,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                         {service.replaced_parts.map((part, pIdx) => (
                           <span
                             key={pIdx}
-                            className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/90"
+                            className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 text-white/90"
                           >
                             ✓ {part}
                           </span>
@@ -455,7 +453,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                     )}
 
                     {/* Immutable Cryptographic Signature Footer */}
-                    <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-mono text-[10px]">
+                    <div className="pt-2 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-mono text-[10px]">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="text-[#00E676] font-bold shrink-0 flex items-center gap-1">
                           <CheckCircle2 className="w-3.5 h-3.5" />
@@ -503,7 +501,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-[var(--accent-primary)]" />
                 <h3 className="text-base sm:text-lg font-bold">
@@ -530,7 +528,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
                   placeholder="Ej. Cambio de Rodete Bomba Agua y Filtros Yanmar"
-                  className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/10"
+                  className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
                 />
               </div>
 
@@ -542,7 +540,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                   <select
                     value={formType}
                     onChange={(e) => setFormType(e.target.value as VesselMaintenanceType)}
-                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                   >
                     <option value="preventive">Preventivo Oficial</option>
                     <option value="warranty_check">Garantía &amp; Compliance</option>
@@ -562,7 +560,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                     required
                     value={formHorometer}
                     onChange={(e) => setFormHorometer(e.target.value)}
-                    className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/5"
                   />
                 </div>
               </div>
@@ -576,7 +574,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                   value={formParts}
                   onChange={(e) => setFormParts(e.target.value)}
                   placeholder="Impulsor Yanmar, Ánodo Zinc MaxProp, Filtro Racor R20P"
-                  className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/10"
+                  className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
                 />
               </div>
 
@@ -590,7 +588,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                     value={formTechnician}
                     onChange={(e) => setFormTechnician(e.target.value)}
                     placeholder="Carlos Morales (Yanmar Cert.)"
-                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                   />
                 </div>
 
@@ -603,7 +601,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                     value={formDealer}
                     onChange={(e) => setFormDealer(e.target.value)}
                     placeholder="Yanmar Marine Chile Official"
-                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                   />
                 </div>
               </div>
@@ -618,7 +616,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                     value={formCost}
                     onChange={(e) => setFormCost(e.target.value)}
                     placeholder="450"
-                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                   />
                 </div>
 
@@ -631,7 +629,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                     required
                     value={formDate}
                     onChange={(e) => setFormDate(e.target.value)}
-                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                   />
                 </div>
               </div>
@@ -645,7 +643,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   placeholder="Detalles sobre temperatura de escape, torque de tornillos, análisis de aceite..."
-                  className="w-full p-3 text-sm rounded-xl bg-white/5 border border-white/10 font-mono"
+                  className="w-full p-3 text-sm rounded-xl bg-white/5 border border-white/5 font-mono"
                 />
               </div>
 
@@ -658,7 +656,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                 </span>
               </div>
 
-              <div className="pt-3 border-t border-white/10 flex items-center justify-end gap-3">
+              <div className="pt-3 border-t border-white/5 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsAddingService(false)}

@@ -177,7 +177,7 @@ export function IntegrationHub() {
         =================================================================== */}
         <div
           data-testid="integration-card-signalk"
-          className="marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/50 hover:border-white/10 transition-all"
+          className="marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/50 hover:border-white/5 transition-all"
         >
           <div className="space-y-4">
             <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-4">
@@ -195,7 +195,7 @@ export function IntegrationHub() {
                 className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${
                   formData.signalk.enabled
                     ? "bg-[#00E676]/15 text-[#00E676] border-[#00E676]/40"
-                    : "bg-white/5 text-white/50 border-white/10"
+                    : "bg-white/5 text-white/50 border-white/5"
                 }`}
               >
                 {formData.signalk.enabled ? "CONECTADO" : "DESCONECTADO"}
@@ -245,7 +245,7 @@ export function IntegrationHub() {
         =================================================================== */}
         <div
           data-testid="integration-card-directemar"
-          className="marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/50 hover:border-white/10 transition-all"
+          className="marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/50 hover:border-white/5 transition-all"
         >
           <div className="space-y-4">
             <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-4">
@@ -263,7 +263,7 @@ export function IntegrationHub() {
                 className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${
                   formData.directemar.enabled
                     ? "bg-[#00E676]/15 text-[#00E676] border-[#00E676]/40"
-                    : "bg-white/5 text-white/50 border-white/10"
+                    : "bg-white/5 text-white/50 border-white/5"
                 }`}
               >
                 {formData.directemar.enabled ? "CONECTADO" : "DESCONECTADO"}
@@ -312,7 +312,7 @@ export function IntegrationHub() {
         =================================================================== */}
         <div
           data-testid="integration-card-meteo"
-          className="marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/50 hover:border-white/10 transition-all"
+          className="marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/50 hover:border-white/5 transition-all"
         >
           <div className="space-y-4">
             <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-4">
@@ -371,7 +371,7 @@ export function IntegrationHub() {
         =================================================================== */}
         <div
           data-testid="integration-card-satellite"
-          className="marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/50 hover:border-white/10 transition-all"
+          className="marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/50 hover:border-white/5 transition-all"
         >
           <div className="space-y-4">
             <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-4">
@@ -389,7 +389,7 @@ export function IntegrationHub() {
                 className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${
                   formData.satellite.enabled
                     ? "bg-[#00E676]/15 text-[#00E676] border-[#00E676]/40"
-                    : "bg-white/5 text-white/50 border-white/10"
+                    : "bg-white/5 text-white/50 border-white/5"
                 }`}
               >
                 {formData.satellite.enabled ? "CONECTADO" : "STANDBY"}
@@ -460,7 +460,7 @@ export function IntegrationHub() {
               className="w-full max-w-md rounded-3xl bg-[#040B16] border border-white/5 p-6 space-y-5 shadow-2xl shadow-black/80"
               onClick={(e) => e.stopPropagation()}
             >
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <div className="flex items-center gap-2">
                 <Radio className="w-5 h-5 text-[#00E5FF]" />
                 <h3 className="font-bold text-base text-white">Configurar Gateway Signal K</h3>
@@ -483,7 +483,7 @@ export function IntegrationHub() {
               }}
               className="space-y-4 text-xs font-mono"
             >
-              <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
                 <span className="font-bold">Habilitar Integración Signal K</span>
                 <input
                   type="checkbox"
@@ -511,7 +511,7 @@ export function IntegrationHub() {
                     })
                   }
                   placeholder="192.168.1.100 o localhost"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/10"
+                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
                 />
               </div>
 
@@ -530,7 +530,7 @@ export function IntegrationHub() {
                         },
                       })
                     }
-                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                   />
                 </div>
 
@@ -547,7 +547,7 @@ export function IntegrationHub() {
                         },
                       })
                     }
-                    className="w-full min-h-12 px-2 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-12 px-2 text-xs rounded-xl bg-white/5 border border-white/5"
                   >
                     <option value="http">HTTP (Red Barco)</option>
                     <option value="https">HTTPS</option>
@@ -555,7 +555,7 @@ export function IntegrationHub() {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
+              <div className="pt-3 border-t border-white/5 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
@@ -622,7 +622,7 @@ export function IntegrationHub() {
               }}
               className="space-y-4 text-xs font-mono"
             >
-              <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
                 <span className="font-bold">Habilitar e-Zarpe Directemar</span>
                 <input
                   type="checkbox"
@@ -653,7 +653,7 @@ export function IntegrationHub() {
                     })
                   }
                   placeholder="CB-4582"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/10"
+                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
                 />
               </div>
 
@@ -670,7 +670,7 @@ export function IntegrationHub() {
                     })
                   }
                   placeholder="13.452.890-1"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/10"
+                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
                 />
               </div>
 
@@ -686,11 +686,11 @@ export function IntegrationHub() {
                     })
                   }
                   placeholder="••••••••••••••••••••••••"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/10"
+                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
                 />
               </div>
 
-              <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
+              <div className="pt-3 border-t border-white/5 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
@@ -831,7 +831,7 @@ export function IntegrationHub() {
               }}
               className="space-y-4 text-xs font-mono"
             >
-              <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
                 <span className="font-bold">Habilitar Satelital</span>
                 <input
                   type="checkbox"
@@ -859,7 +859,7 @@ export function IntegrationHub() {
                       },
                     })
                   }
-                  className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                  className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                 >
                   <option value="iridium_go">Iridium GO! (Wi-Fi Local)</option>
                   <option value="garmin_inreach">Garmin inReach (MapShare Feed)</option>
@@ -879,7 +879,7 @@ export function IntegrationHub() {
                     })
                   }
                   placeholder="192.168.10.1"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/10"
+                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
                 />
               </div>
 
@@ -895,11 +895,11 @@ export function IntegrationHub() {
                     })
                   }
                   placeholder="300434063991200"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/10"
+                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
                 />
               </div>
 
-              <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
+              <div className="pt-3 border-t border-white/5 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}

@@ -1286,14 +1286,14 @@ export default function MarineOSHomePage() {
 
             <span className="hidden sm:inline opacity-25">|</span>
 
-            <div className="relative inline-flex items-center rounded-full bg-black/40 p-1 border border-white/10">
+            <div className="relative inline-flex items-center rounded-full bg-black/40 p-1 border border-white/5">
               <button
                 type="button"
                 data-testid="gps-mode-simulator-btn"
                 onClick={() => setGpsMode("simulator")}
                 className={`min-h-14 px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "simulator"
-                  ? "bg-[var(--accent-primary)] text-[var(--accent-contrast)] font-bold"
-                  : "opacity-70 hover:opacity-100"
+                  ? "bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-bold"
+                  : "opacity-60 hover:opacity-100"
                   }`}
               >
                 SIM
@@ -1303,8 +1303,8 @@ export default function MarineOSHomePage() {
                 data-testid="gps-mode-native-btn"
                 onClick={() => setGpsMode("native_gps")}
                 className={`min-h-14 px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "native_gps"
-                  ? "bg-[var(--accent-primary)] text-[var(--accent-contrast)] font-bold"
-                  : "opacity-70 hover:opacity-100"
+                  ? "bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-bold"
+                  : "opacity-60 hover:opacity-100"
                   }`}
               >
                 GPS REAL
@@ -1481,7 +1481,7 @@ export default function MarineOSHomePage() {
                 <div className="marine-card h-full p-5 flex flex-col justify-between overflow-y-auto space-y-4 border border-white/5 shadow-2xl shadow-black/80">
               <div className="space-y-4">
                 {/* Drawer Mode Switcher + Close Button */}
-                <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div className="flex items-center justify-between gap-2 border-b border-white/5 pb-3">
                   <div className="grid grid-cols-3 gap-1.5 flex-1">
                     <button
                       type="button"
@@ -1576,7 +1576,7 @@ export default function MarineOSHomePage() {
                       ))}
                     </div>
 
-                    <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5">
+                    <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2.5">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-[var(--accent-primary)]">
                           {passagePlan.label}
@@ -1619,7 +1619,7 @@ export default function MarineOSHomePage() {
                         </div>
                       </div>
 
-                      <div className="pt-2 border-t border-white/10 text-[11px] text-[#00E676]">
+                      <div className="pt-2 border-t border-white/5 text-[11px] text-[#00E676]">
                         Plan Vélico: <strong>{passagePlan.sail_plan}</strong>
                       </div>
                     </div>
@@ -1665,7 +1665,7 @@ export default function MarineOSHomePage() {
 
                     {/* Real-Time Open-Meteo Weather & Marine Readouts with Zero-CLS Skeletons */}
                     <div className="grid grid-cols-2 gap-2.5 font-mono">
-                      <div className="min-h-[96px] p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+                      <div className="min-h-[96px] p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col justify-between">
                         <div className="flex items-center justify-between text-[10px] opacity-60 uppercase">
                           <span>VIENTO REAL</span>
                           <Wind className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
@@ -1692,7 +1692,7 @@ export default function MarineOSHomePage() {
                         )}
                       </div>
 
-                      <div className="min-h-[96px] p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+                      <div className="min-h-[96px] p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col justify-between">
                         <div className="flex items-center justify-between text-[10px] opacity-60 uppercase">
                           <span>OLEAJE MARINO</span>
                           <Waves className="w-3.5 h-3.5 text-[#00E676]" />
@@ -1720,7 +1720,7 @@ export default function MarineOSHomePage() {
                     </div>
 
                     {/* Calculated Chain Scope & Safety Score */}
-                    <div className="min-h-[148px] p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2 font-mono text-xs flex flex-col justify-between">
+                    <div className="min-h-[148px] p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2 font-mono text-xs flex flex-col justify-between">
                       {liveWeather.loading ? (
                         <div className="space-y-2.5 py-1">
                           <div className="h-4 w-full marine-skeleton" />
@@ -1753,7 +1753,7 @@ export default function MarineOSHomePage() {
                             <span className="opacity-70">AMPLITUD DE MAREA</span>
                             <span>+{scopeCalc.tideAmplitudeMeters}m</span>
                           </div>
-                          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-sm font-bold text-[var(--accent-primary)]">
+                          <div className="pt-2 border-t border-white/5 flex items-center justify-between text-sm font-bold text-[var(--accent-primary)]">
                             <span>CADENA RECOMENDADA</span>
                             <span>
                               {scopeCalc.recommendedChainMeters}m (Ratio{" "}
@@ -1765,7 +1765,7 @@ export default function MarineOSHomePage() {
                     </div>
 
                     {/* Circular Anchor Watch Radar & Siren Controls */}
-                    <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-3">
+                    <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 font-semibold text-xs">
                           <BellRing className="w-4 h-4 text-[var(--accent-primary)]" />
@@ -1854,7 +1854,7 @@ export default function MarineOSHomePage() {
               </div>
 
               {/* Bottom GPX Import in Drawer */}
-              <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+              <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs font-mono">
                 <span className="opacity-60 truncate pr-2">
                   GPX: {parsedRoute.totalDistanceNm} MN
                 </span>
@@ -1949,7 +1949,7 @@ export default function MarineOSHomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-5 space-y-6">
               <div className="marine-card p-6 space-y-4">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center justify-between border-b border-white/5 pb-3">
                   <div>
                     <div className="text-[11px] font-mono uppercase tracking-widest text-[var(--accent-primary)]">
                       DIGITAL TWIN • SIGNAL K NMEA 2000 LIVE
@@ -1962,7 +1962,7 @@ export default function MarineOSHomePage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 font-mono text-xs">
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
                     <div className="opacity-60 text-[10px]">
                       YANMAR 4JH57 (RPM)
                     </div>
@@ -1973,7 +1973,7 @@ export default function MarineOSHomePage() {
                       {telemetry.rpm} RPM
                     </div>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
                     <div className="opacity-60 text-[10px]">
                       REFRIGERANTE MOTOR
                     </div>
@@ -1981,13 +1981,13 @@ export default function MarineOSHomePage() {
                       {telemetry.coolant_temp_c.toFixed(1)} °C
                     </div>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
                     <div className="opacity-60 text-[10px]">PRESIÓN ACEITE</div>
                     <div className="font-semibold text-base mt-1">
                       {telemetry.oil_pressure_kpa} kPa
                     </div>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
                     <div className="opacity-60 text-[10px]">
                       ALTERNADOR / SOC
                     </div>
@@ -1996,14 +1996,14 @@ export default function MarineOSHomePage() {
                       {telemetry.house_battery_soc_pct}%)
                     </div>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
                     <div className="opacity-60 text-[10px]">ESLORA × CALADO</div>
                     <div className="font-semibold text-sm mt-1">
                       {vessel?.loa_meters || 12.43}m ×{" "}
                       {vessel?.draft_meters || 2.18}m
                     </div>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
                     <div className="opacity-60 text-[10px]">HORÓMETRO ACTUAL</div>
                     <div
                       data-testid="vessel-horometer-value"
@@ -2014,7 +2014,7 @@ export default function MarineOSHomePage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-3">
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-mono">
                     <span className="opacity-80">Próximo servicio 1.500h:</span>
                     <span className="text-[#00E676]">
@@ -2055,7 +2055,7 @@ export default function MarineOSHomePage() {
               </div>
 
               <div className="marine-card p-6 space-y-3">
-                <h2 className="text-lg font-semibold flex items-center gap-2 border-b border-white/10 pb-3">
+                <h2 className="text-lg font-semibold flex items-center gap-2 border-b border-white/5 pb-3">
                   <QrCode className="w-5 h-5 text-[var(--accent-primary)]" />
                   <span>Sistemas QR Twins a Bordo ({qrNodes.length})</span>
                 </h2>
@@ -2063,7 +2063,7 @@ export default function MarineOSHomePage() {
                   {qrNodes.map((node) => (
                     <div
                       key={node.id}
-                      className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-wrap items-center justify-between gap-2"
+                      className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-2"
                     >
                       <div className="min-w-0">
                         <div className="font-medium text-sm truncate">
@@ -2088,12 +2088,12 @@ export default function MarineOSHomePage() {
 
             <div className="lg:col-span-7 space-y-6">
               <div className="marine-card p-6 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
                   <h2 className="text-lg font-semibold">
                     Inventario de Tambuchos & Alertas SOLAS (
                     {inventoryItems.length})
                   </h2>
-                  <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                  <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-white/5 border border-white/5">
                     IndexedDB Sync
                   </span>
                 </div>
@@ -2104,7 +2104,7 @@ export default function MarineOSHomePage() {
                     return (
                       <div
                         key={item.id}
-                        className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-wrap items-center justify-between gap-3"
+                        className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-3"
                       >
                         <div className="min-w-0">
                           <div className="font-medium text-sm flex flex-wrap items-center gap-2">
@@ -2137,7 +2137,7 @@ export default function MarineOSHomePage() {
                           >
                             <Minus className="w-4 h-4" />
                           </button>
-                          <span className="min-h-14 px-3.5 flex items-center rounded-xl bg-white/5 border border-white/10 font-bold text-sm">
+                          <span className="min-h-14 px-3.5 flex items-center rounded-xl bg-white/5 border border-white/5 font-bold text-sm">
                             {item.quantity} uds
                           </span>
                           <button
@@ -2161,7 +2161,7 @@ export default function MarineOSHomePage() {
 
                 <form
                   onSubmit={handleAddInventoryItemOffline}
-                  className="pt-3 border-t border-white/10 flex flex-wrap gap-2"
+                  className="pt-3 border-t border-white/5 flex flex-wrap gap-2"
                 >
                   <input
                     type="text"
@@ -2488,13 +2488,13 @@ export default function MarineOSHomePage() {
                     </div>
 
                     {/* Wallet Interactive Controls (Test Semaphore & License Tier Offline in IndexedDB) */}
-                    <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                    <div className="pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           data-testid="share-passport-trophy-btn"
                           onClick={() => setIsSharingPassport(true)}
-                          className="marine-btn text-xs px-3.5 bg-gradient-to-r from-[var(--accent-primary)] to-[#FF7043] text-white font-semibold shadow-lg shadow-[var(--accent-primary)]/20 hover:brightness-110"
+                          className="marine-btn text-xs px-3.5 bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-semibold shadow-none hover:bg-[#202c3f]"
                         >
                           <Share2 className="w-4 h-4" />
                           <span>Compartir mi Perfil / Logbook</span>
@@ -2602,7 +2602,7 @@ export default function MarineOSHomePage() {
                 </div>
 
                 {/* Sub-Tab Navigation: Bitácora & Replay vs. Órdenes de Repuestos */}
-                <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-3 pt-2">
+                <div className="flex flex-wrap items-center gap-2 border-b border-white/5 pb-3 pt-2">
                   <button
                     type="button"
                     data-testid="logbook-tab-entries-btn"
@@ -2638,7 +2638,7 @@ export default function MarineOSHomePage() {
                   /* Bottom Row: Track Recorder & Replay + Watch Logbook & Expenses */
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <div className="lg:col-span-7 marine-card p-6 space-y-4">
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
                         <div>
                           <h2 className="text-lg font-semibold flex items-center gap-2">
                             <Award className="w-5 h-5 text-[var(--accent-primary)]" />
@@ -2683,7 +2683,7 @@ export default function MarineOSHomePage() {
                               className={`min-h-14 p-3.5 rounded-xl border text-left font-mono text-xs transition ${
                                 selectedReplayTrackId === trk.id
                                   ? "bg-[var(--accent-primary)]/15 border-[var(--accent-primary)]/50"
-                                  : "bg-white/[0.03] border-white/10 hover:bg-white/[0.06]"
+                                  : "bg-white/[0.03] border-white/5 hover:bg-white/[0.06]"
                               }`}
                             >
                               <div className="font-semibold truncate">{trk.title}</div>
@@ -2696,7 +2696,7 @@ export default function MarineOSHomePage() {
                         </div>
 
                         {activeReplayTrack && (
-                          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
+                          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
                             <button
                               type="button"
                               data-testid="replay-track-btn"
@@ -2763,7 +2763,7 @@ export default function MarineOSHomePage() {
 
                     <div className="lg:col-span-5 space-y-6">
                       <div className="marine-card p-6 space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
                           <h3 className="text-lg font-semibold flex items-center gap-2">
                             <BookOpen className="w-5 h-5 text-[var(--accent-primary)]" />
                             <span>
@@ -2817,7 +2817,7 @@ export default function MarineOSHomePage() {
                           {logbookEntries.map((entry) => (
                             <div
                               key={entry.id}
-                              className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs font-mono"
+                              className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs font-mono"
                             >
                               <div className="flex justify-between font-semibold text-[var(--accent-primary)]">
                                 <span>{entry.author}</span>
@@ -2836,7 +2836,7 @@ export default function MarineOSHomePage() {
                       </div>
 
                       <div className="marine-card p-6 space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
                           <h3 className="text-base font-semibold flex items-center gap-2">
                             <Receipt className="w-5 h-5 text-[#00E676]" />
                             <span>Gastos de Travesía &amp; OCR Boletas</span>
@@ -2869,7 +2869,7 @@ export default function MarineOSHomePage() {
                           {expenses.map((exp) => (
                             <div
                               key={exp.id}
-                              className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-xs font-mono"
+                              className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between text-xs font-mono"
                             >
                               <div className="min-w-0 pr-2">
                                 <div className="font-medium truncate">{exp.title}</div>
@@ -2888,7 +2888,7 @@ export default function MarineOSHomePage() {
                         </div>
 
                         {/* División Automática de Gastos (Split-Bill FinOps) */}
-                        <div className="pt-4 border-t border-white/10 space-y-3">
+                        <div className="pt-4 border-t border-white/5 space-y-3">
                           <div className="flex items-center justify-between">
                             <div className="text-xs font-mono uppercase tracking-wider text-[var(--accent-primary)] font-semibold flex items-center gap-1.5">
                               <MessageCircle className="w-3.5 h-3.5" />
@@ -2899,8 +2899,8 @@ export default function MarineOSHomePage() {
                             </span>
                           </div>
 
-                          <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-3">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono pb-2 border-b border-white/10">
+                          <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono pb-2 border-b border-white/5">
                               <div>
                                 <div className="text-[10px] uppercase opacity-60">CUOTA EXACTA POR PERSONA</div>
                                 <div className="text-lg font-bold text-[#00E676] mt-0.5">
@@ -2910,7 +2910,7 @@ export default function MarineOSHomePage() {
                                   </span>
                                 </div>
                               </div>
-                              <div className="text-left sm:text-right text-[11px] opacity-80 sm:border-l sm:border-white/10 sm:pl-3">
+                              <div className="text-left sm:text-right text-[11px] opacity-80 sm:border-l sm:border-white/5 sm:pl-3">
                                 <div>Cada tripulante debe transferir a:</div>
                                 <div className="font-bold text-white text-xs mt-0.5">
                                   {expenses[0]?.paid_by || activeAccount.name}
@@ -2993,7 +2993,7 @@ export default function MarineOSHomePage() {
                   <div className="space-y-6">
                     {/* Metrics Top Row */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
                         <div className="text-[10px] opacity-60">TOTAL ÓRDENES</div>
                         <div className="text-2xl font-bold mt-1 text-[var(--accent-primary)]">
                           {marketplaceOrders.length}
@@ -3001,7 +3001,7 @@ export default function MarineOSHomePage() {
                         <div className="text-[10px] opacity-50 mt-0.5">Repuestos Solicitados</div>
                       </div>
 
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
                         <div className="text-[10px] opacity-60">EN TRÁNSITO</div>
                         <div className="text-2xl font-bold mt-1 text-[#00E5FF]">
                           {marketplaceOrders.filter((o) => o.status === "dispatched" || o.status === "in_transit").length}
@@ -3009,7 +3009,7 @@ export default function MarineOSHomePage() {
                         <div className="text-[10px] opacity-50 mt-0.5">Rumbo al Puerto</div>
                       </div>
 
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
                         <div className="text-[10px] opacity-60">A BORDO / ENTREGADOS</div>
                         <div className="text-2xl font-bold mt-1 text-[#00E676]">
                           {marketplaceOrders.filter((o) => o.status === "delivered").length}
@@ -3017,7 +3017,7 @@ export default function MarineOSHomePage() {
                         <div className="text-[10px] opacity-50 mt-0.5">Recibidos por Tripulación</div>
                       </div>
 
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
                         <div className="text-[10px] opacity-60">PRESUPUESTO TOTAL</div>
                         <div className="text-2xl font-bold mt-1 text-white">
                           USD ${marketplaceOrders.reduce((acc, o) => acc + (o.estimated_price_usd || 0), 0).toLocaleString("es-CL")}
@@ -3031,7 +3031,7 @@ export default function MarineOSHomePage() {
                     {/* Orders List / Empty State */}
                     {marketplaceOrders.length === 0 ? (
                       <div className="marine-card p-12 text-center space-y-4">
-                        <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-[var(--accent-primary)]">
+                        <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mx-auto text-[var(--accent-primary)]">
                           <ShoppingBag className="w-8 h-8" />
                         </div>
                         <div className="max-w-md mx-auto space-y-2">
@@ -3073,7 +3073,7 @@ export default function MarineOSHomePage() {
                                     ? "border-[#00E676]/40 bg-[#00E676]/[0.02]"
                                     : isInTransit
                                     ? "border-[#00E5FF]/40 bg-[#00E5FF]/[0.02]"
-                                    : "border-white/10"
+                                    : "border-white/5"
                                 }`}
                               >
                                 <div className="flex items-start justify-between gap-3">
@@ -3131,7 +3131,7 @@ export default function MarineOSHomePage() {
                                   </div>
                                 </div>
 
-                                <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                                <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
                                   <div className="text-[10px] font-mono opacity-50">
                                     {order.created_at ? new Date(order.created_at).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" }) : "Fecha no disp."}
                                   </div>
@@ -3187,7 +3187,7 @@ export default function MarineOSHomePage() {
                         : "bg-[#0A192F] border-white/15 text-white"
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
+                    <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-4">
                       <div>
                         <h3 className="text-xl font-bold flex items-center gap-2">
                           <UserCog className="w-5 h-5 text-[var(--accent-primary)]" />
@@ -3219,7 +3219,7 @@ export default function MarineOSHomePage() {
                             onChange={(e) =>
                               setProfileFormData({ ...profileFormData, name: e.target.value })
                             }
-                            className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/10"
+                            className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
                             placeholder="Ej. Felipe Valverde"
                           />
                         </div>
@@ -3238,7 +3238,7 @@ export default function MarineOSHomePage() {
                                 avatarInitials: e.target.value.toUpperCase(),
                               })
                             }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono uppercase rounded-xl bg-white/5 border border-white/10"
+                            className="w-full min-h-12 px-3.5 text-sm font-mono uppercase rounded-xl bg-white/5 border border-white/5"
                             placeholder="FV"
                           />
                         </div>
@@ -3257,7 +3257,7 @@ export default function MarineOSHomePage() {
                                 documentType: e.target.value,
                               })
                             }
-                            className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/10"
+                            className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/5"
                           >
                             <option value="RUT" className="bg-[#0A192F]">RUT</option>
                             <option value="Pasaporte" className="bg-[#0A192F]">Pasaporte</option>
@@ -3279,7 +3279,7 @@ export default function MarineOSHomePage() {
                                 documentNumber: e.target.value,
                               })
                             }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/10"
+                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
                             placeholder="12.345.678-9"
                           />
                         </div>
@@ -3297,7 +3297,7 @@ export default function MarineOSHomePage() {
                                 nationality: e.target.value,
                               })
                             }
-                            className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/10"
+                            className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
                             placeholder="Chilena"
                           />
                         </div>
@@ -3318,7 +3318,7 @@ export default function MarineOSHomePage() {
                               licenseType: e.target.value,
                             })
                           }
-                          className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/10"
+                          className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/5"
                         >
                           <option value="Capitán Deportivo de Alta Mar (DIRECTEMAR)" className="bg-[#0A192F]">
                             Capitán Deportivo de Alta Mar (DIRECTEMAR)
@@ -3352,7 +3352,7 @@ export default function MarineOSHomePage() {
                                 licenseNumber: e.target.value,
                               })
                             }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/10"
+                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
                             placeholder="ARM-CL-94821"
                           />
                         </div>
@@ -3370,7 +3370,7 @@ export default function MarineOSHomePage() {
                                 licenseExpiry: e.target.value,
                               })
                             }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/10"
+                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
                           />
                         </div>
 
@@ -3388,7 +3388,7 @@ export default function MarineOSHomePage() {
                                 maxLoaMeters: parseFloat(e.target.value) || 0,
                               })
                             }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/10"
+                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
                           />
                         </div>
                       </div>
@@ -3406,12 +3406,12 @@ export default function MarineOSHomePage() {
                               vhfOperatorCert: e.target.value,
                             })
                           }
-                          className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/10"
+                          className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
                           placeholder="Certificado Radioperador Restringido VHF"
                         />
                       </div>
 
-                      <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+                      <div className="pt-4 border-t border-white/5 flex items-center justify-end gap-3">
                         <button
                           type="button"
                           onClick={() => setIsEditingProfile(false)}
@@ -3437,11 +3437,11 @@ export default function MarineOSHomePage() {
                   onClick={() => setIsSharingPassport(false)}
                 >
                   <div
-                    className="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl bg-[#040B16] border-2 border-[var(--accent-primary)]/50 p-6 sm:p-7 shadow-2xl shadow-[var(--accent-primary)]/20 relative space-y-5"
+                    className="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl bg-[#040B16] border border-white/5 p-6 sm:p-7 shadow-2xl shadow-black/80 relative space-y-5"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {/* Header */}
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-3">
                       <div className="flex items-center gap-2">
                         <Award className="w-5 h-5 text-[var(--accent-primary)]" />
                         <span className="font-mono text-xs uppercase tracking-widest text-[var(--accent-primary)] font-bold">
@@ -3458,10 +3458,7 @@ export default function MarineOSHomePage() {
                     </div>
 
                     {/* Instagram Story Format Card (Digital Trophy) */}
-                    <div className="relative rounded-2xl p-5 bg-gradient-to-b from-[#0A192F] via-[#040B16] to-[#02050B] border border-white/20 shadow-inner overflow-hidden space-y-4 text-center">
-                      {/* Decorative Background Elements */}
-                      <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-[var(--accent-primary)]/15 blur-2xl pointer-events-none" />
-                      <div className="absolute -bottom-12 -left-12 w-32 h-32 rounded-full bg-[#00E5FF]/15 blur-2xl pointer-events-none" />
+                    <div className="relative rounded-2xl p-5 bg-[#0a1424] border border-white/5 overflow-hidden space-y-4 text-center">
 
                       {/* Top Badge */}
                       <div className="flex justify-center">
@@ -3472,7 +3469,7 @@ export default function MarineOSHomePage() {
 
                       {/* Captain Avatar & Name */}
                       <div className="flex flex-col items-center space-y-2">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[var(--accent-primary)] to-[#00E5FF] p-1 shadow-lg shadow-[var(--accent-primary)]/30">
+                        <div className="w-20 h-20 rounded-full border-2 border-[var(--accent-primary)]/60 p-1">
                           <div className="w-full h-full rounded-full bg-[#040B16] flex items-center justify-center font-bold text-2xl text-white font-mono">
                             {activeAccount.name.slice(0, 2).toUpperCase()}
                           </div>
@@ -3491,7 +3488,7 @@ export default function MarineOSHomePage() {
                       </div>
 
                       {/* Big Sea Time Counter */}
-                      <div className="py-3 px-4 rounded-xl bg-white/[0.04] border border-white/10 space-y-1">
+                      <div className="py-3 px-4 rounded-xl bg-white/[0.04] border border-white/5 space-y-1">
                         <div className="text-[10px] font-mono uppercase tracking-widest opacity-60">
                           TOTAL SEA TIME ACUMULADO
                         </div>
@@ -3509,28 +3506,28 @@ export default function MarineOSHomePage() {
                           INSIGNIAS DE EXPEDICIÓN GANADAS
                         </div>
                         <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
-                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-2">
+                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
                             <span className="text-base">🌊</span>
                             <div>
                               <div className="font-bold text-white text-[10px]">Cruce Golfo Ancud</div>
                               <div className="text-[9px] opacity-60">Océano Abierto</div>
                             </div>
                           </div>
-                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-2">
+                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
                             <span className="text-base">⚓</span>
                             <div>
                               <div className="font-bold text-white text-[10px]">Veterano Chiloé</div>
                               <div className="text-[9px] opacity-60">1500+ MN Navegadas</div>
                             </div>
                           </div>
-                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-2">
+                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
                             <span className="text-base">🛡️</span>
                             <div>
                               <div className="font-bold text-white text-[10px]">Fondeo Seguro</div>
                               <div className="text-[9px] opacity-60">10 Noches Sin Garreo</div>
                             </div>
                           </div>
-                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-2">
+                          <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
                             <span className="text-base">🇨🇱</span>
                             <div>
                               <div className="font-bold text-white text-[10px]">DIRECTEMAR</div>
@@ -3541,7 +3538,7 @@ export default function MarineOSHomePage() {
                       </div>
 
                       {/* Cryptographic Seal */}
-                      <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[9px] font-mono opacity-60">
+                      <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[9px] font-mono opacity-60">
                         <span>MARINOS DECENTRALIZED LEDGER</span>
                         <span>HASH: SHA256-e8f491c2</span>
                       </div>
@@ -3553,7 +3550,7 @@ export default function MarineOSHomePage() {
                         type="button"
                         data-testid="copy-trophy-text-btn"
                         onClick={handleCopyTrophyText}
-                        className="w-full marine-btn marine-btn-primary min-h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-[var(--accent-primary)]/20"
+                        className="w-full marine-btn marine-btn-primary min-h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-none"
                       >
                         {copiedShareLink ? (
                           <>

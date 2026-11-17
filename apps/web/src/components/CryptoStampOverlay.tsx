@@ -44,7 +44,7 @@ export function CryptoStampOverlay({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="animate-sha-stamp relative max-w-lg w-full rounded-3xl p-6 sm:p-8 border-4 border-[var(--status-ok)] bg-[var(--bg-primary)] text-[var(--text-primary)] shadow-[0_0_70px_rgba(16,185,129,0.45)] space-y-4"
+        className="animate-sha-stamp relative max-w-lg w-full rounded-3xl p-6 sm:p-8 border-2 border-[var(--status-ok)] bg-[var(--bg-primary)] text-[var(--text-primary)] shadow-2xl shadow-black/80 space-y-4"
       >
         {/* Double-Ring Stamp Header */}
         <div className="flex items-start justify-between gap-3 border-b-2 border-[var(--status-ok)]/40 pb-4">

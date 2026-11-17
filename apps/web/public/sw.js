@@ -1,4 +1,4 @@
-const APP_CACHE_NAME = "marinos-app-shell-v3.2-tactical";
+const APP_CACHE_NAME = "marinos-app-shell-v3.3-matte-tactical";
 const TILE_CACHE_NAME = "marinos-nautical-tiles-v3";
 
 const PRECACHE_ROUTES = [

@@ -445,7 +445,7 @@ export function HandoverWizard({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 marine-card p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-[var(--accent-primary)]" />
               <span>Checklist Técnico de Sistemas ({checklist.length})</span>
@@ -456,7 +456,7 @@ export function HandoverWizard({
             {checklist.map((item) => (
               <div
                 key={item.id}
-                className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5"
+                className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2.5"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="font-medium text-sm">{item.system_name}</div>
@@ -501,7 +501,7 @@ export function HandoverWizard({
 
         <div className="lg:col-span-5 space-y-6">
           <div className="marine-card p-6 space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2 border-b border-white/10 pb-3">
+            <h2 className="text-lg font-semibold flex items-center gap-2 border-b border-white/5 pb-3">
               <Camera className="w-5 h-5 text-[var(--accent-primary)]" />
               <span>Evidencia de Cámara ({photos.length})</span>
             </h2>
@@ -547,7 +547,7 @@ export function HandoverWizard({
                 {photos.map((p) => (
                   <div
                     key={p.id}
-                    className="rounded-xl bg-white/[0.03] border border-white/10 p-2 text-[11px] font-mono"
+                    className="rounded-xl bg-white/[0.03] border border-white/5 p-2 text-[11px] font-mono"
                   >
                     <img
                       src={p.data_url}
@@ -565,7 +565,7 @@ export function HandoverWizard({
           </div>
 
           <div className="marine-card p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <FileSignature className="w-5 h-5 text-[var(--accent-primary)]" />
                 <span>Firma Táctil & Sello SHA-256</span>
@@ -634,7 +634,7 @@ export function HandoverWizard({
             {pastInspections.map((insp) => (
               <div
                 key={insp.id}
-                className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs font-mono"
+                className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs font-mono"
               >
                 <div>
                   <span className="font-bold uppercase px-2 py-0.5 rounded-full bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] mr-2">
@@ -646,7 +646,7 @@ export function HandoverWizard({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                  <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/5">
                     Fotos: {insp.photos_evidence.length}
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-[#00E676]/15 text-[#00E676]">

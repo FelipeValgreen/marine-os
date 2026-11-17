@@ -540,8 +540,8 @@ export function CommandCenter({
                         }}
                         className={`w-full min-h-[64px] px-4 py-2.5 rounded-xl flex items-center justify-between gap-3 text-left transition-all ${
                           isSelected
-                            ? "bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/40 shadow-lg shadow-[var(--accent-primary)]/10"
-                            : "hover:bg-white/5 border border-transparent"
+                            ? "bg-slate-800/90 border border-[var(--accent-primary)]/40 text-white shadow-none"
+                            : "hover:bg-white/[0.04] border border-transparent"
                         }`}
                       >
                         <div className="flex items-center gap-3.5 min-w-0">

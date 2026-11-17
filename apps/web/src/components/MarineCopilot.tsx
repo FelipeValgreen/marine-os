@@ -293,7 +293,7 @@ export function MarineCopilot({
       className={compact ? "space-y-3" : "marine-card p-6 space-y-4"}
     >
       {/* Header + Auto-Injected Telemetry Pills */}
-      <div className="border-b border-white/10 pb-3 space-y-2">
+      <div className="border-b border-white/5 pb-3 space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base sm:text-lg font-semibold flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-[var(--accent-primary)]" />
@@ -306,16 +306,16 @@ export function MarineCopilot({
 
         {/* Live Context Telemetry Strip */}
         <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px] opacity-80">
-          <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 flex items-center gap-1">
+          <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 flex items-center gap-1">
             <Compass className="w-3 h-3 text-[#00E5FF]" />
             {vesselContext.dms_coords}
           </span>
-          <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 flex items-center gap-1">
+          <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 flex items-center gap-1">
             <Wind className="w-3 h-3 text-[var(--status-ok)]" />
             {vesselContext.wind_speed_kn.toFixed(1)} kn / Ola{" "}
             {vesselContext.wave_height_m.toFixed(2)}m
           </span>
-          <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 flex items-center gap-1">
+          <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 flex items-center gap-1">
             <Gauge className="w-3 h-3 text-[var(--status-warn)]" />
             Calado {vesselContext.draft_meters}m • {vesselContext.engine_hours}h
           </span>
@@ -326,7 +326,7 @@ export function MarineCopilot({
       {warrantyAlertItem && (
         <div
           data-testid="copilot-warranty-predictive-alert"
-          className="p-3.5 sm:p-4 rounded-2xl bg-[#FF2D55]/15 border-2 border-[#FF2D55] text-white space-y-1.5 shadow-[0_0_24px_rgba(255,45,85,0.25)] animate-pulse"
+          className="p-3.5 sm:p-4 rounded-2xl bg-red-950/30 border border-red-800 text-white space-y-1.5 shadow-none"
         >
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#FF2D55] uppercase tracking-wide">
@@ -464,7 +464,7 @@ export function MarineCopilot({
       {/* Fixed min-h-[172px] Response Container with Shimmer Skeleton (Zero Layout Shift) */}
       <div
         data-testid="copilot-response-box"
-        className="min-h-[172px] p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2 text-xs sm:text-sm font-mono whitespace-pre-line flex flex-col justify-between"
+        className="min-h-[172px] p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2 text-xs sm:text-sm font-mono whitespace-pre-line flex flex-col justify-between"
       >
         {loading ? (
           <div className="space-y-2.5 py-2">
@@ -476,7 +476,7 @@ export function MarineCopilot({
         ) : (
           <>
             <div className="leading-relaxed">{response.answer}</div>
-            <div className="pt-2 border-t border-white/10 space-y-1">
+            <div className="pt-2 border-t border-white/5 space-y-1">
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs opacity-80">
                 <span>
                   {response.manual_title} (Pág. {response.page_number})

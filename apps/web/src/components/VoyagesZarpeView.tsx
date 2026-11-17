@@ -528,7 +528,7 @@ export function VoyagesZarpeView({
             type="button"
             data-testid="plan-new-zarpe-btn"
             onClick={() => setIsCreatingVoyage(true)}
-            className="marine-btn marine-btn-primary min-h-12 px-6 text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-[var(--accent-primary)]/25 shrink-0"
+            className="marine-btn marine-btn-primary min-h-12 px-6 text-sm font-bold flex items-center justify-center gap-2 shadow-none shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>+ PLANIFICAR NUEVO ZARPE</span>
@@ -557,7 +557,7 @@ export function VoyagesZarpeView({
               >
                 <div className="space-y-3">
                   {/* Card Header */}
-                  <div className="flex items-start justify-between gap-2 border-b border-white/10 pb-3">
+                  <div className="flex items-start justify-between gap-2 border-b border-white/5 pb-3">
                     <div>
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${
@@ -575,7 +575,7 @@ export function VoyagesZarpeView({
                       </h3>
                     </div>
 
-                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center shrink-0">
                       <Anchor className="w-5 h-5 text-[var(--accent-primary)]" />
                     </div>
                   </div>
@@ -613,7 +613,7 @@ export function VoyagesZarpeView({
                 </div>
 
                 {/* Card Action Footer */}
-                <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                <div className="pt-3 border-t border-white/5 flex items-center justify-between">
                   <span className="text-[11px] font-mono opacity-65">
                     Token: {v.magic_link_token}
                   </span>
@@ -646,7 +646,7 @@ export function VoyagesZarpeView({
               className="w-full max-w-lg rounded-3xl bg-[#040B16] border-2 border-[var(--accent-primary)]/50 p-6 sm:p-7 shadow-2xl relative space-y-5"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
                 <div className="flex items-center gap-2">
                   <Compass className="w-5 h-5 text-[var(--accent-primary)]" />
                   <h3 className="text-base sm:text-lg font-bold">Planificar Nuevo Zarpe</h3>
@@ -671,7 +671,7 @@ export function VoyagesZarpeView({
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     placeholder="Ej. Travesía Dalcahue a Caleta Mechuque"
-                    className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
                   />
                 </div>
 
@@ -686,7 +686,7 @@ export function VoyagesZarpeView({
                       value={newDepPort}
                       onChange={(e) => setNewDepPort(e.target.value)}
                       placeholder="Marina Puerto Montt"
-                      className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/10 font-mono"
+                      className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5 font-mono"
                     />
                   </div>
 
@@ -700,7 +700,7 @@ export function VoyagesZarpeView({
                       value={newArrPort}
                       onChange={(e) => setNewArrPort(e.target.value)}
                       placeholder="Caleta Mechuque"
-                      className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/10 font-mono"
+                      className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5 font-mono"
                     />
                   </div>
                 </div>
@@ -715,7 +715,7 @@ export function VoyagesZarpeView({
                       required
                       value={newDepDate}
                       onChange={(e) => setNewDepDate(e.target.value)}
-                      className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/10 font-mono"
+                      className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5 font-mono"
                     />
                   </div>
 
@@ -728,12 +728,12 @@ export function VoyagesZarpeView({
                       required
                       value={newArrDate}
                       onChange={(e) => setNewArrDate(e.target.value)}
-                      className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/10 font-mono"
+                      className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5 font-mono"
                     />
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-white/10 flex items-center justify-end gap-3">
+                <div className="pt-3 border-t border-white/5 flex items-center justify-end gap-3">
                   <button
                     type="button"
                     onClick={() => setIsCreatingVoyage(false)}
@@ -763,7 +763,7 @@ export function VoyagesZarpeView({
   return (
     <div data-testid="voyage-stepper-view" className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
       {/* Top Breadcrumb & Return to Dashboard */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-4">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -837,14 +837,14 @@ export function VoyagesZarpeView({
                 type="button"
                 data-testid={`stepper-tab-${s.step}`}
                 onClick={() => setCurrentStep(s.step as 1 | 2 | 3 | 4)}
-                className={`p-2 sm:p-3 rounded-xl border text-left transition-all ${
+                className={`p-2 sm:p-3 rounded-xl border text-left transition-all shadow-none ${
                   isActive
                     ? isNight
-                      ? "bg-[#FF0000] text-black border-[#FF0000] font-bold"
-                      : "bg-[var(--accent-primary)] text-white border-[var(--accent-primary)] font-bold shadow-lg shadow-[var(--accent-primary)]/20"
+                      ? "bg-red-950/40 text-red-500 border-b-2 border-b-red-500 border-transparent font-bold"
+                      : "bg-[#1a2332] text-[var(--accent-primary)] border-b-2 border-b-[var(--accent-primary)] border-transparent font-bold"
                     : isCompleted
-                    ? "bg-[#00E676]/10 text-[#00E676] border-[#00E676]/30 hover:bg-[#00E676]/20"
-                    : "bg-white/5 border-white/10 opacity-70 hover:opacity-100"
+                    ? "bg-[#111c2e] text-[#00E676] border-b-2 border-b-[#00E676]/60 border-transparent hover:bg-[#1a2332]"
+                    : "bg-[#0c1421] border-transparent text-slate-400 opacity-70 hover:opacity-100"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -865,7 +865,7 @@ export function VoyagesZarpeView({
       ======================================================================= */}
       {currentStep === 1 && (
         <div data-testid="step-1-route-dates" className="marine-card p-6 space-y-6">
-          <div className="border-b border-white/10 pb-3 flex items-center justify-between">
+          <div className="border-b border-white/5 pb-3 flex items-center justify-between">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold">
                 PASO 1 DE 4 • PLANIFICACIÓN NÁUTICA
@@ -876,7 +876,7 @@ export function VoyagesZarpeView({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 font-mono text-xs">
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-3">
               <div className="text-[10px] uppercase opacity-60">PUERTOS PRINCIPALES:</div>
               <div className="space-y-2 text-sm">
                 <div>
@@ -890,7 +890,7 @@ export function VoyagesZarpeView({
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-3">
               <div className="text-[10px] uppercase opacity-60">VENTANA DE NAVEGACIÓN:</div>
               <div className="space-y-2">
                 <div>
@@ -935,7 +935,7 @@ export function VoyagesZarpeView({
       ======================================================================= */}
       {currentStep === 2 && (
         <div data-testid="step-2-crew-manifest" className="marine-card p-6 space-y-6">
-          <div className="border-b border-white/10 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="border-b border-white/5 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold">
                 PASO 2 DE 4 • DOTACIÓN A BORDO
@@ -960,7 +960,7 @@ export function VoyagesZarpeView({
                 data-testid="scan-crew-ocr-btn"
                 onClick={() => handleRunMultimodalOCR("felipe")}
                 disabled={ocrLoading}
-                className="marine-btn marine-btn-primary text-xs px-3.5 py-2 flex items-center gap-1.5 font-bold shadow-md shadow-[var(--accent-primary)]/20"
+                className="marine-btn marine-btn-primary text-xs px-3.5 py-2 flex items-center gap-1.5 font-bold shadow-none"
               >
                 <ScanLine className="w-4 h-4" />
                 <span>{ocrLoading ? "Escaneando..." : "+ Escanear Carnet OCR"}</span>
@@ -980,7 +980,7 @@ export function VoyagesZarpeView({
 
           {/* Crew Table List */}
           {(!crewList || crewList.length === 0) ? (
-            <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10 text-center space-y-3 font-mono">
+            <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/5 text-center space-y-3 font-mono">
               <Users className="w-10 h-10 text-white/30 mx-auto" />
               <div className="font-bold text-sm">Sin tripulantes registrados aún</div>
               <p className="text-xs opacity-60 max-w-md mx-auto">
@@ -999,7 +999,7 @@ export function VoyagesZarpeView({
                 {crewList.map((m) => (
                   <div
                     key={m.id}
-                    className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono"
+                    className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono"
                   >
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
@@ -1051,7 +1051,7 @@ export function VoyagesZarpeView({
                 className="w-full max-w-md rounded-2xl bg-[#040B16] border border-white/20 p-6 space-y-4"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <div className="flex items-center justify-between border-b border-white/5 pb-2">
                   <h3 className="font-bold text-sm">Inscribir Tripulante en Rol de Zarpe</h3>
                   <button type="button" onClick={() => setShowManualCrewForm(false)}>
                     <X className="w-4 h-4" />
@@ -1074,7 +1074,7 @@ export function VoyagesZarpeView({
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Cap. Felipe Valverde"
-                      className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                      className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                     />
                   </div>
 
@@ -1084,7 +1084,7 @@ export function VoyagesZarpeView({
                       <select
                         value={docType}
                         onChange={(e) => setDocType(e.target.value)}
-                        className="w-full min-h-11 px-2 text-xs rounded-xl bg-white/5 border border-white/10"
+                        className="w-full min-h-11 px-2 text-xs rounded-xl bg-white/5 border border-white/5"
                       >
                         <option value="RUT">RUT (Chile)</option>
                         <option value="PASSPORT">Pasaporte</option>
@@ -1099,7 +1099,7 @@ export function VoyagesZarpeView({
                         value={docNumber}
                         onChange={(e) => setDocNumber(e.target.value)}
                         placeholder="13.452.890-1"
-                        className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                        className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                       />
                     </div>
                   </div>
@@ -1110,7 +1110,7 @@ export function VoyagesZarpeView({
                       <select
                         value={role}
                         onChange={(e) => setRole(e.target.value as "skipper" | "crew" | "guest")}
-                        className="w-full min-h-11 px-2 text-xs rounded-xl bg-white/5 border border-white/10"
+                        className="w-full min-h-11 px-2 text-xs rounded-xl bg-white/5 border border-white/5"
                       >
                         <option value="skipper">Capitán / Patrón</option>
                         <option value="crew">Tripulante</option>
@@ -1124,7 +1124,7 @@ export function VoyagesZarpeView({
                         value={nationality}
                         onChange={(e) => setNationality(e.target.value)}
                         placeholder="CL"
-                        className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                        className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                       />
                     </div>
                   </div>
@@ -1136,7 +1136,7 @@ export function VoyagesZarpeView({
                       value={licenseType}
                       onChange={(e) => setLicenseType(e.target.value)}
                       placeholder="Capitán Deportivo Alta Mar"
-                      className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                      className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                     />
                   </div>
 
@@ -1174,7 +1174,7 @@ export function VoyagesZarpeView({
           )}
 
           {/* Stepper Navigation */}
-          <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+          <div className="pt-3 border-t border-white/5 flex items-center justify-between">
             <button
               type="button"
               onClick={() => setCurrentStep(1)}
@@ -1201,7 +1201,7 @@ export function VoyagesZarpeView({
       ======================================================================= */}
       {currentStep === 3 && (
         <div data-testid="step-3-checklist" className="marine-card p-6 space-y-6">
-          <div className="border-b border-white/10 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="border-b border-white/5 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold">
                 PASO 3 DE 4 • SEGURIDAD MARÍTIMA
@@ -1238,7 +1238,7 @@ export function VoyagesZarpeView({
                   className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3.5 select-none ${
                     isChecked
                       ? "bg-[#00E676]/[0.06] border-[#00E676]/30 shadow-sm"
-                      : "bg-white/[0.02] border-white/10 hover:border-white/20"
+                      : "bg-white/[0.02] border-white/5 hover:border-white/20"
                   }`}
                 >
                   <div
@@ -1265,7 +1265,7 @@ export function VoyagesZarpeView({
           </div>
 
           {/* Stepper Navigation */}
-          <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+          <div className="pt-3 border-t border-white/5 flex items-center justify-between">
             <button
               type="button"
               onClick={() => setCurrentStep(2)}
@@ -1292,7 +1292,7 @@ export function VoyagesZarpeView({
       ======================================================================= */}
       {currentStep === 4 && (
         <div data-testid="step-4-ezarpe" className="marine-card p-6 space-y-6">
-          <div className="border-b border-white/10 pb-4 flex items-center justify-between">
+          <div className="border-b border-white/5 pb-4 flex items-center justify-between">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold">
                 PASO 4 DE 4 • DESPACHO ELECTRÓNICO OFICIAL
@@ -1335,7 +1335,7 @@ export function VoyagesZarpeView({
           </div>
 
           {/* Summary Details */}
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2 font-mono text-xs">
+          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2 font-mono text-xs">
             <div className="text-[10px] uppercase opacity-60">DATOS DE EXPEDIENTE NÁUTICO:</div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
               <div>
@@ -1378,7 +1378,7 @@ export function VoyagesZarpeView({
                   data-testid="transmit-ezarpe-directemar-btn"
                   onClick={handleTransmitZarpe}
                   disabled={transmittingZarpe}
-                  className="marine-btn marine-btn-primary min-h-12 px-7 text-sm font-bold shadow-xl shadow-[var(--accent-primary)]/30 flex items-center gap-2"
+                  className="marine-btn marine-btn-primary min-h-12 px-7 text-sm font-bold shadow-none flex items-center gap-2"
                 >
                   <RadioTower className="w-4 h-4" />
                   <span>
@@ -1435,7 +1435,7 @@ export function VoyagesZarpeView({
           )}
 
           {/* Stepper Navigation */}
-          <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+          <div className="pt-3 border-t border-white/5 flex items-center justify-between">
             <button
               type="button"
               onClick={() => setCurrentStep(3)}

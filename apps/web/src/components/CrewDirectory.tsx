@@ -301,8 +301,8 @@ export function CrewDirectory({
               onClick={() => setRoleFilter(r)}
               className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition ${
                 roleFilter === r
-                  ? "bg-[var(--accent-primary)] text-white font-bold"
-                  : "bg-white/5 hover:bg-white/10 opacity-70"
+                  ? "bg-[#1a2332] text-[var(--accent-primary)] border-b-2 border-[var(--accent-primary)] font-bold shadow-none"
+                  : "bg-white/[0.03] text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] opacity-70"
               }`}
             >
               {r === "all" ? "Todos" : r.toUpperCase()}
@@ -332,7 +332,7 @@ export function CrewDirectory({
                 className="marine-card p-5 flex flex-col justify-between space-y-4 hover:border-white/25 transition-all"
               >
                 <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-2 border-b border-white/10 pb-3">
+                  <div className="flex items-start justify-between gap-2 border-b border-white/5 pb-3">
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-bold">
@@ -438,7 +438,7 @@ export function CrewDirectory({
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
           <div className="w-full max-w-xl marine-card p-6 sm:p-8 space-y-5 my-8">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <h2 className="text-lg font-bold">
                 {editingId ? "Editar Tripulante" : "Registrar en Libreta de Tripulación"}
               </h2>
@@ -581,7 +581,7 @@ export function CrewDirectory({
                 </div>
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-3 border-t border-white/10">
+              <div className="pt-3 flex items-center justify-end gap-3 border-t border-white/5">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}

@@ -109,10 +109,10 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 14 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className={`w-full max-w-6xl rounded-3xl p-6 sm:p-8 border shadow-2xl shadow-black/80 space-y-6 ${
+        className={`w-full max-w-6xl rounded-3xl p-6 sm:p-8 border shadow-2xl shadow-black/90 space-y-6 ${
           isNight
             ? "bg-black border-[#FF1E1E]"
-            : "bg-[#040B16]/98 border-[#FF2D55]/60 shadow-[0_24px_70px_rgba(255,45,85,0.25)]"
+            : "bg-[#040B16] border-red-900/60"
         }`}
       >
         {/* Top Emergency Header */}
@@ -155,7 +155,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
         {/* GIANT 32PT LIVE GPS COORDINATES BANNER FOR WHEELHOUSE / VHF READOUT */}
         <div
           data-testid="sos-giant-32pt-coords"
-          className="p-5 sm:p-6 rounded-2xl bg-black border-2 border-[#FF2D55] flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-[0_0_40px_rgba(255,69,58,0.25)]"
+          className="p-5 sm:p-6 rounded-2xl bg-black border border-red-900 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-none"
         >
           <div>
             <div className="font-mono text-xs uppercase tracking-[0.2em] text-[#FF2D55] font-bold">
@@ -207,7 +207,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* PANEL A: VHF CHANNEL 16 MAYDAY SCRIPT (7 cols) */}
           <div className="lg:col-span-7 rounded-2xl p-6 bg-white/[0.03] border border-white/15 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <div className="flex items-center gap-2.5">
                 <Radio className="w-6 h-6 text-[#FF2D55]" />
                 <div>
@@ -277,7 +277,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
           {/* PANEL B: SATELLITE GATEWAY IRIDIUM GO! / GARMIN INREACH (5 cols) */}
           <div className="lg:col-span-5 rounded-2xl p-6 bg-white/[0.03] border border-white/15 flex flex-col justify-between space-y-5">
             <div className="space-y-4">
-              <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2.5 border-b border-white/5 pb-3">
                 <Satellite className="w-6 h-6 text-[#00E5FF]" />
                 <div>
                   <h2 className="text-lg font-bold">
@@ -303,7 +303,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 font-mono text-xs space-y-1">
+              <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-xs space-y-1">
                 <div className="font-semibold flex items-center gap-1.5 text-[#FF9F0A]">
                   <ShieldAlert className="w-4 h-4" />
                   <span>DESTINO GATEWAY SATELITAL:</span>
@@ -335,7 +335,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
               type="button"
               data-testid="transmit-satellite-sos-btn"
               onClick={handleSendSatelliteBurst}
-              className="w-full min-h-[60px] rounded-2xl bg-[#FF2D55] hover:bg-[#FF2D55]/90 text-white font-mono text-sm font-black flex items-center justify-center gap-2.5 shadow-[0_0_30px_rgba(255,69,58,0.45)]"
+              className="w-full min-h-[60px] rounded-2xl bg-red-600 hover:bg-red-700 text-white font-mono text-sm font-bold flex items-center justify-center gap-2.5 shadow-none border border-red-800"
             >
               <Send className="w-5 h-5" />
               <span>

@@ -268,7 +268,7 @@ export function DamageControl() {
               onClick={() => handleSelectScenario(sc.id)}
               className={`min-h-14 p-5 rounded-2xl border text-left transition flex flex-col justify-between space-y-3 ${
                 isSelected
-                  ? "bg-[#FF2D55]/15 border-[#FF2D55] shadow-[0_0_28px_rgba(255,69,58,0.2)]"
+                  ? "bg-red-950/30 border border-red-800 shadow-none"
                   : "marine-card hover:bg-white/[0.06]"
               }`}
             >
@@ -292,7 +292,7 @@ export function DamageControl() {
         {/* Left 6 cols: Interactive Decision Tree + Spare Parts Marketplace Sourcing */}
         <div className="lg:col-span-6 marine-card p-6 flex flex-col justify-between space-y-5">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-widest text-[#FF2D55]">
                   ÁRBOL DE DECISIÓN TÁCTIL &amp; SOURCING DE REPUESTOS
@@ -341,14 +341,14 @@ export function DamageControl() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2 font-mono text-xs">
+                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2 font-mono text-xs">
                   <div className="text-[var(--accent-primary)] font-bold uppercase">
                     PROCEDIMIENTO MECÁNICO PASO A PASO:
                   </div>
                   <p className="leading-relaxed opacity-90 font-sans text-sm">
                     {currentNode.actionInstruction}
                   </p>
-                  <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                  <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
                     <span className="text-[#00E676]">
                       Repuesto requerido:{" "}
                       <strong>{currentNode.equipmentToUse}</strong> (
@@ -450,7 +450,7 @@ export function DamageControl() {
         {/* Right 6 cols: Interactive Digital Twin Hull Map + Marketplace Orders in IndexedDB */}
         <div className="lg:col-span-6 space-y-6">
           <div className="marine-card p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--accent-primary)]">
                   PLANO DE CUBIERTA &amp; SENTINA • SV ALBATROS (12.43M)
@@ -573,7 +573,7 @@ export function DamageControl() {
             data-testid="marketplace-orders-list"
             className="marine-card p-6 space-y-3"
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
               <h3 className="text-base font-semibold flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4 text-[var(--accent-primary)]" />
                 <span>

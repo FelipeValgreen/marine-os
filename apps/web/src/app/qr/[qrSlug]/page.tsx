@@ -125,7 +125,7 @@ export default function QRSystemTwinPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-6 marine-card p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
             <div>
               <span className="text-[11px] font-mono uppercase text-[var(--accent-primary)]">
                 QR SLUG • {qrSlug}
@@ -150,8 +150,8 @@ export default function QRSystemTwinPage() {
             </span>
           </div>
 
-          <div className="rounded-2xl p-5 bg-[#040B16] border border-white/10 font-mono space-y-4">
-            <div className="flex items-center justify-between text-xs border-b border-white/10 pb-2 text-[var(--accent-primary)]">
+          <div className="rounded-2xl p-5 bg-[#040B16] border border-white/5 font-mono space-y-4">
+            <div className="flex items-center justify-between text-xs border-b border-white/5 pb-2 text-[var(--accent-primary)]">
               <span>MICRO-TUTORIAL OPERATIVO (28 SEG)</span>
               <span>00:{String(videoSeconds).padStart(2, "0")} / 00:28</span>
             </div>
@@ -206,7 +206,7 @@ export default function QRSystemTwinPage() {
 
         <div className="lg:col-span-6 space-y-6">
           <div className="marine-card p-6 space-y-3">
-            <h2 className="text-lg font-semibold border-b border-white/10 pb-2.5">
+            <h2 className="text-lg font-semibold border-b border-white/5 pb-2.5">
               Guía Rápida de Operación a Bordo
             </h2>
             {steps.length > 1 ? (
@@ -214,7 +214,7 @@ export default function QRSystemTwinPage() {
                 {steps.map((step, idx) => (
                   <li
                     key={idx}
-                    className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-start gap-3"
+                    className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-start gap-3"
                   >
                     <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-[var(--accent-primary)]/15 text-[var(--accent-primary)]">
                       0{idx + 1}
@@ -224,14 +224,14 @@ export default function QRSystemTwinPage() {
                 ))}
               </ol>
             ) : (
-              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 text-sm">
+              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-sm">
                 {qrSystem?.quick_instructions}
               </div>
             )}
           </div>
 
           <div className="marine-card p-6 space-y-3">
-            <h2 className="text-lg font-semibold flex items-center gap-2 border-b border-white/10 pb-2.5">
+            <h2 className="text-lg font-semibold flex items-center gap-2 border-b border-white/5 pb-2.5">
               <Package className="w-5 h-5 text-[var(--accent-primary)]" />
               <span>Repuestos Vinculados ({linkedInventory.length})</span>
             </h2>
@@ -245,7 +245,7 @@ export default function QRSystemTwinPage() {
                 {linkedInventory.map((item) => (
                   <div
                     key={item.id}
-                    className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-wrap items-center justify-between gap-2"
+                    className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-2"
                   >
                     <div>
                       <div className="font-medium text-sm">{item.item_name}</div>
@@ -264,7 +264,7 @@ export default function QRSystemTwinPage() {
                       >
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className="font-mono font-bold text-sm px-3.5 py-2 rounded-xl bg-white/5 border border-white/10">
+                      <span className="font-mono font-bold text-sm px-3.5 py-2 rounded-xl bg-white/5 border border-white/5">
                         {item.quantity} uds
                       </span>
                       <button

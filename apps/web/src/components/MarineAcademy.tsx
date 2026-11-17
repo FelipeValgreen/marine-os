@@ -221,7 +221,7 @@ export function MarineAcademy({
         {/* PART A: Grilla de "Micro-Clases" (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
           <div className="marine-card p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Play className="w-5 h-5 text-[var(--accent-primary)]" />
                 <span>A. Grilla de Micro-Clases Interactivas</span>
@@ -242,11 +242,11 @@ export function MarineAcademy({
                     key={lesson.id}
                     className={`p-4 rounded-2xl border transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${isSelected
                       ? "bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]/50"
-                      : "bg-white/[0.03] border-white/10 hover:bg-white/[0.06]"
+                      : "bg-white/[0.03] border-white/5 hover:bg-white/[0.06]"
                       }`}
                   >
                     <div className="flex items-start gap-3.5 min-w-0">
-                      <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[var(--accent-primary)] shrink-0 mt-0.5">
+                      <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-[var(--accent-primary)] shrink-0 mt-0.5">
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
@@ -291,7 +291,7 @@ export function MarineAcademy({
 
             {/* Simulated Interactive Micro-Video Walkthrough Viewer */}
             <div className="p-5 rounded-2xl bg-[#040B16] border border-white/15 space-y-3 font-mono">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2 text-xs text-[var(--accent-primary)]">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-2 text-xs text-[var(--accent-primary)]">
                 <span>REPRODUCTOR MICRO-CLASE: {activeLesson.title}</span>
                 <span>DURACIÓN: {activeLesson.duration}</span>
               </div>
@@ -300,7 +300,7 @@ export function MarineAcademy({
                 {activeLesson.steps.map((st, i) => (
                   <div
                     key={i}
-                    className="p-3 rounded-xl bg-white/[0.03] border border-white/10"
+                    className="p-3 rounded-xl bg-white/[0.03] border border-white/5"
                   >
                     {st}
                   </div>
@@ -324,7 +324,7 @@ export function MarineAcademy({
         {/* PART B: Chat de Soporte IA (Cómo usar la App) (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
           <div className="marine-card p-6 space-y-4">
-            <div className="border-b border-white/10 pb-3">
+            <div className="border-b border-white/5 pb-3">
               <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)]">
                 PARTE B • SOPORTE INTERACTIVO MARINE COPILOT
               </div>
@@ -408,7 +408,7 @@ export function MarineAcademy({
 
             <div
               data-testid="academy-support-answer"
-              className="min-h-[168px] p-4 rounded-xl bg-white/[0.03] border border-white/10 font-mono text-xs sm:text-sm whitespace-pre-line leading-relaxed"
+              className="min-h-[168px] p-4 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-xs sm:text-sm whitespace-pre-line leading-relaxed"
             >
               {supportLoading ? (
                 <div className="space-y-2.5 py-2">

@@ -230,7 +230,7 @@ export function SeaTrialsOnboarding({
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="space-y-1 font-mono text-xs">
                 <div className="text-[var(--accent-primary)] font-bold">
                   NODO DETECTADO: yanmar-4jh57
@@ -278,7 +278,7 @@ export function SeaTrialsOnboarding({
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 font-mono text-xs space-y-1.5">
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 font-mono text-xs space-y-1.5">
               <div className="flex justify-between">
                 <span className="opacity-70">EMBARCACIÓN:</span>
                 <span className="font-bold">{vesselName} (CB-4582)</span>
@@ -327,7 +327,7 @@ export function SeaTrialsOnboarding({
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between gap-4">
+            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-between gap-4">
               <div className="w-16 h-16 rounded-full border-2 border-dashed border-[var(--status-ok)] bg-[var(--status-ok)]/10 flex items-center justify-center font-mono text-xs font-bold text-[var(--status-ok)] shrink-0">
                 24m
               </div>
@@ -359,7 +359,7 @@ export function SeaTrialsOnboarding({
             data-testid="sea-trials-success-screen"
             className="text-center space-y-5 py-2"
           >
-            <div className="w-20 h-20 rounded-3xl bg-[#00E676]/20 border-2 border-[#00E676] text-[#00E676] mx-auto flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.35)]">
+            <div className="w-20 h-20 rounded-3xl bg-[#00E676]/20 border border-[#00E676] text-[#00E676] mx-auto flex items-center justify-center shadow-none">
               <Award className="w-10 h-10" />
             </div>
 

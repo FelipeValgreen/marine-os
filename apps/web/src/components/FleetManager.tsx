@@ -315,7 +315,7 @@ export function FleetManager() {
               className="w-full max-w-2xl marine-card p-6 sm:p-8 space-y-6 my-8 border border-white/5 shadow-2xl shadow-black/80"
               onClick={(e) => e.stopPropagation()}
             >
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div className="flex items-center justify-between border-b border-white/5 pb-4">
               <div className="flex items-center gap-3">
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center ${
@@ -339,7 +339,7 @@ export function FleetManager() {
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="w-10 min-h-14 rounded-xl border border-white/10 hover:bg-white/10 flex items-center justify-center opacity-70 hover:opacity-100"
+                className="w-10 min-h-14 rounded-xl border border-white/5 hover:bg-white/10 flex items-center justify-center opacity-70 hover:opacity-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -573,9 +573,9 @@ export function FleetManager() {
               className={`marine-card p-6 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/60 transition-all ${
                 isActive
                   ? isNight
-                    ? "border-[#FF0000] shadow-[0_0_24px_rgba(255,0,0,0.3)]"
-                    : "border-[var(--accent-primary)]/50 shadow-[0_12px_40px_rgba(255,87,34,0.18)]"
-                  : "hover:border-white/10"
+                    ? "border-red-900 bg-red-950/20"
+                    : "border-[var(--accent-primary)]/40 bg-[#0d1626]"
+                  : "hover:border-white/5"
               }`}
             >
               <div className="space-y-4">
@@ -586,8 +586,8 @@ export function FleetManager() {
                       className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
                         isActive
                           ? isNight
-                            ? "bg-[#FF0000] text-black"
-                            : "bg-[var(--accent-primary)] text-white shadow-lg shadow-[var(--accent-primary)]/30"
+                            ? "bg-red-950/40 text-red-500 border border-red-800"
+                            : "bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40"
                           : "bg-white/5 border border-white/5 text-slate-300"
                       }`}
                     >
@@ -816,7 +816,7 @@ export function FleetManager() {
               onClick={(e) => e.stopPropagation()}
             >
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <div className="flex items-center gap-2">
                 <KeyRound className="w-5 h-5 text-[#00E5FF]" />
                 <span className="font-mono text-xs uppercase tracking-widest text-[#00E5FF] font-bold">
@@ -855,7 +855,7 @@ export function FleetManager() {
                     type="text"
                     value={genesisBuyerName}
                     onChange={(e) => setGenesisBuyerName(e.target.value)}
-                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                     placeholder="Cap. Matías Edwards"
                   />
                 </div>
@@ -868,7 +868,7 @@ export function FleetManager() {
                     type="text"
                     value={genesisBuyerEmail}
                     onChange={(e) => setGenesisBuyerEmail(e.target.value)}
-                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                     placeholder="matias.edwards@gmail.com"
                   />
                 </div>
@@ -883,7 +883,7 @@ export function FleetManager() {
                     type="text"
                     value={genesisDealerName}
                     onChange={(e) => setGenesisDealerName(e.target.value)}
-                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                     placeholder="Beneteau Americas Official"
                   />
                 </div>
@@ -899,7 +899,7 @@ export function FleetManager() {
                         e.target.value as "new_shipyard" | "brokerage_used"
                       )
                     }
-                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/10"
+                    className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                   >
                     <option value="new_shipyard">Entrega Nuevo de Astillero (0h)</option>
                     <option value="brokerage_used">Traspaso Brokerage / Segundo Dueño</option>
@@ -917,12 +917,12 @@ export function FleetManager() {
                 <span className="text-[9px] opacity-60">TOKEN: {genesisToken}</span>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 font-mono text-[11px] break-all opacity-90 select-all">
+              <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 font-mono text-[11px] break-all opacity-90 select-all">
                 {typeof window !== "undefined" ? window.location.origin : "https://marine-os-sigma.vercel.app"}/genesis-handover?token={genesisToken}&amp;vessel_id={genesisVessel.id}
               </div>
 
               {/* Package contents included */}
-              <div className="pt-2 border-t border-white/10 space-y-1 text-[11px] font-mono opacity-80">
+              <div className="pt-2 border-t border-white/5 space-y-1 text-[11px] font-mono opacity-80">
                 <div className="text-[10px] uppercase opacity-55">ACTIVOS TRANSFERIDOS AUTOMÁTICAMENTE:</div>
                 <div className="grid grid-cols-2 gap-1 text-[10px]">
                   <div>✓ 4 Nodos QR (Motor, WC, Molinete, Sentina)</div>
@@ -940,7 +940,7 @@ export function FleetManager() {
                   type="button"
                   data-testid="copy-genesis-link-btn"
                   onClick={handleCopyGenesisLink}
-                  className="marine-btn marine-btn-primary text-xs py-2.5 flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#00E5FF]/20"
+                  className="marine-btn marine-btn-primary text-xs py-2.5 flex items-center justify-center gap-2 font-bold shadow-none"
                 >
                   {copiedGenesisLink ? (
                     <>

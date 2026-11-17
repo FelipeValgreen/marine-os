@@ -32,7 +32,7 @@ export function Logo({
     >
       {/* Geometric Compass + Albatross Vector Mark with Lifebuoy Orange Accent */}
       <div
-        className={`${dimensions} rounded-xl flex items-center justify-center relative shrink-0 border transition-all duration-200 border-[var(--border-subtle)] bg-[var(--bg-secondary)] shadow-[0_0_24px_rgba(255,87,34,0.22)]`}
+        className={`${dimensions} rounded-xl flex items-center justify-center relative shrink-0 border transition-all duration-200 border-[var(--border-subtle)] bg-[var(--bg-secondary)] shadow-none`}
       >
         <svg
           viewBox="0 0 40 40"

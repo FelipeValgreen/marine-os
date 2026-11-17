@@ -607,7 +607,7 @@ export function NauticalMap({
       className={
         fullScreen
           ? "fixed inset-0 w-screen h-screen z-0"
-          : "relative w-full h-[460px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
+          : "relative w-full h-[460px] rounded-2xl overflow-hidden border border-white/5 shadow-2xl shadow-black/80"
       }
     >
       <div ref={mapContainerRef} className="w-full h-full" />

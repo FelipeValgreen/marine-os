@@ -665,7 +665,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
                 : isDaylight
                 ? "bg-[#F0F4F8]/95 backdrop-blur-2xl border-slate-300 text-[#0A192F] shadow-xl"
-                : "bg-[#040B16]/90 backdrop-blur-2xl border-white/10 text-slate-200 shadow-2xl"
+                : "bg-[#040B16]/95 backdrop-blur-2xl border-white/5 text-slate-200"
             }`}
           >
             {/* Top Brand Logo + Collapse Toggle + Cmd+K Trigger */}
@@ -756,11 +756,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                       } ${
                         isCurrent
                           ? isNight
-                            ? "bg-[#FF0000] text-black font-black shadow-[0_0_16px_rgba(255,0,0,0.45)]"
+                            ? "bg-red-950/40 text-red-500 font-bold border-l-2 border-red-500 rounded-r-2xl rounded-l-none"
                             : isDaylight
-                            ? "bg-[#D94A1A] text-white shadow-md"
-                            : "bg-[#FF5722] text-white shadow-[0_4px_20px_rgba(255,87,34,0.4)]"
-                          : "hover:bg-white/10 opacity-80 hover:opacity-100"
+                            ? "bg-slate-200 text-[#D94A1A] font-bold border-l-2 border-[#D94A1A] rounded-r-2xl rounded-l-none"
+                            : "bg-[#1a2332] text-[var(--accent-primary)] font-bold border-l-2 border-[var(--accent-primary)] rounded-r-2xl rounded-l-none"
+                          : "hover:bg-white/[0.04] text-slate-400 hover:text-slate-200"
                       }`}
                     >
                       <span className="flex items-center gap-2.5 truncate">
@@ -1009,7 +1009,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
               onPointerUp={handleSOSPointerUpOrLeave}
               onPointerLeave={handleSOSPointerUpOrLeave}
               onDoubleClick={activateSOSZafarrancho}
-              className="relative overflow-hidden min-h-[64px] px-5 rounded-full bg-[#FF2D55] hover:bg-[#FF2D55]/95 text-white font-mono text-xs sm:text-sm font-black tracking-wider flex items-center gap-2.5 border-2 border-white/30 shadow-[0_0_36px_rgba(255,45,85,0.75)] transition transform active:scale-95 select-none"
+              className="relative overflow-hidden min-h-[64px] px-5 rounded-full bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm font-bold tracking-wider flex items-center gap-2.5 border border-red-800 shadow-none transition transform active:scale-95 select-none"
             >
               {/* 3-Second Hold Progress Fill Bar */}
               {sosHoldProgress > 0 && (
@@ -1042,7 +1042,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
                 : isDaylight
                 ? "bg-[#F0F4F8]/95 backdrop-blur-2xl border-slate-300 text-[#0A192F]"
-                : "backdrop-blur-2xl bg-black/85 border-white/10 text-slate-200"
+                : "backdrop-blur-2xl bg-black/90 border-white/5 text-slate-200"
             }`}
           >
             {NAV_ITEMS.map((item) => {
@@ -1056,11 +1056,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   className={`min-h-[60px] min-w-[62px] px-2 flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold shrink-0 transition rounded-xl ${
                     isCurrent
                       ? isNight
-                        ? "text-[#FF0000] font-black bg-[#FF0000]/15"
+                        ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
                         : isDaylight
-                        ? "text-[#D94A1A] font-black bg-[#D94A1A]/10"
-                        : "text-[var(--accent-primary)] font-black bg-white/10"
-                      : "opacity-65 hover:opacity-100"
+                        ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
+                        : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
+                      : "text-slate-400 opacity-60 hover:opacity-100"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
