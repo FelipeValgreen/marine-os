@@ -4,7 +4,7 @@ import {
   calculateAnchorScope,
   evaluateAnchorWatch,
   calculateApparentWind,
-  calculateTrueWind,
+  
   calculateTWAFromBearing,
   evaluateDynamicRoutingWindow,
 } from "./index.ts";

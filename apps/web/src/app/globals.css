@@ -4,60 +4,90 @@
 
 /* ============================================================================
    IALA MARITIME SIGNALING & NAVAL PSYCHOLOGY COLOR SYSTEM
-   - midnight-ocean: Abyssal Navy (#040B16 / #0A192F), Lifebuoy Orange (#FF5722),
-     Starboard Green (#00E676), Port Red (#FF2D55), Tactical Aqua (#00E5FF)
-   - daylight-high-contrast: Ice Mist (#F0F4F8 / #E1E7EE), Deep Navy (#0A192F),
-     Solar Lifebuoy Orange (#D94A1A)
-   - night-red-shift: Biological Scotopic Preservation (#000000 + #FF0000)
+   - midnight-ocean: Abyssal Navy (#060B14 / #0D1524), Lifebuoy Orange (#C2410C),
+     Tactical Cyan (#38BDF8), Muted Starboard Emerald (#34D399), Alert Amber (#FBBF24)
+   - daylight-high-contrast: Solar High-Glare (#F8FAFC / #E2E8F0), Deep Navy (#020617),
+     Solar Lifebuoy (#C2410C), WCAG AA >= 4.5:1 compliant
+   - night-red-shift: Biological Scotopic Preservation (#000000 + Monochromatic Red)
 ============================================================================ */
 :root,
 [data-theme="midnight-ocean"] {
   --bg-primary: #060b14;
   --bg-secondary: #0d1524;
   --bg-glass: rgba(13, 21, 36, 0.90);
-  --text-primary: #f0f4f8;
+  --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   --border-subtle: rgba(255, 255, 255, 0.05);
-  --accent-primary: #ff5722;
+
+  /* PRD 5.2 Semantic Tokens (WCAG 2.1 AA compliant) */
+  --color-brand: #38bdf8;
+  --color-action: #c2410c;
+  --color-ok: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-data: #38bdf8;
+  --color-sim: #f59e0b;
+
+  --accent-primary: #c2410c;
   --accent-contrast: #ffffff;
-  --telemetry-aqua: #00e5ff;
-  --status-ok: #00e676;
-  --status-warn: #ff9f0a;
-  --status-danger: #ff2d55;
+  --telemetry-aqua: #38bdf8;
+  --status-ok: #34d399;
+  --status-warn: #fbbf24;
+  --status-danger: #f87171;
 }
 
-/* Daylight High-Contrast: Glare-proof Ice Mist (#F0F4F8), Deep Navy (#0A192F), Solar Orange (#D94A1A) */
+/* Daylight High-Contrast: Glare-proof Ice White (#F8FAFC), Deep Navy (#020617), Solar Orange (#C2410C) */
 [data-theme="daylight-high-contrast"] {
-  --bg-primary: #f0f4f8;
-  --bg-secondary: #e1e7ee;
-  --bg-glass: rgba(240, 244, 248, 0.94);
-  --text-primary: #0a192f;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #e2e8f0;
+  --bg-glass: rgba(248, 250, 252, 0.95);
+  --text-primary: #020617;
   --text-secondary: #1e293b;
   --text-muted: #475569;
-  --border-subtle: rgba(10, 25, 47, 0.18);
-  --accent-primary: #d94a1a;
+  --border-subtle: rgba(10, 25, 47, 0.22);
+
+  /* PRD 5.2 Semantic Tokens */
+  --color-brand: #0369a1;
+  --color-action: #c2410c;
+  --color-ok: #047857;
+  --color-warning: #b45309;
+  --color-danger: #b91c1c;
+  --color-data: #0369a1;
+  --color-sim: #b45309;
+
+  --accent-primary: #c2410c;
   --accent-contrast: #ffffff;
   --telemetry-aqua: #0284c7;
-  --status-ok: #059669;
-  --status-warn: #d97706;
-  --status-danger: #dc2626;
+  --status-ok: #047857;
+  --status-warn: #b45309;
+  --status-danger: #b91c1c;
 }
 
-/* Night Red-Shift: Strict OLED #000000 + pure #FF0000 red — ZERO white pixels */
+/* Night Red-Shift: Strict OLED #000000 + pure #FF2222 red — ZERO white pixels */
 [data-theme="night-red-shift"] {
   --bg-primary: #000000;
   --bg-secondary: #050000;
-  --bg-glass: rgba(0, 0, 0, 0.96);
-  --text-primary: #ff0000;
-  --text-secondary: #cc0000;
-  --text-muted: #990000;
+  --bg-glass: rgba(0, 0, 0, 0.98);
+  --text-primary: #ff2222;
+  --text-secondary: #cc1111;
+  --text-muted: #880000;
   --border-subtle: rgba(255, 0, 0, 0.38);
+
+  /* PRD 5.2 Semantic Tokens */
+  --color-brand: #ff2222;
+  --color-action: #ff0000;
+  --color-ok: #cc1111;
+  --color-warning: #ff2222;
+  --color-danger: #ff0000;
+  --color-data: #ff2222;
+  --color-sim: #ff2222;
+
   --accent-primary: #ff0000;
   --accent-contrast: #000000;
   --telemetry-aqua: #ff0000;
-  --status-ok: #ff0000;
-  --status-warn: #ff0000;
+  --status-ok: #cc1111;
+  --status-warn: #ff2222;
   --status-danger: #ff0000;
 }
 
@@ -152,9 +182,9 @@ body {
   transform: scale(0.98);
 }
 
-/* Primary CTA Button: Lifebuoy Orange (#FF5722 / #D94A1A) with matte volume — NO NEON GLOW */
+/* Primary CTA Button: Deep Lifebuoy Orange (#C2410C) with matte volume — WCAG AA >= 4.5:1 compliant */
 .marine-btn-primary {
-  background-color: var(--accent-primary);
+  background-color: var(--color-action);
   color: var(--accent-contrast);
   border-color: transparent;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
@@ -163,7 +193,7 @@ body {
 }
 
 [data-theme="daylight-high-contrast"] .marine-btn-primary {
-  background-color: #d94a1a;
+  background-color: var(--color-action);
   color: #ffffff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
@@ -363,4 +393,16 @@ textarea {
 
 [data-theme="night-red-shift"] .marinos-tactical-popup .maplibregl-popup-tip {
   border-top-color: #000000 !important;
+}
+
+/* Accessible reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

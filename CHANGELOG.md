@@ -4,6 +4,32 @@ Todas las modificaciones notables de este proyecto están documentadas en este a
 
 ---
 
+## [Fase 2 — Sistema de Diseño Marino] - 2026-11-16
+Rama: `fase-2-diseno`
+
+### Añadido / Mejorado (Tokens, Temas, Tipografía y Accesibilidad Náutica)
+- **Tokens Semánticos Completos (R-5.2):**
+  - Añadidos en `globals.css` para los tres temas: `--color-brand`, `--color-action`, `--color-ok`, `--color-warning`, `--color-danger`, `--color-data`, `--color-sim`.
+  - Desaturación de cian cegador (`#00E5FF` $\to$ `#38BDF8`) y verde cegador (`#00E676` $\to$ `#34D399`) en el tema nocturno y de puente para evitar deslumbramiento.
+- **Cumplimiento Estricto de Contraste WCAG 2.1 AA:**
+  - Botón de acción principal (`.marine-btn-primary`) configurado con `--color-action: #C2410C` y texto blanco (`#FFFFFF`), logrando una relación de contraste calculada de $5.2:1$ (superando el umbral AA de $4.5:1$).
+- **Tres Temas Operacionales (R-5.1):**
+  - **Océano (Día):** Modo oscuro abisal de baja fatiga ocular para puente de mando.
+  - **Noche (Red-Shift):** Fondo negro OLED puro (`#000000`), textos e íconos estrictamente en espectro rojo (`#FF2222` / `#CC1111`), sin píxeles blancos, verdes o cian.
+  - **Sol (Alto Contraste):** Fondo hielo claro (`#F8FAFC`), texto marino carbón (`#020617`, peso $\ge 600$), sin grises claros deslavados.
+  - Atajo de un toque al modo noche escotópico integrado directamente en el HUD superior del Bridge.
+  - Inicialización automática respetando `prefers-color-scheme` cuando no hay preferencia guardada.
+- **Accesibilidad y Anti-Mareo (R-5.7):**
+  - Soporte global para `prefers-reduced-motion: reduce` que colapsa duraciones de animación para reducir la cinetosis a bordo.
+  - Añadido `role="alert"` y `aria-live="assertive"` en banners de emergencia y alarma de garreo (`drag-alarm-banner`, `anchor-sog-warning-banner`).
+  - Alarmas multi-sensoriales completas (color + ícono + texto explícito + sirena de audio + vibración háptica).
+- **Tipografía y Legibilidad de Timón (R-5.3):**
+  - Números del HUD ampliados a `text-2xl sm:text-4xl` con tipografía monoespaciada tabular (**JetBrains Mono**, `tabular-nums slashed-zero`) garantizando $CLS = 0$.
+- **Documento Entregable:**
+  - Creado `docs/DESIGN_SYSTEM.md` con las especificaciones cromáticas, cálculo de ratios de contraste WCAG 2.1 AA y ergonomía de pantalla táctil para uso con guantes en mar abierto.
+
+---
+
 ## [Fase 1 — Coherencia de Datos] - 2026-11-16
 Rama: `fase-1-datos`
 

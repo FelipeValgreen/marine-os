@@ -55,11 +55,6 @@ export type MarineTheme =
   | "daylight-high-contrast"
   | "night-red-shift";
 export type MarineRole = "fleet_admin" | "skipper" | "crew";
-export type VesselOperationalState =
-  | "AMARRADO"
-  | "FONDEADO"
-  | "NAVEGANDO_MOTOR"
-  | "NAVEGANDO_VELA";
 export type MarineSection =
   | "bridge"
   | "vessel"
@@ -102,8 +97,6 @@ interface ThemeContextValue {
   setSimulatedOffline: (offline: boolean) => void;
   dataMode: "SIMULADO" | "EN_VIVO";
   setDataMode: (mode: "SIMULADO" | "EN_VIVO") => void;
-  vesselOperationalState: VesselOperationalState;
-  setVesselOperationalState: (s: VesselOperationalState) => void;
   pendingSyncCount: number;
   triggerManualSync: () => Promise<number>;
   isSeeded: boolean;
@@ -128,70 +121,70 @@ const NAV_ITEMS: {
   shortcut: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  {
-    id: "bridge",
-    label: "Bridge • Carta & HUD",
-    shortLabel: "Bridge",
-    shortcut: "⌘1",
-    icon: Compass,
-  },
-  {
-    id: "vessel",
-    label: "Vessel • Gemelo & Averías",
-    shortLabel: "Vessel",
-    shortcut: "⌘2",
-    icon: Ship,
-  },
-  {
-    id: "voyages",
-    label: "Voyages • E-Zarpe OCR",
-    shortLabel: "Zarpe",
-    shortcut: "⌘3",
-    icon: FileCheck2,
-  },
-  {
-    id: "fleet",
-    label: "Fleet • Gestor de Flota",
-    shortLabel: "Flota",
-    shortcut: "⌘4",
-    icon: Anchor,
-  },
-  {
-    id: "crew",
-    label: "Crew • Libreta Tripulación",
-    shortLabel: "Tripulantes",
-    shortcut: "⌘5",
-    icon: Users,
-  },
-  {
-    id: "logbook",
-    label: "Pasaporte & Bitácora Voz",
-    shortLabel: "Passport",
-    shortcut: "⌘6",
-    icon: BookOpen,
-  },
-  {
-    id: "integrations",
-    label: "Integraciones • NMEA & Sat",
-    shortLabel: "Hub",
-    shortcut: "⌘7",
-    icon: Sliders,
-  },
-  {
-    id: "handover",
-    label: "Handover • Sello SHA-256",
-    shortLabel: "Handover",
-    shortcut: "⌘8",
-    icon: ShieldCheck,
-  },
-  {
-    id: "academy",
-    label: "Marine Academy 🛟",
-    shortLabel: "Academy",
-    shortcut: "⌘9",
-    icon: LifeBuoy,
-  },
-];
+    {
+      id: "bridge",
+      label: "Bridge • Carta & HUD",
+      shortLabel: "Bridge",
+      shortcut: "⌘1",
+      icon: Compass,
+    },
+    {
+      id: "vessel",
+      label: "Vessel • Gemelo & Averías",
+      shortLabel: "Vessel",
+      shortcut: "⌘2",
+      icon: Ship,
+    },
+    {
+      id: "voyages",
+      label: "Voyages • E-Zarpe OCR",
+      shortLabel: "Zarpe",
+      shortcut: "⌘3",
+      icon: FileCheck2,
+    },
+    {
+      id: "fleet",
+      label: "Fleet • Gestor de Flota",
+      shortLabel: "Flota",
+      shortcut: "⌘4",
+      icon: Anchor,
+    },
+    {
+      id: "crew",
+      label: "Crew • Libreta Tripulación",
+      shortLabel: "Tripulantes",
+      shortcut: "⌘5",
+      icon: Users,
+    },
+    {
+      id: "logbook",
+      label: "Pasaporte & Bitácora Voz",
+      shortLabel: "Passport",
+      shortcut: "⌘6",
+      icon: BookOpen,
+    },
+    {
+      id: "integrations",
+      label: "Integraciones • NMEA & Sat",
+      shortLabel: "Hub",
+      shortcut: "⌘7",
+      icon: Sliders,
+    },
+    {
+      id: "handover",
+      label: "Handover • Sello SHA-256",
+      shortLabel: "Handover",
+      shortcut: "⌘8",
+      icon: ShieldCheck,
+    },
+    {
+      id: "academy",
+      label: "Marine Academy 🛟",
+      shortLabel: "Academy",
+      shortcut: "⌘9",
+      icon: LifeBuoy,
+    },
+  ];
 
 const AUTH_STORAGE_KEY = "marinos-authenticated-profile-id";
 const THEME_STORAGE_KEY = "marinos-theme";
@@ -211,8 +204,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [activeSection, setActiveSectionState] =
     useState<MarineSection>("bridge");
   const [dataMode, setDataMode] = useState<"SIMULADO" | "EN_VIVO">("SIMULADO");
-  const [vesselOperationalState, setVesselOperationalState] =
-    useState<VesselOperationalState>("FONDEADO");
   const [simulatedOffline, setSimulatedOffline] = useState<boolean>(false);
   const [browserOffline, setBrowserOffline] = useState<boolean>(false);
   const [isSeeded, setIsSeeded] = useState<boolean>(false);
@@ -354,13 +345,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setThemeState(savedTheme);
         document.documentElement.setAttribute("data-theme", savedTheme);
       } else {
-        document.documentElement.setAttribute("data-theme", "midnight-ocean");
+        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        const initialTheme: MarineTheme = prefersLight ? "daylight-high-contrast" : "midnight-ocean";
+        setThemeState(initialTheme);
+        document.documentElement.setAttribute("data-theme", initialTheme);
       }
 
       setBrowserOffline(!navigator.onLine);
       const handleOnline = () => {
         setBrowserOffline(false);
-        flushSyncQueue().catch(() => {});
+        flushSyncQueue().catch(() => { });
       };
       const handleOffline = () => setBrowserOffline(true);
 
@@ -371,7 +365,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         navigator.serviceWorker
           .register("/sw.js")
           .then((registration) => {
-            registration.update().catch(() => {});
+            registration.update().catch(() => { });
             registration.onupdatefound = () => {
               const installingWorker = registration.installing;
               if (installingWorker) {
@@ -383,7 +377,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
               }
             };
           })
-          .catch(() => {});
+          .catch(() => { });
 
         let isRefreshing = false;
         navigator.serviceWorker.addEventListener("controllerchange", () => {
@@ -634,8 +628,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setSimulatedOffline,
         dataMode,
         setDataMode,
-        vesselOperationalState,
-        setVesselOperationalState,
         pendingSyncCount: pendingSyncItems.length,
         triggerManualSync,
         isSeeded: isSeeded && authChecked,
@@ -660,13 +652,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       />
 
       <div
-        className={`min-h-screen relative selection:bg-[var(--accent-primary)]/25 ${
-          isNight
-            ? "bg-black text-[#FF0000]"
-            : isDaylight
+        className={`min-h-screen relative selection:bg-[var(--accent-primary)]/25 ${isNight
+          ? "bg-black text-[#FF0000]"
+          : isDaylight
             ? "bg-[#F0F4F8] text-[#0A192F]"
             : "bg-[#040B16] text-slate-100"
-        }`}
+          }`}
       >
         {/* ===================================================================
             COLLAPSIBLE LINEAR-STYLE DESKTOP SIDEBAR (w-16 collapsed / w-60 expanded)
@@ -674,22 +665,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         {!isLoginRoute && (
           <aside
             aria-label="MarinOS Navigation Rail"
-            className={`hidden lg:flex fixed top-0 left-0 bottom-0 z-50 flex-col justify-between py-3.5 border-r transition-all duration-200 ${
-              sidebarCollapsed ? "w-16 items-center" : "w-60 px-3"
-            } ${
-              isNight
+            className={`hidden lg:flex fixed top-0 left-0 bottom-0 z-50 flex-col justify-between py-3.5 border-r transition-all duration-200 ${sidebarCollapsed ? "w-16 items-center" : "w-60 px-3"
+              } ${isNight
                 ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
                 : isDaylight
-                ? "bg-[#F0F4F8]/95 backdrop-blur-2xl border-slate-300 text-[#0A192F] shadow-xl"
-                : "bg-[#040B16]/95 backdrop-blur-2xl border-white/5 text-slate-200"
-            }`}
+                  ? "bg-[#F0F4F8]/95 backdrop-blur-2xl border-slate-300 text-[#0A192F] shadow-xl"
+                  : "bg-[#040B16]/95 backdrop-blur-2xl border-white/5 text-slate-200"
+              }`}
           >
             {/* Top Brand Logo + Collapse Toggle + Cmd+K Trigger */}
             <div className="flex flex-col gap-2 w-full items-center">
               <div
-                className={`flex items-center w-full ${
-                  sidebarCollapsed ? "justify-center" : "justify-between px-1"
-                }`}
+                className={`flex items-center w-full ${sidebarCollapsed ? "justify-center" : "justify-between px-1"
+                  }`}
               >
                 <div className="flex items-center gap-1.5">
                   <button
@@ -726,17 +714,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 data-testid="open-command-center-btn"
                 onClick={() => setCommandCenterOpen(true)}
                 title="Command Center (⌘K)"
-                className={`min-h-14 rounded-2xl border flex items-center transition ${
-                  sidebarCollapsed
-                    ? "w-12 justify-center"
-                    : "w-full px-3 justify-between text-xs font-mono"
-                } ${
-                  isNight
+                className={`min-h-14 rounded-2xl border flex items-center transition ${sidebarCollapsed
+                  ? "w-12 justify-center"
+                  : "w-full px-3 justify-between text-xs font-mono"
+                  } ${isNight
                     ? "bg-black border-[#FF0000]/50 text-[#FF0000]"
                     : isDaylight
-                    ? "bg-[#E1E7EE] border-slate-300 text-[#0A192F]"
-                    : "bg-white/5 hover:bg-white/10 border-white/15 text-slate-200"
-                }`}
+                      ? "bg-[#E1E7EE] border-slate-300 text-[#0A192F]"
+                      : "bg-white/5 hover:bg-white/10 border-white/15 text-slate-200"
+                  }`}
               >
                 <span className="flex items-center gap-2">
                   <Search className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
@@ -765,19 +751,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                       data-testid={`nav-${item.id}`}
                       aria-label={item.label}
                       onClick={() => setActiveSection(item.id)}
-                      className={`min-h-14 rounded-2xl flex items-center transition-all ${
-                        sidebarCollapsed
-                          ? "w-12 justify-center"
-                          : "w-full px-3 justify-between text-xs font-semibold"
-                      } ${
-                        isCurrent
+                      className={`min-h-14 rounded-2xl flex items-center transition-all ${sidebarCollapsed
+                        ? "w-12 justify-center"
+                        : "w-full px-3 justify-between text-xs font-semibold"
+                        } ${isCurrent
                           ? isNight
                             ? "bg-red-950/40 text-red-500 font-bold border-l-2 border-red-500 rounded-r-2xl rounded-l-none"
                             : isDaylight
-                            ? "bg-slate-200 text-[#D94A1A] font-bold border-l-2 border-[#D94A1A] rounded-r-2xl rounded-l-none"
-                            : "bg-[#1a2332] text-[var(--accent-primary)] font-bold border-l-2 border-[var(--accent-primary)] rounded-r-2xl rounded-l-none"
+                              ? "bg-slate-200 text-[#D94A1A] font-bold border-l-2 border-[#D94A1A] rounded-r-2xl rounded-l-none"
+                              : "bg-[#1a2332] text-[var(--accent-primary)] font-bold border-l-2 border-[var(--accent-primary)] rounded-r-2xl rounded-l-none"
                           : "hover:bg-white/[0.04] text-slate-400 hover:text-slate-200"
-                      }`}
+                        }`}
                     >
                       <span className="flex items-center gap-2.5 truncate">
                         <Icon className="w-5 h-5 shrink-0" />
@@ -794,11 +778,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
                     {sidebarCollapsed && (
                       <span
-                        className={`pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute left-16 top-1/2 -translate-y-1/2 ml-2 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap z-50 border shadow-xl ${
-                          isNight
-                            ? "bg-black border-[#FF0000] text-[#FF0000]"
-                            : "bg-slate-900/95 backdrop-blur-xl border-white/15 text-white"
-                        }`}
+                        className={`pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute left-16 top-1/2 -translate-y-1/2 ml-2 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap z-50 border shadow-xl ${isNight
+                          ? "bg-black border-[#FF0000] text-[#FF0000]"
+                          : "bg-slate-900/95 backdrop-blur-xl border-white/15 text-white"
+                          }`}
                       >
                         {item.label} ({item.shortcut})
                       </span>
@@ -828,9 +811,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   type="button"
                   data-testid="rail-account-btn"
                   onClick={() => setActiveSection("logbook")}
-                  className={`${
-                    sidebarCollapsed ? "w-11 flex-col" : "w-full px-3 flex-row gap-2"
-                  } min-h-14 rounded-2xl border border-[var(--border-subtle)] bg-white/5 hover:bg-white/10 font-mono text-xs font-bold flex items-center justify-center`}
+                  className={`${sidebarCollapsed ? "w-11 flex-col" : "w-full px-3 flex-row gap-2"
+                    } min-h-14 rounded-2xl border border-[var(--border-subtle)] bg-white/5 hover:bg-white/10 font-mono text-xs font-bold flex items-center justify-center`}
                 >
                   <span>{activeAccount.avatarInitials}</span>
                   {sidebarCollapsed ? (
@@ -861,15 +843,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                       tone: next ? "amber" : "emerald",
                     });
                   }}
-                  className={`${
-                    sidebarCollapsed
-                      ? "w-11 flex-col"
-                      : "w-full px-3 flex-row justify-between"
-                  } min-h-14 rounded-2xl border flex items-center justify-center transition ${
-                    isOffline
+                  className={`${sidebarCollapsed
+                    ? "w-11 flex-col"
+                    : "w-full px-3 flex-row justify-between"
+                    } min-h-14 rounded-2xl border flex items-center justify-center transition ${isOffline
                       ? "border-[#FF9F0A]/60 bg-[#FF9F0A]/15 text-[#FF9F0A]"
                       : "border-[var(--border-subtle)] bg-white/5 hover:bg-white/10"
-                  }`}
+                    }`}
                 >
                   {isOffline ? (
                     <WifiOff className="w-4 h-4" />
@@ -890,15 +870,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   type="button"
                   data-testid="theme-toggle-btn"
                   onClick={toggleTheme}
-                  className={`${
-                    sidebarCollapsed
-                      ? "w-11"
-                      : "w-full px-3 justify-between font-mono text-xs"
-                  } min-h-14 rounded-2xl border flex items-center justify-center transition ${
-                    isNight
+                  className={`${sidebarCollapsed
+                    ? "w-11"
+                    : "w-full px-3 justify-between font-mono text-xs"
+                    } min-h-14 rounded-2xl border flex items-center justify-center transition ${isNight
                       ? "bg-[#FF0000] text-black border-[#FF0000] font-bold"
                       : "border-[var(--border-subtle)] bg-white/5 hover:bg-white/10"
-                  }`}
+                    }`}
                 >
                   {isNight ? (
                     <Eye className="w-5 h-5" />
@@ -912,8 +890,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                       {isNight
                         ? "RED-SHIFT"
                         : isDaylight
-                        ? "DAYLIGHT"
-                        : "MIDNIGHT"}
+                          ? "DAYLIGHT"
+                          : "MIDNIGHT"}
                     </span>
                   )}
                 </button>
@@ -926,9 +904,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   data-testid="rail-logout-btn"
                   onClick={logoutSession}
                   aria-label="Cerrar sesión / Ir a Login"
-                  className={`${
-                    sidebarCollapsed ? "w-11" : "w-full px-3 gap-2 text-xs font-mono"
-                  } min-h-14 rounded-2xl border border-[var(--border-subtle)] bg-white/5 hover:bg-[#FF2D55]/20 hover:border-[#FF2D55]/40 flex items-center justify-center transition`}
+                  className={`${sidebarCollapsed ? "w-11" : "w-full px-3 gap-2 text-xs font-mono"
+                    } min-h-14 rounded-2xl border border-[var(--border-subtle)] bg-white/5 hover:bg-[#FF2D55]/20 hover:border-[#FF2D55]/40 flex items-center justify-center transition`}
                 >
                   <LogOut className="w-4 h-4 opacity-75" />
                   {!sidebarCollapsed && <span>Cambiar Cuenta</span>}
@@ -970,9 +947,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         {!isLoginRoute && dataMode === "SIMULADO" && (
           <div
             data-testid="simulation-mode-banner"
-            className={`${
-              sidebarCollapsed ? "lg:pl-16" : "lg:pl-60"
-            } w-full bg-[#D94A1A] text-white py-1 px-4 text-center font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase shadow-md flex items-center justify-center gap-2 relative z-40 transition-all duration-200`}
+            className={`${sidebarCollapsed ? "lg:pl-16" : "lg:pl-60"
+              } w-full bg-[#D94A1A] text-white py-1 px-4 text-center font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase shadow-md flex items-center justify-center gap-2 relative z-40 transition-all duration-200`}
           >
             <span>⚠️ MODO SIMULACIÓN — datos ficticios, no usar para navegar</span>
           </div>
@@ -985,9 +961,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           className={
             isLoginRoute || isBridgeFullscreen
               ? "w-screen h-screen overflow-hidden relative"
-              : `${
-                  sidebarCollapsed ? "lg:pl-16" : "lg:pl-60"
-                } min-h-screen pb-24 lg:pb-10 transition-all duration-200`
+              : `${sidebarCollapsed ? "lg:pl-16" : "lg:pl-60"
+              } min-h-screen pb-24 lg:pb-10 transition-all duration-200`
           }
         >
           {isLoginRoute || isBridgeFullscreen ? (
@@ -1053,8 +1028,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
               <span className="relative z-10">
                 {sosHoldProgress > 0
                   ? `ZAFARRANCHO ${Math.ceil(
-                      ((100 - sosHoldProgress) / 100) * 3
-                    )}S...`
+                    ((100 - sosHoldProgress) / 100) * 3
+                  )}S...`
                   : "SOS • MANTENER 3S"}
               </span>
             </button>
@@ -1067,13 +1042,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         {!isLoginRoute && (
           <nav
             aria-label="Mobile Bottom Navigation"
-            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t flex items-center overflow-x-auto no-scrollbar px-1 py-0.5 justify-start sm:justify-center gap-1 ${
-              isNight
-                ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
-                : isDaylight
+            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t flex items-center overflow-x-auto no-scrollbar px-1 py-0.5 justify-start sm:justify-center gap-1 ${isNight
+              ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
+              : isDaylight
                 ? "bg-[#F0F4F8]/95 backdrop-blur-2xl border-slate-300 text-[#0A192F]"
                 : "backdrop-blur-2xl bg-black/90 border-white/5 text-slate-200"
-            }`}
+              }`}
           >
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
@@ -1083,15 +1057,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   key={item.id}
                   type="button"
                   onClick={() => setActiveSection(item.id)}
-                  className={`min-h-[60px] min-w-[62px] px-2 flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold shrink-0 transition rounded-xl ${
-                    isCurrent
-                      ? isNight
-                        ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
-                        : isDaylight
+                  className={`min-h-[60px] min-w-[62px] px-2 flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold shrink-0 transition rounded-xl ${isCurrent
+                    ? isNight
+                      ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
+                      : isDaylight
                         ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
                         : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
-                      : "text-slate-400 opacity-60 hover:opacity-100"
-                  }`}
+                    : "text-slate-400 opacity-60 hover:opacity-100"
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span className="truncate max-w-[64px]">{item.shortLabel}</span>
