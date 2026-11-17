@@ -11,6 +11,7 @@
     "build:web": "npm --prefix apps/web run build",
     "lint:web": "npm --prefix apps/web run lint",
     "typecheck:web": "npm --prefix apps/web run typecheck",
+    "test:web": "npm --prefix apps/web run test",
     "dev:api": "cd apps/api && .venv/bin/uvicorn main:app --reload --port 8000"
   }
 }

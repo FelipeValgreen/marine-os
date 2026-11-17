@@ -28,14 +28,13 @@ import {
   Sparkles,
   ShieldCheck,
   Compass,
-  LogOut,
+  Ship,
   Mic,
   UserCog,
   ShoppingBag,
   Truck,
   PackageCheck,
   Package,
-  Share2,
   CheckCircle2,
   MessageCircle,
   Copy,
@@ -58,8 +57,14 @@ import {
   formatNauticalCoordsDMS,
   triggerAcousticMarineAlarm,
   haversineDistanceMeters,
+  calculateApparentWind,
+  calculateTWAFromBearing,
+  evaluateDynamicRoutingWindow,
 } from "@/lib/nautical";
-import { useMarineContext } from "@/components/ThemeProvider";
+import {
+  useMarineContext,
+  type VesselOperationalState,
+} from "@/components/ThemeProvider";
 import { NauticalMap } from "@/components/NauticalMap";
 import { HandoverWizard } from "@/components/HandoverWizard";
 import { VoyagesZarpeView } from "@/components/VoyagesZarpeView";
@@ -178,7 +183,6 @@ export default function MarineOSHomePage() {
     theme,
     activeAccount,
     updatePassportProfile,
-    logoutSession,
     activeSection,
     setActiveSection,
     requestedVesselSubView,
@@ -187,6 +191,8 @@ export default function MarineOSHomePage() {
     isOffline,
     pushToast,
     relaunchSeaTrials,
+    vesselOperationalState,
+    setVesselOperationalState,
   } = useMarineContext();
   const isNight = theme === "night-red-shift";
 
@@ -393,6 +399,23 @@ export default function MarineOSHomePage() {
   useEffect(() => {
     let active = true;
     async function loadPassagePlan() {
+      // Dynamic passage planning based on planned COG (194°) and forecast wind
+      const catalog: Record<string, { wind_kn: number; gust_kn: number; dir_deg: number; wave_m: number; label: string }> = {
+        now: { wind_kn: 16.5, gust_kn: 23.0, dir_deg: 295, wave_m: 0.65, label: "Zarpar Ahora (T+0h)" },
+        in_2h: { wind_kn: 14.2, gust_kn: 18.5, dir_deg: 315, wave_m: 0.42, label: "Zarpar en 2 hrs (Ventana Óptima)" },
+        in_6h: { wind_kn: 24.8, gust_kn: 33.5, dir_deg: 195, wave_m: 1.45, label: "Zarpar en 6 hrs" },
+        tomorrow_0800: { wind_kn: 12.8, gust_kn: 16.4, dir_deg: 330, wave_m: 0.35, label: "Zarpar Mañana 08:00" },
+      };
+      const target = catalog[departureWindowId] || catalog.in_2h;
+      const evaluated = evaluateDynamicRoutingWindow({
+        plannedCogDeg: 194,
+        windSpeedKn: target.wind_kn,
+        windGustKn: target.gust_kn,
+        windDirDeg: target.dir_deg,
+        waveHeightM: target.wave_m,
+        label: target.label,
+      });
+
       if (!isOffline) {
         try {
           const res = await fetch(
@@ -400,15 +423,21 @@ export default function MarineOSHomePage() {
           );
           if (res.ok && active) {
             const data = await res.json();
-            setPassagePlan({
-              ...data.selected_window,
-              forecast_48h: data.forecast_48h,
-            });
+            setPassagePlan((prev) => ({
+              ...evaluated,
+              forecast_48h: data.forecast_48h || prev.forecast_48h,
+            }));
             return;
           }
         } catch {
-          // Offline fallback
+          // Fallback to local evaluation
         }
+      }
+      if (active) {
+        setPassagePlan((prev) => ({
+          ...evaluated,
+          forecast_48h: prev.forecast_48h,
+        }));
       }
     }
     loadPassagePlan();
@@ -430,9 +459,45 @@ export default function MarineOSHomePage() {
     oil_pressure_kpa: 340,
     alternator_voltage_v: 14.2,
     house_battery_soc_pct: 94,
-    bus_source: "Signal K NMEA2000 Bus (can0)",
+    bus_source: "simulator",
     connected: true,
   });
+
+  // Simulator Dead-Reckoning Position Advance (PRD R-4.3: 10s @ 7kn ≈ 36m)
+  useEffect(() => {
+    if (gpsMode !== "simulator") return;
+    const tickIntervalMs = 2000;
+    const interval = setInterval(() => {
+      setTelemetry((prev) => {
+        if (prev.sog_kn <= 0.1) return prev;
+        const dtSeconds = tickIntervalMs / 1000;
+        const distMeters = prev.sog_kn * 0.51444 * dtSeconds;
+        const cogRad = (prev.cog_deg * Math.PI) / 180;
+        const dLat = (distMeters * Math.cos(cogRad)) / 111139;
+        const latRad = (prev.lat * Math.PI) / 180;
+        const dLon = (distMeters * Math.sin(cogRad)) / (111139 * Math.cos(latRad));
+
+        return {
+          ...prev,
+          lat: prev.lat + dLat,
+          lon: prev.lon + dLon,
+        };
+      });
+    }, tickIntervalMs);
+
+    return () => clearInterval(interval);
+  }, [gpsMode]);
+
+  // Coherent synchronization of operational vessel state based on engine & speed
+  useEffect(() => {
+    if (telemetry.sog_kn > 0.5) {
+      if (telemetry.rpm > 700) {
+        if (vesselOperationalState !== "NAVEGANDO_MOTOR") setVesselOperationalState("NAVEGANDO_MOTOR");
+      } else {
+        if (vesselOperationalState !== "NAVEGANDO_VELA") setVesselOperationalState("NAVEGANDO_VELA");
+      }
+    }
+  }, [telemetry.sog_kn, telemetry.rpm, vesselOperationalState, setVesselOperationalState]);
 
   // Real Asynchronous Connection to FastAPI `/api/v1/signalk/telemetry`
   useEffect(() => {
@@ -478,8 +543,7 @@ export default function MarineOSHomePage() {
             house_battery_soc_pct: Number(
               data.propulsion?.house_battery_soc_pct ?? 94
             ),
-            bus_source:
-              data.source || "Signal K NMEA2000 Bus (can0 / Actisense NGT-1)",
+            bus_source: data.source || "simulator",
             connected: true,
           }));
         }
@@ -682,6 +746,7 @@ export default function MarineOSHomePage() {
     windSpeedKnots: liveWeather.windSpeedKn,
     seabedType: selectedAnchorage?.seabed_type ?? "sand",
     vesselLoaMeters: vessel?.loa_meters ?? 12.43,
+    availableChainMeters: vessel?.chain_length_meters ?? 60,
   });
 
   const anchorLat = selectedAnchorage?.lat ?? -41.4717;
@@ -707,8 +772,34 @@ export default function MarineOSHomePage() {
     anchorLon,
     effectiveVesselLat,
     effectiveVesselLon,
-    scopeCalc.swingRadiusMeters
+    scopeCalc.swingRadiusMeters,
+    telemetry.sog_kn
   );
+
+  // Single Coherent Marine Environment Store (PRD R-4.4 / R-4.7)
+  const twaCalculated = calculateTWAFromBearing(
+    telemetry.cog_deg,
+    liveWeather.windDirDeg
+  );
+  const apparentWindCalculated = calculateApparentWind({
+    twsKn: liveWeather.windSpeedKn,
+    twaDeg: twaCalculated,
+    sogKn: telemetry.sog_kn,
+  });
+
+  const environment = {
+    tws_kn: liveWeather.windSpeedKn,
+    twd_deg: liveWeather.windDirDeg,
+    twa_deg: twaCalculated,
+    aws_kn: apparentWindCalculated.awsKn,
+    awa_deg: apparentWindCalculated.awaDeg,
+    water_temp_c: 11.8,
+    air_temp_c: liveWeather.temperatureC,
+    wave_height_m: liveWeather.waveHeightM,
+    wave_period_s: liveWeather.wavePeriodS,
+    wave_dir_deg: liveWeather.waveDirDeg,
+    forecast_source: liveWeather.source,
+  };
 
   const copilotContext: CopilotTelemetryContext = {
     lat: effectiveVesselLat,
@@ -1334,8 +1425,36 @@ export default function MarineOSHomePage() {
           </div>
         </div>
 
-        {/* 2. TOP-RIGHT FLOATING BUTTONS ("⌘K", "Planificador 48h", "Copiloto IA" + "Fondeo & Clima") */}
+        {/* 2. TOP-RIGHT FLOATING BUTTONS ("Vessel State", "⌘K", "Planificador 48h", "Copiloto IA" + "Fondeo & Clima") */}
         <div className="fixed top-4 right-3 sm:right-4 z-30 flex items-center gap-2">
+          {/* Operational Vessel State Pill (PRD R-4.2) */}
+          <button
+            type="button"
+            data-testid="vessel-operational-state-pill"
+            onClick={() => {
+              const nextState: VesselOperationalState =
+                vesselOperationalState === "AMARRADO"
+                  ? "FONDEADO"
+                  : vesselOperationalState === "FONDEADO"
+                  ? "NAVEGANDO_MOTOR"
+                  : vesselOperationalState === "NAVEGANDO_MOTOR"
+                  ? "NAVEGANDO_VELA"
+                  : "AMARRADO";
+              setVesselOperationalState(nextState);
+              pushToast({
+                title: `Estado Operacional: ${nextState.replace("_", " ")}`,
+                subtitle: "Máquina de estados actualizada",
+                tone: "cyan",
+              });
+            }}
+            className="marine-pill min-h-14 px-3 sm:px-4 py-2.5 flex items-center gap-2 text-xs font-mono font-bold"
+            title="Alternar estado operacional del barco"
+          >
+            <Ship className="w-3.5 h-3.5 text-[var(--accent-primary)] shrink-0" />
+            <span className="hidden sm:inline">{vesselOperationalState.replace("_", " ")}</span>
+            <span className="sm:hidden">{vesselOperationalState.slice(0, 3)}</span>
+          </button>
+
           <button
             type="button"
             data-testid="bridge-cmd-k-btn"
@@ -1400,12 +1519,12 @@ export default function MarineOSHomePage() {
             <CloudSun className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
             <span>Fondeo & Clima</span>
             <span className="hidden sm:inline font-mono text-xs px-2 py-0.5 rounded-full bg-white/10">
-              {liveWeather.windSpeedKn.toFixed(1)} kn • {liveWeather.score}%
+              {environment.tws_kn.toFixed(1)} kn • {liveWeather.score}%
             </span>
           </button>
         </div>
 
-        {/* 3. BOTTOM-LEFT MINIMALIST TELEMETRY HUD (4 Clean Numbers: SOG, COG, PROF, VIENTO) */}
+        {/* 3. BOTTOM-LEFT MINIMALIST TELEMETRY HUD (4 Clean Numbers: SOG, COG, PROF, VIENTO TWS & AWS) */}
         <div className="fixed bottom-20 lg:bottom-6 left-3 right-3 sm:right-auto lg:left-20 z-30">
           <div className="marine-card px-4 sm:px-5 py-3.5 rounded-2xl grid grid-cols-4 sm:flex sm:items-center gap-3 sm:gap-8">
             <div>
@@ -1451,13 +1570,16 @@ export default function MarineOSHomePage() {
             <div className="hidden sm:block h-8 w-px bg-white/10" />
 
             <div>
-              <div className="font-mono text-[10px] uppercase tracking-widest opacity-55">
-                VIENTO
+              <div className="font-mono text-[10px] uppercase tracking-widest opacity-55 flex items-center justify-between gap-1">
+                <span>VIENTO</span>
+                <span className="text-[9px] text-[var(--accent-primary)] font-normal hidden sm:inline">
+                  AWS {environment.aws_kn.toFixed(1)}k
+                </span>
               </div>
               <div className="font-mono text-xl sm:text-3xl font-semibold tracking-tight leading-none mt-1 text-[#00E676]">
-                {liveWeather.windSpeedKn.toFixed(1)}
+                {environment.tws_kn.toFixed(1)}
                 <span className="text-[10px] font-normal opacity-50 ml-0.5">
-                  KN
+                  TWS
                 </span>
               </div>
             </div>
@@ -1753,6 +1875,20 @@ export default function MarineOSHomePage() {
                                 {scopeCalc.recommendedRatio}:1)
                               </span>
                             </div>
+                            <div className="flex items-center justify-between text-[11px] font-mono">
+                              <span className="opacity-70">CADENA A BORDO</span>
+                              <span className={scopeCalc.isChainSufficient ? "text-[#00E676] font-bold" : "text-[#FF2D55] font-bold"}>
+                                {scopeCalc.availableChainMeters}m
+                              </span>
+                            </div>
+                            {scopeCalc.chainWarning && (
+                              <div
+                                data-testid="insufficient-chain-alert"
+                                className="p-2.5 rounded-lg bg-[#FF2D55]/20 border border-[#FF2D55]/40 text-[#FF2D55] text-[11px] font-bold"
+                              >
+                                ⚠️ {scopeCalc.chainWarning}
+                              </div>
+                            )}
                           </>
                         )}
                       </div>
@@ -1766,9 +1902,12 @@ export default function MarineOSHomePage() {
                           </div>
                           <span
                             data-testid="anchor-watch-status"
-                            className={`font-mono text-[11px] px-2.5 py-0.5 rounded-full font-bold ${anchorWatch.isDragging
-                              ? "bg-[#FF2D55]/20 text-[#FF2D55]"
-                              : "bg-[#00E676]/20 text-[#00E676]"
+                            className={`font-mono text-[11px] px-2.5 py-0.5 rounded-full font-bold ${
+                              anchorWatch.alertLevel === "DRAG_ALARM"
+                                ? "bg-[#FF2D55]/20 text-[#FF2D55] border border-[#FF2D55]/40"
+                                : anchorWatch.alertLevel === "WARNING"
+                                ? "bg-[#FF9F0A]/20 text-[#FF9F0A] border border-[#FF9F0A]/40"
+                                : "bg-[#00E676]/20 text-[#00E676] border border-[#00E676]/40"
                               }`}
                           >
                             {anchorWatch.alertLevel}
@@ -1779,6 +1918,8 @@ export default function MarineOSHomePage() {
                           <div
                             className={`w-20 h-20 rounded-full border-2 border-dashed flex flex-col items-center justify-center font-mono shrink-0 ${anchorWatch.isDragging
                               ? "border-[#FF2D55] bg-[#FF2D55]/10 text-[#FF2D55] animate-pulse"
+                              : anchorWatch.alertLevel === "WARNING"
+                              ? "border-[#FF9F0A] bg-[#FF9F0A]/10 text-[#FF9F0A]"
                               : "border-[#00E676]/60 bg-[#00E676]/5 text-[#00E676]"
                               }`}
                           >
@@ -1821,6 +1962,15 @@ export default function MarineOSHomePage() {
                             ¡ALARMA DE GARREO! Barco fuera del radio de borneo (
                             {anchorWatch.distanceFromAnchorMeters}m &gt;{" "}
                             {anchorWatch.maxSwingRadiusMeters}m).
+                          </div>
+                        )}
+
+                        {anchorWatch.sogWarning && !anchorWatch.isDragging && (
+                          <div
+                            data-testid="anchor-sog-warning-banner"
+                            className="p-3 rounded-xl bg-[#FF9F0A]/20 border border-[#FF9F0A]/40 font-mono text-xs text-[#FF9F0A] font-semibold"
+                          >
+                            ⚠️ {anchorWatch.sogWarning}
                           </div>
                         )}
 
@@ -2326,163 +2476,17 @@ export default function MarineOSHomePage() {
                   </div>
                 </div>
 
-                    {/* Middle Body: Captain Metadata + Simulated Official QR Code */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                      <div className="space-y-3 flex-1">
-                        <div>
-                          <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">
-                            TITULAR DEL PASAPORTE NÁUTICO
-                          </div>
-                          <div className="text-2xl font-bold tracking-tight text-white mt-0.5">
-                            {activeAccount.name}
-                          </div>
-                          <div className="text-xs opacity-75 font-medium text-slate-300">
-                            {activeAccount.email || "demo@marinos.app"} •{" "}
-                            <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
-                          </div>
-                        </div>
-
-                {/* Insignias de Logros (Gamificación y Prestigio Náutico) */}
-                <div className="space-y-1.5 pt-2">
-                  <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold flex items-center gap-1.5">
-                    <Award className="w-3.5 h-3.5" />
-                    <span>INSIGNIAS DE LOGROS • PRESTIGIO NÁUTICO</span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 font-semibold shadow-sm">
-                      <span>🌊</span> Cruce Golfo de Ancud
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/30 font-semibold shadow-sm">
-                      <span>⚓</span> Veterano de Chiloé: 1500+ MN
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30 font-semibold shadow-sm">
-                      <span>🛡️</span> Fondeo Seguro: 10 Noches
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 text-white border border-white/20 font-semibold shadow-sm">
-                      <span>🇨🇱</span> DIRECTEMAR Verificado
-                    </span>
-                  </div>
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="px-2.5 py-1 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-[11px] text-slate-300">
+                    Atribución Máx: {activeAccount.maxLoaMeters}m LOA
+                  </span>
+                  <span className="px-2.5 py-1 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-[11px] text-slate-300">
+                    {activeAccount.vhfOperatorCert}
+                  </span>
                 </div>
-              </div>
 
-              {/* Simulated Vector QR Code for Port Authority Verification */}
-              <div className="p-3.5 rounded-2xl bg-black/60 border border-white/15 flex flex-col items-center justify-center shrink-0 self-start sm:self-center">
-                <svg
-                  viewBox="0 0 100 100"
-                  className="w-28 h-28"
-                  aria-label="Código QR de Verificación DIRECTEMAR"
-                >
-                  <rect width="100" height="100" rx="8" fill="#040B16" />
-                  <rect
-                    x="10"
-                    y="10"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    stroke={isNight ? "#FF1E1E" : "#00E5FF"}
-                    strokeWidth="4"
-                  />
-                  <rect
-                    x="16"
-                    y="16"
-                    width="12"
-                    height="12"
-                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                  />
-                  <rect
-                    x="66"
-                    y="10"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    stroke={isNight ? "#FF1E1E" : "#00E5FF"}
-                    strokeWidth="4"
-                  />
-                  <rect
-                    x="72"
-                    y="16"
-                    width="12"
-                    height="12"
-                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                  />
-                  <rect
-                    x="10"
-                    y="66"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    stroke={isNight ? "#FF1E1E" : "#00E5FF"}
-                    strokeWidth="4"
-                  />
-                  <rect
-                    x="16"
-                    y="72"
-                    width="12"
-                    height="12"
-                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                  />
-                  <rect
-                    x="42"
-                    y="14"
-                    width="6"
-                    height="6"
-                    fill={isNight ? "#FF1E1E" : "#00E676"}
-                  />
-                  <rect
-                    x="52"
-                    y="22"
-                    width="6"
-                    height="14"
-                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                  />
-                  <rect
-                    x="42"
-                    y="42"
-                    width="16"
-                    height="16"
-                    fill={isNight ? "#FF1E1E" : "#00E676"}
-                  />
-                  <rect
-                    x="14"
-                    y="44"
-                    width="18"
-                    height="6"
-                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                  />
-                  <rect
-                    x="66"
-                    y="44"
-                    width="22"
-                    height="6"
-                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                  />
-                  <rect
-                    x="44"
-                    y="68"
-                    width="8"
-                    height="20"
-                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                  />
-                  <rect
-                    x="62"
-                    y="62"
-                    width="12"
-                    height="12"
-                    fill={isNight ? "#FF1E1E" : "#00E676"}
-                  />
-                  <rect
-                    x="78"
-                    y="76"
-                    width="12"
-                    height="12"
-                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                  />
-                </svg>
-                <span className="font-mono text-[9px] uppercase tracking-widest opacity-70 mt-1.5">
-                  QR VERIFICACIÓN ARMADA
-                </span>
-              </div>
-            </div>
+
+
 
                         {/* Insignias de Logros (Gamificación y Prestigio Náutico) */}
                         <div className="space-y-1.5 pt-2">
@@ -2625,6 +2629,31 @@ export default function MarineOSHomePage() {
                         </span>
                       </div>
                     </div>
+
+                    {/* Wallet Interactive Controls */}
+                    <div className="pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          data-testid="share-passport-trophy-btn"
+                          onClick={() => setIsSharingPassport(true)}
+                          className="marine-btn text-xs px-3.5 bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-semibold shadow-none hover:bg-[#202c3f]"
+                        >
+                          <Award className="w-4 h-4" />
+                          <span>Compartir mi Perfil / Logbook</span>
+                        </button>
+                        <button
+                          type="button"
+                          data-testid="edit-passport-profile-btn"
+                          onClick={handleOpenEditProfile}
+                          className="marine-btn text-xs px-3.5 bg-white/5 text-white/80 border border-white/10 hover:bg-white/10"
+                        >
+                          <UserCog className="w-4 h-4" />
+                          <span>Editar Perfil</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
 
           {/* Right 5 cols: Total Nautical Miles (Sea Time Log) & Certification Summary — Bento Card */}
           <div className="lg:col-span-5 marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/60">
@@ -3326,24 +3355,11 @@ export default function MarineOSHomePage() {
                     }
                     className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/5"
                   >
-                    <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-4">
-                      <div>
-                        <h3 className="text-xl font-bold flex items-center gap-2">
-                          <UserCog className="w-5 h-5 text-[var(--accent-primary)]" />
-                          <span>Editar Perfil Náutico &amp; Credencial</span>
-                        </h3>
-                        <p className="text-xs font-mono opacity-70 mt-1">
-                          Modifica tus datos de oficial de navegación y credencial náutica en el Pasaporte Digital
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setIsEditingProfile(false)}
-                        className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
+                    <option value="RUT" className="bg-[#0A192F]">RUT / Cédula (CL)</option>
+                    <option value="PASAPORTE" className="bg-[#0A192F]">Pasaporte</option>
+                    <option value="DNI" className="bg-[#0A192F]">DNI Extranjero</option>
+                  </select>
+                </div>
 
                 <div className="space-y-1">
                   <label className="text-xs font-mono uppercase opacity-70">
@@ -3510,6 +3526,7 @@ export default function MarineOSHomePage() {
           </div>
         </div>
       )}
+
       {/* Modal Trofeo Digital & Pasaporte Náutico Compartible (Instagram Stories / Red Social) */}
       {isSharingPassport && (
         <div
@@ -3539,53 +3556,12 @@ export default function MarineOSHomePage() {
 
             {/* Instagram Story Format Card (Digital Trophy) */}
             <div className="relative rounded-2xl p-5 bg-[#0a1424] border border-white/5 overflow-hidden space-y-4 text-center">
-
               {/* Top Badge */}
               <div className="flex justify-center">
                 <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 uppercase">
                   BITÁCORA OFICIAL CERTIFICADA
                 </span>
               </div>
-
-              {/* Captain Avatar & Name */}
-              <div className="flex flex-col items-center space-y-2">
-                <div className="w-20 h-20 rounded-full border-2 border-[var(--accent-primary)]/60 p-1">
-                  <div className="w-full h-full rounded-full bg-[#040B16] flex items-center justify-center font-bold text-2xl text-white font-mono">
-                    {activeAccount.name.slice(0, 2).toUpperCase()}
-                  </div>
-                </div>
-                <div>
-                  <h4 className="text-xl font-bold tracking-tight text-white">
-                    {activeAccount.name}
-                  </h4>
-                  <div className="text-xs font-mono text-[var(--accent-primary)] mt-0.5">
-                    {activeAccount.licenseType}
-                  </div>
-                  <div className="text-[11px] font-mono opacity-60">
-                    Reg. {activeAccount.licenseNumber} • {activeAccount.documentType} {activeAccount.documentNumber}
-                  </div>
-                </div>
-              </div>
-
-              {/* Big Sea Time Counter */}
-              <div className="py-3 px-4 rounded-xl bg-white/[0.04] border border-white/5 space-y-1">
-                <div className="text-[10px] font-mono uppercase tracking-widest opacity-60">
-                  TOTAL SEA TIME ACUMULADO
-                </div>
-                <div className="text-3xl font-extrabold font-mono text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[var(--accent-primary)]">
-                  {totalSeaTimeMilesNm.toFixed(1)} MN
-                </div>
-                <div className="text-[11px] font-mono opacity-70">
-                  Embarcación habitual: SV Albatros (14.2m LOA)
-                </div>
-              </div>
-
-                      {/* Top Badge */}
-                      <div className="flex justify-center">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 uppercase">
-                          BITÁCORA OFICIAL CERTIFICADA
-                        </span>
-                      </div>
 
                       {/* Captain Avatar & Name */}
                       <div className="flex flex-col items-center space-y-2">
@@ -3663,37 +3639,6 @@ export default function MarineOSHomePage() {
                         <span>HASH: SHA256-e8f491c2</span>
                       </div>
                     </div>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
-                    <span className="text-base">⚓</span>
-                    <div>
-                      <div className="font-bold text-white text-[10px]">Veterano Chiloé</div>
-                      <div className="text-[9px] opacity-60">1500+ MN Navegadas</div>
-                    </div>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
-                    <span className="text-base">🛡️</span>
-                    <div>
-                      <div className="font-bold text-white text-[10px]">Fondeo Seguro</div>
-                      <div className="text-[9px] opacity-60">10 Noches Sin Garreo</div>
-                    </div>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
-                    <span className="text-base">🇨🇱</span>
-                    <div>
-                      <div className="font-bold text-white text-[10px]">DIRECTEMAR</div>
-                      <div className="text-[9px] opacity-60">Firma Criptográfica</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Cryptographic Seal */}
-              <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[9px] font-mono opacity-60">
-                <span>MARINOS DECENTRALIZED LEDGER</span>
-                <span>HASH: SHA256-e8f491c2</span>
-              </div>
-            </div>
 
             {/* Action Buttons */}
             <div className="space-y-2 pt-2">

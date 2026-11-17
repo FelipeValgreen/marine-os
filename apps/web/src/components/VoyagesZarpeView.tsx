@@ -149,15 +149,8 @@ export function VoyagesZarpeView({
   const [newDepDate, setNewDepDate] = useState(() => new Date(Date.now() + 7200000).toISOString().slice(0, 16));
   const [newArrDate, setNewArrDate] = useState(() => new Date(Date.now() + 86400000 * 2).toISOString().slice(0, 16));
 
-  // Checklist interactive state
-  const [checklistChecks, setChecklistChecks] = useState<Record<string, boolean>>({
-    "check-sentina": true,
-    "check-diesel": true,
-    "check-vhf": true,
-    "check-chalecos": true,
-    "check-balsa": true,
-    "check-meteo": true,
-  });
+  // Checklist interactive state - Starts empty (0/6) per PRD R-4.6 safety rule
+  const [checklistChecks, setChecklistChecks] = useState<Record<string, boolean>>({});
 
   // Manual Crew Member Form State
   const [role, setRole] = useState<"skipper" | "crew" | "guest">("crew");

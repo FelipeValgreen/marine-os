@@ -173,7 +173,7 @@ async def get_passage_weather_routing(
     distance_nm: float = Query(default=52.4),
 ):
     """
-    PredictWind-style Weather Routing & Passage Planner evaluating the next 48 hours
+    Weather Routing & Passage Planner evaluating the next 48 hours
     across Seno de Reloncaví / Golfo de Ancud using Open-Meteo hourly forecast.
     """
     windows_catalog = {

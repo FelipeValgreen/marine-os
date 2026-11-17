@@ -21,6 +21,9 @@ export interface AnchorScopeCalculation {
   totalVerticalMeters: number;
   recommendedRatio: 5 | 7;
   recommendedChainMeters: number;
+  availableChainMeters?: number;
+  isChainSufficient: boolean;
+  chainWarning?: string | null;
   swingRadiusMeters: number;
   holdingNotes: string;
 }
@@ -32,6 +35,7 @@ export interface AnchorWatchState {
   isDragging: boolean;
   bearingFromAnchorDeg: number;
   alertLevel: "SECURE" | "WARNING" | "DRAG_ALARM";
+  sogWarning?: string;
 }
 
 /**
@@ -87,6 +91,7 @@ export function calculateAnchorScope(params: {
   windSpeedKnots: number;
   seabedType: "sand" | "mud" | "rock" | "weed" | "mixed";
   vesselLoaMeters?: number;
+  availableChainMeters?: number;
 }): AnchorScopeCalculation {
   const bowFreeboardMeters = params.freeboardMeters ?? 1.4;
   const loa = params.vesselLoaMeters ?? 12.43;
@@ -101,6 +106,12 @@ export function calculateAnchorScope(params: {
     params.seabedType === "rock";
   const recommendedRatio: 5 | 7 = needsHeavyScope ? 7 : 5;
   const recommendedChainMeters = Math.ceil(totalVerticalMeters * recommendedRatio);
+
+  const available = params.availableChainMeters ?? 60;
+  const isChainSufficient = available >= recommendedChainMeters;
+  const chainWarning = isChainSufficient
+    ? null
+    : `ATENCIÓN: cadena insuficiente a bordo (requiere ${recommendedChainMeters}m, a bordo ${available}m)`;
 
   // Horizontal projection of deployed catenary + vessel LOA + GPS accuracy margin (5m)
   const horizontalChain = Math.sqrt(
@@ -124,6 +135,9 @@ export function calculateAnchorScope(params: {
     totalVerticalMeters,
     recommendedRatio,
     recommendedChainMeters,
+    availableChainMeters: available,
+    isChainSufficient,
+    chainWarning,
     swingRadiusMeters,
     holdingNotes: seabedNotes[params.seabedType] || seabedNotes.sand,
   };
@@ -131,13 +145,15 @@ export function calculateAnchorScope(params: {
 
 /**
  * Pure Anchor Watch GPS drift and drag alarm calculator.
+ * R-4.4: If SOG > 0.5 kn, Anchor Watch cannot state 'SECURE'.
  */
 export function evaluateAnchorWatch(
   anchorLat: number,
   anchorLon: number,
   vesselLat: number,
   vesselLon: number,
-  maxSwingRadiusMeters: number
+  maxSwingRadiusMeters: number,
+  sogKn: number = 0
 ): AnchorWatchState {
   const distanceFromAnchorMeters = haversineDistanceMeters(
     anchorLat,
@@ -158,6 +174,9 @@ export function evaluateAnchorWatch(
   let alertLevel: "SECURE" | "WARNING" | "DRAG_ALARM" = "SECURE";
   if (isDragging) {
     alertLevel = "DRAG_ALARM";
+  } else if (sogKn > 0.5) {
+    // SOG > 0.5 kn while anchored: Cannot be SECURE per PRD R-4.4
+    alertLevel = "WARNING";
   } else if (distanceFromAnchorMeters >= maxSwingRadiusMeters * 0.85) {
     alertLevel = "WARNING";
   }
@@ -166,9 +185,136 @@ export function evaluateAnchorWatch(
     distanceFromAnchorMeters,
     maxSwingRadiusMeters,
     marginMeters,
-    isDragging,
+    isDragging: isDragging || (sogKn > 0.5 && distanceFromAnchorMeters > maxSwingRadiusMeters * 0.6),
     bearingFromAnchorDeg,
     alertLevel,
+    sogWarning: sogKn > 0.5 ? `SOG ${sogKn} kn detectada — posible garreo o desfondeo en curso` : undefined,
+  };
+}
+
+/**
+ * Calculates Apparent Wind (AWS, AWA) from True Wind (TWS, TWA) and boat speed (SOG).
+ * Standard marine trigonometry:
+ * If boat is heading directly into the wind (TWA = 0°), AWS = TWS + SOG (AWS > TWS).
+ * If boat is heading away from wind (TWA = 180°), AWS = |TWS - SOG|.
+ */
+export function calculateApparentWind(params: {
+  twsKn: number;
+  twaDeg: number;
+  sogKn: number;
+}): { awsKn: number; awaDeg: number } {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const toDeg = (rad: number) => (rad * 180) / Math.PI;
+
+  const twaRad = toRad(params.twaDeg);
+  const wx = params.twsKn * Math.sin(twaRad);
+  const wy = params.twsKn * Math.cos(twaRad) + params.sogKn;
+
+  const awsKn = Math.round(Math.sqrt(wx * wx + wy * wy) * 10) / 10;
+  let awaDeg = Math.round(toDeg(Math.atan2(wx, wy)));
+  if (awaDeg < 0) awaDeg += 360;
+
+  return { awsKn, awaDeg };
+}
+
+/**
+ * Calculates True Wind (TWS, TWA) from Apparent Wind (AWS, AWA) and boat speed (SOG).
+ */
+export function calculateTrueWind(params: {
+  awsKn: number;
+  awaDeg: number;
+  sogKn: number;
+}): { twsKn: number; twaDeg: number } {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const toDeg = (rad: number) => (rad * 180) / Math.PI;
+
+  const awaRad = toRad(params.awaDeg);
+  const wx = params.awsKn * Math.sin(awaRad);
+  const wy = params.awsKn * Math.cos(awaRad) - params.sogKn;
+
+  const twsKn = Math.round(Math.sqrt(wx * wx + wy * wy) * 10) / 10;
+  let twaDeg = Math.round(toDeg(Math.atan2(wx, wy)));
+  if (twaDeg < 0) twaDeg += 360;
+
+  return { twsKn, twaDeg };
+}
+
+/**
+ * Computes True Wind Angle relative to boat course over ground (COG) and True Wind Direction (TWD).
+ */
+export function calculateTWAFromBearing(cogDeg: number, twdDeg: number): number {
+  let diff = Math.abs(twdDeg - cogDeg) % 360;
+  if (diff > 180) diff = 360 - diff;
+  return Math.round(diff);
+}
+
+/**
+ * Evaluates dynamic tactical passage routing for a departure window
+ * based on planned COG, forecast wind, and vessel polar.
+ */
+export function evaluateDynamicRoutingWindow(params: {
+  plannedCogDeg: number;
+  windSpeedKn: number;
+  windGustKn: number;
+  windDirDeg: number;
+  waveHeightM: number;
+  label: string;
+}) {
+  const twa = calculateTWAFromBearing(params.plannedCogDeg, params.windDirDeg);
+
+  let predictedSogKn = 6.8;
+  let comfortScore = 85;
+  let status: "OPTIMAL" | "GOOD" | "CAUTION" = "GOOD";
+  let sailPlan = "Mayor Full + Génova 100%";
+  let tacticalSummary = "";
+
+  if (twa < 35) {
+    predictedSogKn = Math.min(6.2, 5.5 + params.windSpeedKn * 0.05);
+    comfortScore = Math.max(40, Math.round(80 - params.waveHeightM * 25));
+    status = params.windSpeedKn > 22 ? "CAUTION" : "GOOD";
+    sailPlan = "Proa al viento — Tránsito a motor Yanmar 4JH57 o bordadas a ceñida";
+    tacticalSummary = `Viento proel (${twa}° TWA). Requerirá apoyo de máquina o ceñida abierta.`;
+  } else if (twa <= 60) {
+    predictedSogKn = Math.round(Math.min(7.8, 5.8 + params.windSpeedKn * 0.1) * 10) / 10;
+    comfortScore = Math.max(50, Math.round(85 - params.waveHeightM * 20));
+    status = params.windSpeedKn > 24 ? "CAUTION" : "GOOD";
+    sailPlan = params.windSpeedKn > 18 ? "Mayor 1 rizo + Trinqueta (Ceñida 50° TWA)" : "Mayor Plena + Génova cazada a rabiar";
+    tacticalSummary = `Ceñida franca (${twa}° TWA) con buena velocidad de casco.`;
+  } else if (twa <= 110) {
+    predictedSogKn = Math.round(Math.min(8.5, 6.2 + params.windSpeedKn * 0.12) * 10) / 10;
+    comfortScore = Math.max(70, Math.round(96 - params.waveHeightM * 10));
+    status = "OPTIMAL";
+    sailPlan = "Través — Velamen pleno, planeo estable";
+    tacticalSummary = `Rumbo al través óptimo (${twa}° TWA) con velocidad máxima y excelente confort.`;
+  } else if (twa <= 150) {
+    predictedSogKn = Math.round(Math.min(8.2, 6.0 + params.windSpeedKn * 0.11) * 10) / 10;
+    comfortScore = Math.max(75, Math.round(94 - params.waveHeightM * 8));
+    status = "OPTIMAL";
+    sailPlan = "Aleta / Largo — Mayor con retenida + Génova / Código Cero";
+    tacticalSummary = `Navegación franca a la aleta (${twa}° TWA). Confortable y segura en popa abierta.`;
+  } else {
+    predictedSogKn = Math.round(Math.min(7.4, 5.4 + params.windSpeedKn * 0.08) * 10) / 10;
+    comfortScore = Math.max(65, Math.round(88 - params.waveHeightM * 12));
+    status = "GOOD";
+    sailPlan = "Popa redonda — Orejas de burro con retenida preventiva de botavara";
+    tacticalSummary = `Popa redonda (${twa}° TWA). Mantener retenida de botavara por riesgo de trasluchada involuntaria.`;
+  }
+
+  const etaHours = Math.round((42.0 / predictedSogKn) * 10) / 10;
+
+  return {
+    label: params.label,
+    avg_wind_kn: params.windSpeedKn,
+    max_gust_kn: params.windGustKn,
+    wind_dir_deg: params.windDirDeg,
+    wave_height_m: params.waveHeightM,
+    predicted_sog_kn: predictedSogKn,
+    eta_hours: etaHours,
+    comfort_score: comfortScore,
+    status,
+    sail_plan: sailPlan,
+    tactical_summary: tacticalSummary,
+    twa_deg: twa,
   };
 }
 

@@ -55,6 +55,11 @@ export type MarineTheme =
   | "daylight-high-contrast"
   | "night-red-shift";
 export type MarineRole = "fleet_admin" | "skipper" | "crew";
+export type VesselOperationalState =
+  | "AMARRADO"
+  | "FONDEADO"
+  | "NAVEGANDO_MOTOR"
+  | "NAVEGANDO_VELA";
 export type MarineSection =
   | "bridge"
   | "vessel"
@@ -97,6 +102,8 @@ interface ThemeContextValue {
   setSimulatedOffline: (offline: boolean) => void;
   dataMode: "SIMULADO" | "EN_VIVO";
   setDataMode: (mode: "SIMULADO" | "EN_VIVO") => void;
+  vesselOperationalState: VesselOperationalState;
+  setVesselOperationalState: (s: VesselOperationalState) => void;
   pendingSyncCount: number;
   triggerManualSync: () => Promise<number>;
   isSeeded: boolean;
@@ -204,6 +211,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [activeSection, setActiveSectionState] =
     useState<MarineSection>("bridge");
   const [dataMode, setDataMode] = useState<"SIMULADO" | "EN_VIVO">("SIMULADO");
+  const [vesselOperationalState, setVesselOperationalState] =
+    useState<VesselOperationalState>("FONDEADO");
   const [simulatedOffline, setSimulatedOffline] = useState<boolean>(false);
   const [browserOffline, setBrowserOffline] = useState<boolean>(false);
   const [isSeeded, setIsSeeded] = useState<boolean>(false);
@@ -625,6 +634,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setSimulatedOffline,
         dataMode,
         setDataMode,
+        vesselOperationalState,
+        setVesselOperationalState,
         pendingSyncCount: pendingSyncItems.length,
         triggerManualSync,
         isSeeded: isSeeded && authChecked,

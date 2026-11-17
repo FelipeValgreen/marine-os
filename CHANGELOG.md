@@ -4,6 +4,34 @@ Todas las modificaciones notables de este proyecto están documentadas en este a
 
 ---
 
+## [Fase 1 — Coherencia de Datos] - 2026-11-16
+Rama: `fase-1-datos`
+
+### Añadido / Mejorado (Consistencia Física y Náutica entre Módulos)
+- **Máquina de Estados Operacional del Barco (R-4.2):**
+  - Implementado tipo y estado compartido `VesselOperationalState` (`AMARRADO`, `FONDEADO`, `NAVEGANDO_MOTOR`, `NAVEGANDO_VELA`) en `ThemeProvider.tsx` y expuesto mediante selector interactivo en la barra superior.
+  - Sincronización automática de estado según RPM y SOG: SOG > 0.5 kn y RPM > 700 conmuta a `NAVEGANDO_MOTOR`; RPM <= 700 conmuta a `NAVEGANDO_VELA`.
+- **Regla Estricta Anchor Watch (R-4.4):**
+  - Si `SOG > 0.5 kn`, el estado de la alarma de fondeo nunca puede indicar `SECURE`. Pasa automáticamente a `WARNING` o `DRAG_ALARM` con aviso visible: `"SOG X kn detectada — posible garreo o desfondeo en curso"`.
+- **Avance de Posición en Simulador por Rumbo y Velocidad (R-4.3):**
+  - Implementado avance por estima (Dead-Reckoning) en `page.tsx`: cada tick actualiza latitud y longitud según $SOG \times \Delta t$ y $COG$ ($10\text{ s a } 7\text{ kn} \approx 36\text{ m}$).
+- **Store Único de Entorno y Cálculo Vectorial de Viento (R-4.4 / R-4.7):**
+  - Creadas funciones trigonométricas náuticas `calculateApparentWind`, `calculateTrueWind` y `calculateTWAFromBearing` en `lib/nautical/index.ts`.
+  - Cuando el barco navega a motor proa al viento ($TWA = 0^\circ$), $AWS = TWS + SOG > TWS$.
+  - El HUD inferior izquierdo ahora muestra tanto el viento verdadero ($TWS$) como el viento aparente ($AWS$).
+- **Largo de Cadena y Fondeo Seguro (R-4.4):**
+  - Cálculo de radio de borneo y ratio ($5:1$ o $7:1$ según viento y tipo de fondo).
+  - Comparación automática con `chain_length_meters` del barco; si la cadena requerida supera la disponible a bordo, se despliega: `"ATENCIÓN: cadena insuficiente a bordo (requiere X m, a bordo Y m)"`.
+- **Planificador 48h con TWA Dinámico:**
+  - Eliminada cualquier referencia a "PredictWind Engine".
+  - Implementada función pura `evaluateDynamicRoutingWindow` que calcula el ángulo relativo de viento ($TWA$) dinámicamente según el rumbo planificado ($COG = 194^\circ$) y la dirección pronosticada, deduciendo automáticamente la polar de velocidad, el plan vélico recomendado y el índice de confort.
+- **Checklist Pre-Zarpe Inicial (R-4.6):**
+  - Inicialización en $0/6$ completados en lugar de $6/6$. Requiere verificación manual del capitán antes de habilitar la generación de documentos de zarpe.
+- **Pruebas Automatizadas:**
+  - Creada suite de pruebas unitarias náuticas en `apps/web/src/lib/nautical/nautical.test.ts` ejecutables con `npm run test:web`.
+
+---
+
 ## [Fase 0 — Honestidad Radical] - 2026-11-16
 Rama: `fase-0-honestidad`
 
