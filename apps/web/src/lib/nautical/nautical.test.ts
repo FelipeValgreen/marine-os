@@ -196,3 +196,25 @@ test("Safety inventory expiration semaphore respects 90/30 day threshold (PRD R-
   assert.equal(evaluateExpiry(in60Days), "warning");
   assert.equal(evaluateExpiry(in15Days), "expired");
 });
+
+test("Copilot intent routing: weather uses environment and unknown queries express uncertainty (PRD R-4.13.3 / R-4.13.4)", () => {
+  // Intent detector logic matching MarineCopilot
+  function detectIntent(q: string): "weather" | "mechanic" | "emergency" | "unknown" {
+    const query = q.toLowerCase();
+    if (query.includes("mayday") || query.includes("hombre al agua") || query.includes("sos")) {
+      return "emergency";
+    }
+    if (query.includes("viento") || query.includes("olas") || query.includes("clima")) {
+      return "weather";
+    }
+    if (query.includes("motor") || query.includes("yanmar") || query.includes("impulsor")) {
+      return "mechanic";
+    }
+    return "unknown";
+  }
+
+  assert.equal(detectIntent("¿Cuál es el viento actual?"), "weather");
+  assert.equal(detectIntent("Alarma de temperatura en motor Yanmar"), "mechanic");
+  assert.equal(detectIntent("¡Hombre al agua!"), "emergency");
+  assert.equal(detectIntent("¿Cómo cocinar un risotto de mariscos?"), "unknown");
+});

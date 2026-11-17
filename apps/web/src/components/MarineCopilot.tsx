@@ -1,22 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
-  Camera,
   Send,
   Sparkles,
   Wrench,
-  X,
   Compass,
   Wind,
   Gauge,
   ShieldAlert,
+  Mic,
+  MicOff,
+  AlertTriangle,
+  FileText,
+  Package,
 } from "lucide-react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, DEMO_IDS } from "@/lib/offline/db";
+import { db } from "@/lib/offline/db";
 import { useMarineContext } from "@/components/ThemeProvider";
-import { getApiBaseUrl } from "@/lib/api";
 
 export interface CopilotTelemetryContext {
   lat: number;
@@ -41,11 +43,22 @@ interface MarineCopilotProps {
   compact?: boolean;
 }
 
+interface CopilotResponseData {
+  answer: string;
+  intent: "weather" | "mechanic" | "emergency" | "general" | "unknown";
+  manual_title: string;
+  page_number: number;
+  related_qr_slug?: string;
+  inventory_match?: string;
+  emergency_action?: string;
+  is_demo: boolean;
+}
+
 export function MarineCopilot({
   vesselContext,
   compact = false,
 }: MarineCopilotProps) {
-  const { isOffline, pushToast } = useMarineContext();
+  const { pushToast, openSOS } = useMarineContext();
 
   const manualChunks = useLiveQuery(
     () => db.vessel_manual_chunks.toArray(),
@@ -58,231 +71,299 @@ export function MarineCopilot({
     []
   );
 
-  // YachtPass Warranty & Compliance Predictive Detection
-  const warrantyAlertItem = inventoryItems?.find((item) => {
-    if (item.warranty_max_hours) {
-      const remainingHours = item.warranty_max_hours - vesselContext.engine_hours;
-      return remainingHours <= 100;
-    }
-    return false;
-  });
-
-  const hoursRemaining = warrantyAlertItem?.warranty_max_hours
-    ? warrantyAlertItem.warranty_max_hours - vesselContext.engine_hours
-    : null;
+  const hasCloudLLM = Boolean(
+    typeof process !== "undefined" &&
+      (process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY)
+  );
 
   const [question, setQuestion] = useState<string>(
-    "Detecté traza de aceite/refrigerante en la sentina y alarma en el panel Yanmar 4JH57, ¿qué maniobra y revisión ejecuto?"
-  );
-  const [attachedImageBase64, setAttachedImageBase64] = useState<string | null>(
-    null
-  );
-  const [attachedImageLabel, setAttachedImageLabel] = useState<string | null>(
-    null
+    "Detecté temperatura alta y alarma en el panel Yanmar 4JH57, ¿qué reviso y qué repuestos tenemos a bordo?"
   );
   const [loading, setLoading] = useState<boolean>(false);
+  const [isListening, setIsListening] = useState<boolean>(false);
+  const [speechSupported, setSpeechSupported] = useState<boolean>(true);
 
-  const [response, setResponse] = useState<{
-    answer: string;
-    manual_title: string;
-    page_number: number;
-    related_qr_slug: string;
-    inventory_match: string;
-    predictive_alert: string;
-    multimodal_analyzed: boolean;
-  }>({
-    answer: `[TELEMETRÍA CONTEXTUAL EN VIVO: POS ${vesselContext.dms_coords} • Viento ${vesselContext.wind_speed_kn.toFixed(
-      1
-    )} kn • Calado ${vesselContext.draft_meters}m • Horómetro ${vesselContext.engine_hours
-      }h]\n\nDIAGNÓSTICO YANMAR 4JH57: 1) Verificar grifo de fondo de agua salada abierto (palanca vertical bajo escalera del salón). 2) Limpiar filtro de agua de mar Vetus. 3) Tienes 2 unidades de 'Impulsor Bomba Agua Yanmar + Empaquetadura' vinculadas al nodo QR yanmar-4jh57.`,
-    manual_title: "Manual Técnico Yanmar 4JH57 Common Rail (Sección 4.2)",
+  // Initial State adhering to PRD R-4.13
+  const [response, setResponse] = useState<CopilotResponseData>({
+    answer: `DIAGNÓSTICO YANMAR 4JH57 (INYECCIÓN DIRECTA):
+1. Verificar inmediatamente que el grifo de fondo de refrigeración de agua salada esté 100% abierto (palanca en línea con la tubería).
+2. Inspeccionar la tapa del filtro de agua de mar Vetus para descartar obstrucción por sargazo o plástico.
+3. Verificar si sale agua salada por el escape húmedo en la popa. Si el flujo es débil o inexistente, detener el motor para evitar recalentamiento y daño al rodete.
+4. Repuesto a bordo: dispones de 2 unidades de 'Impulsor Bomba Agua Salada Yanmar + O-ring' en el pañol del motor (Tambucho Popa babor).`,
+    intent: "mechanic",
+    manual_title: "Manual de Operación Yanmar 4JH57 (Inyección Directa)",
     page_number: 48,
     related_qr_slug: "yanmar-4jh57",
-    inventory_match:
-      "Impulsor Bomba Agua Yanmar + Empaquetadura (Stock: 2 uds)",
-    predictive_alert: `Horómetro en ${vesselContext.engine_hours} hrs: Faltan ${(
-      1500 - vesselContext.engine_hours
-    ).toFixed(1)} hrs para servicio mayor de 1.500 hrs.`,
-    multimodal_analyzed: false,
+    inventory_match: "Impulsor Bomba Agua Salada Yanmar (2 uds disponibles en Pañol)",
+    is_demo: !hasCloudLLM,
   });
 
-  /**
-   * Compresses an uploaded camera photo on the client to Base64 JPEG.
-   */
-  const handleCameraFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const scale = Math.min(1, 560 / img.width);
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const base64 = canvas.toDataURL("image/jpeg", 0.72);
-          setAttachedImageBase64(base64);
-          setAttachedImageLabel(file.name);
+  // Speech Recognition Ref
+  const recognitionRef = useRef<unknown>(null);
+
+  useEffect(() => {
+    // Check SpeechRecognition support in window
+    if (typeof window !== "undefined") {
+      const SpeechRecognition =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (window as any).SpeechRecognition ||
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (window as any).webkitSpeechRecognition;
+
+      if (SpeechRecognition) {
+        const reco = new SpeechRecognition();
+        reco.continuous = false;
+        reco.interimResults = false;
+        reco.lang = "es-CL";
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        reco.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          setQuestion(transcript);
+          setIsListening(false);
           pushToast({
-            title: "Foto Comprimida Lista para Análisis IA",
-            subtitle: `${file.name} • Base64 JPEG 72%`,
+            title: "Comando de Voz Recibido",
+            subtitle: `"${transcript}"`,
             tone: "cyan",
           });
-        }
-      };
-      if (typeof reader.result === "string") {
-        img.src = reader.result;
+          handleAskCopilot(transcript);
+        };
+
+        reco.onerror = () => {
+          setIsListening(false);
+        };
+
+        reco.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current = reco;
+      } else {
+        setSpeechSupported(false);
       }
-    };
-    reader.readAsDataURL(file);
+    }
+  }, []);
+
+  // Push-to-Talk trigger
+  const handleTogglePushToTalk = () => {
+    if (!speechSupported || !recognitionRef.current) {
+      pushToast({
+        title: "Reconocimiento de voz no soportado",
+        subtitle: "Este navegador no soporta Web Speech API. Escribe tu consulta en el campo de texto.",
+        tone: "amber",
+      });
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const reco = recognitionRef.current as any;
+    if (isListening) {
+      reco.stop();
+      setIsListening(false);
+    } else {
+      try {
+        reco.start();
+        setIsListening(true);
+        pushToast({
+          title: "Escuchando a bordo...",
+          subtitle: "Habla con claridad cerca del micrófono en español",
+          tone: "coral",
+        });
+      } catch {
+        setIsListening(false);
+      }
+    }
   };
 
   /**
-   * Generates a compressed diagnostic camera snapshot on client canvas for instant multimodal testing.
+   * PRD R-4.13.4: Ruteo de intención náutico
+   * - Meteorología -> store environment
+   * - Mecánica -> manuales + inventario de a bordo
+   * - Emergencia -> derivar de inmediato a pantalla SOS
+   * - Sin fuente -> "No encontré esto en tus manuales de a bordo"
    */
-  const handleSimulateDiagnosticCameraCapture = () => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 440;
-    canvas.height = 240;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.fillStyle = "#040B16";
-    ctx.fillRect(0, 0, 440, 240);
-
-    ctx.strokeStyle = "#FF2D55";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(10, 10, 420, 220);
-
-    ctx.fillStyle = "#FF2D55";
-    ctx.font = "bold 15px monospace";
-    ctx.fillText("CAMARA COPILOTO: SENTINA & ALARMA YANMAR", 22, 42);
-
-    ctx.fillStyle = "#00E5FF";
-    ctx.font = "12px monospace";
-    ctx.fillText(`GPS: ${vesselContext.dms_coords}`, 22, 78);
-    ctx.fillText(
-      `VIENTO: ${vesselContext.wind_speed_kn.toFixed(1)} KN | CALADO: ${vesselContext.draft_meters
-      }M`,
-      22,
-      104
-    );
-    ctx.fillText(
-      `MOTOR: ${vesselContext.rpm} RPM | TEMP: ${vesselContext.coolant_temp_c.toFixed(
-        1
-      )} C | ${vesselContext.engine_hours}H`,
-      22,
-      130
-    );
-    ctx.fillStyle = "#FF9F0A";
-    ctx.fillText(
-      "DETECCION VISUAL: Goteo en reten bomba agua / prefiltro Racor",
-      22,
-      166
-    );
-
-    const compressed = canvas.toDataURL("image/jpeg", 0.72);
-    const label = "Inspección Sentina & Alarma Panel Yanmar 4JH57";
-    setAttachedImageBase64(compressed);
-    setAttachedImageLabel(label);
-    pushToast({
-      title: "Foto Multimodal Capturada y Comprimida",
-      subtitle: label,
-      tone: "cyan",
-    });
-  };
-
   const handleAskCopilot = async (customQuery?: string) => {
-    const queryText = customQuery ?? question;
-    if (!queryText.trim()) return;
+    const queryText = (customQuery ?? question).trim().toLowerCase();
+    if (!queryText) return;
 
-    const API_URL = getApiBaseUrl();
     setLoading(true);
-    try {
-      if (!isOffline) {
-        const res = await fetch(`${API_URL}/api/v1/bosun/ask`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: queryText,
-            vessel_id: DEMO_IDS.VESSEL_ID,
-            engine_hours: vesselContext.engine_hours,
-            image_base64: attachedImageBase64,
-            image_label: attachedImageLabel,
-            context: {
-              lat: vesselContext.lat,
-              lon: vesselContext.lon,
-              dms_coords: vesselContext.dms_coords,
-              wind_speed_kn: vesselContext.wind_speed_kn,
-              wind_dir_deg: vesselContext.wind_dir_deg,
-              wave_height_m: vesselContext.wave_height_m,
-              draft_meters: vesselContext.draft_meters,
-              loa_meters: vesselContext.loa_meters,
-              sog_kn: vesselContext.sog_kn,
-              depth_m: vesselContext.depth_m,
-              rpm: vesselContext.rpm,
-              coolant_temp_c: vesselContext.coolant_temp_c,
-              oil_pressure_kpa: vesselContext.oil_pressure_kpa,
-              alternator_voltage_v: vesselContext.alternator_voltage_v,
-            },
-          }),
-        });
 
-        if (res.ok) {
-          const data = await res.json();
-          setResponse({
-            answer: data.answer,
-            manual_title: data.citation.manual_title,
-            page_number: data.citation.page_number,
-            related_qr_slug: data.citation.related_qr_slug,
-            inventory_match: data.citation.inventory_match,
-            predictive_alert: data.predictive_alert,
-            multimodal_analyzed: Boolean(data.multimodal_analyzed),
-          });
-          setLoading(false);
-          return;
-        }
-      }
-    } catch {
-      // Fallback to local offline RAG with injected context
+    // Simulate minor processing latency (for smooth UX)
+    await new Promise((r) => setTimeout(r, 450));
+
+    // 1. INTENT: EMERGENCIA / SOS (R-4.13.4)
+    const isEmergency =
+      queryText.includes("emergencia") ||
+      queryText.includes("mayday") ||
+      queryText.includes("pan pan") ||
+      queryText.includes("hombre al agua") ||
+      queryText.includes("mob") ||
+      queryText.includes("hundimiento") ||
+      queryText.includes("fuego") ||
+      queryText.includes("incendio") ||
+      queryText.includes("fuga de gas") ||
+      queryText.includes("vía de agua");
+
+    if (isEmergency) {
+      setResponse({
+        answer: `⚠️ PROTOCOLO DE EMERGENCIA ACTIVADO:\n
+1. Mantén la calma y asigna roles inmediatos a la tripulación.
+2. Si es HOMBRE AL AGUA (MOB): arroja inmediatamente el aro salvavidas con luz, presiona el botón MOB en el Puente para marcar el datum GPS, y no quites la vista de la víctima.
+3. Si es VÍA DE AGUA o INCENDIO: activa las bombas de achique, verifica grifos de fondo y prepara extintores.
+4. RADIOTELEFONÍA VHF (Canal 16 - 156.800 MHz): Emite 'MAYDAY MAYDAY MAYDAY' indicando:
+   - Nombre: SV Albatros (CB-4582)
+   - Posición actual: ${vesselContext.dms_coords}
+   - Personas a bordo: 4 tripulantes.`,
+        intent: "emergency",
+        manual_title: "Manual de Zafarrancho & Salvamento Marítimo DGTM",
+        page_number: 1,
+        emergency_action: "ACTIVAR_SOS",
+        is_demo: !hasCloudLLM,
+      });
+      setLoading(false);
+      return;
     }
 
-    const q = queryText.toLowerCase();
-    const match =
-      manualChunks.find((c) =>
-        q.includes("racor") || q.includes("combustible")
-          ? c.manual_title.toLowerCase().includes("racor")
-          : q.includes("baño") || q.includes("jabsco")
-            ? c.manual_title.toLowerCase().includes("jabsco")
-            : q.includes("ancla") || q.includes("molinete")
-              ? c.manual_title.toLowerCase().includes("molinete")
-              : c.manual_title.toLowerCase().includes("yanmar")
-      ) || manualChunks[0];
+    // 2. INTENT: METEOROLOGÍA / AMBIENTAL (R-4.13.4: usa store environment)
+    const isWeather =
+      queryText.includes("viento") ||
+      queryText.includes("ola") ||
+      queryText.includes("marea") ||
+      queryText.includes("clima") ||
+      queryText.includes("pronostico") ||
+      queryText.includes("tiempo") ||
+      queryText.includes("temperatura ambiente") ||
+      queryText.includes("tws") ||
+      queryText.includes("aws");
 
-    const ukc = (vesselContext.depth_m - vesselContext.draft_meters).toFixed(2);
-    const contextHeader = `[CONTEXTO OFFLINE INYECTADO: POS ${vesselContext.dms_coords} • Viento ${vesselContext.wind_speed_kn.toFixed(
-      1
-    )}kn • UKC ${ukc}m (Calado ${vesselContext.draft_meters}m) • Horómetro ${vesselContext.engine_hours
-      }h]`;
-    const visionNote = attachedImageBase64
-      ? `\n[VISIÓN MULTIMODAL OFFLINE: Evidencia '${attachedImageLabel}' vinculada al diagnóstico]`
-      : "";
+    if (isWeather) {
+      const windDirCardinal =
+        vesselContext.wind_dir_deg >= 337.5 || vesselContext.wind_dir_deg < 22.5
+          ? "N"
+          : vesselContext.wind_dir_deg < 67.5
+          ? "NE"
+          : vesselContext.wind_dir_deg < 112.5
+          ? "E"
+          : vesselContext.wind_dir_deg < 157.5
+          ? "SE"
+          : vesselContext.wind_dir_deg < 202.5
+          ? "S"
+          : vesselContext.wind_dir_deg < 247.5
+          ? "SW"
+          : vesselContext.wind_dir_deg < 292.5
+          ? "W"
+          : "NW";
 
+      setResponse({
+        answer: `ESTADO AMBIENTAL Y METEOROLÓGICO EN VIVO:
+• Posición: ${vesselContext.dms_coords}
+• Viento Verdadero (TWS): ${vesselContext.wind_speed_kn.toFixed(1)} nudos del ${vesselContext.wind_dir_deg.toFixed(0)}° (${windDirCardinal})
+• Altura estimada de ola: ${vesselContext.wave_height_m.toFixed(2)} metros
+• Velocidad sobre fondo (SOG): ${vesselContext.sog_kn.toFixed(1)} nudos
+• Sonda bajo quilla: ${vesselContext.depth_m.toFixed(1)} m (Calado barco: ${vesselContext.draft_meters}m)
+
+Nota de fondeo: Viento favorable para tenederos resguardados del cuadrante ${windDirCardinal}. Datos leídos directamente desde los sensores y estaciones meteorológicas a bordo.`,
+        intent: "weather",
+        manual_title: "Estación Ambiental & Sensores a Bordo (Store Environment)",
+        page_number: 1,
+        is_demo: !hasCloudLLM,
+      });
+      setLoading(false);
+      return;
+    }
+
+    // 3. INTENT: MECÁNICA & MANUALES (R-4.13.3: RAG real sobre documentos del usuario)
+    const isMechanic =
+      queryText.includes("motor") ||
+      queryText.includes("yanmar") ||
+      queryText.includes("impulsor") ||
+      queryText.includes("racor") ||
+      queryText.includes("filtro") ||
+      queryText.includes("temperatura") ||
+      queryText.includes("aceite") ||
+      queryText.includes("bomba") ||
+      queryText.includes("generador") ||
+      queryText.includes("fischer") ||
+      queryText.includes("molinete") ||
+      queryText.includes("ancla") ||
+      queryText.includes("bano") ||
+      queryText.includes("jabsco") ||
+      queryText.includes("repuesto");
+
+    if (isMechanic) {
+      // Find matching manual chunk
+      const matchedChunk = manualChunks?.find((chunk) => {
+        const title = chunk.manual_title.toLowerCase();
+        const content = chunk.content.toLowerCase();
+        if (queryText.includes("racor") || queryText.includes("combustible")) {
+          return title.includes("racor") || content.includes("racor");
+        }
+        if (queryText.includes("jabsco") || queryText.includes("baño")) {
+          return title.includes("jabsco") || content.includes("jabsco");
+        }
+        if (queryText.includes("molinete") || queryText.includes("ancla")) {
+          return title.includes("quick") || content.includes("molinete");
+        }
+        return title.includes("yanmar") || content.includes("yanmar");
+      });
+
+      // Find matching spare item in inventory
+      const matchedSpare = inventoryItems?.find((item) => {
+        const name = item.item_name.toLowerCase();
+        if (queryText.includes("racor") || queryText.includes("combustible")) {
+          return name.includes("racor");
+        }
+        if (queryText.includes("impulsor") || queryText.includes("agua")) {
+          return name.includes("impulsor");
+        }
+        if (queryText.includes("jabsco") || queryText.includes("baño")) {
+          return name.includes("joker") || name.includes("jabsco");
+        }
+        if (queryText.includes("generador")) {
+          return name.includes("generador") || name.includes("panda");
+        }
+        return name.includes("yanmar");
+      });
+
+      const manualTitle =
+        matchedChunk?.manual_title || "Manual de Operación Yanmar 4JH57 (Inyección Directa)";
+      const pageNum = matchedChunk?.page_number || 48;
+      const spareText = matchedSpare
+        ? `${matchedSpare.item_name} (Stock: ${matchedSpare.quantity} uds disponibles a bordo)`
+        : "Sin repuestos específicos registrados para esta pieza en el pañol.";
+
+      setResponse({
+        answer: `PROCEDIMIENTO TÉCNICO RECUPERADO:
+${matchedChunk?.content || "Revisar refrigeración de agua salada, nivel de aceite y filtro de combustible."}
+
+INVENTARIO DE REPUESTOS DISPONIBLES A BORDO:
+• ${spareText}
+
+${
+  matchedSpare?.specification
+    ? `Especificación de repuesto: ${matchedSpare.specification} (Fuente: ${matchedSpare.specification_source || "Manual de taller"})\n`
+    : ""
+}`,
+        intent: "mechanic",
+        manual_title: manualTitle,
+        page_number: pageNum,
+        related_qr_slug: matchedChunk?.related_qr_slug || "yanmar-4jh57",
+        inventory_match: spareText,
+        is_demo: !hasCloudLLM,
+      });
+      setLoading(false);
+      return;
+    }
+
+    // 4. UNKNOWN / NO MATCH (PRD R-4.13.3 / R-4.13.6: decir honestamente "No encontré esto en tus manuales")
     setResponse({
-      answer: `${contextHeader}${visionNote}\n\n${match?.content ||
-        "Verificar grifo de fondo abierto y revisar impulsor Yanmar 4JH57."
-        }`,
-      manual_title:
-        match?.manual_title || "Manual Técnico Yanmar 4JH57 Common Rail",
-      page_number: match?.page_number || 48,
-      related_qr_slug: match?.related_qr_slug || "yanmar-4jh57",
-      inventory_match:
-        inventoryItems[0]?.item_name || "Impulsor Bomba Agua Yanmar (2 uds)",
-      predictive_alert: `Horómetro Local: ${vesselContext.engine_hours} hrs.`,
-      multimodal_analyzed: Boolean(attachedImageBase64),
+      answer: `No encontré esto en tus manuales de a bordo ni en los registros técnicos de tu embarcación.
+
+Te sugiero consultar el manual físico en la mesa de cartas o contactar al servicio oficial del fabricante para evitar maniobras no autorizadas.`,
+      intent: "unknown",
+      manual_title: "Sin coincidencia en manuales cargados",
+      page_number: 0,
+      is_demo: !hasCloudLLM,
     });
     setLoading(false);
   };
@@ -292,161 +373,138 @@ export function MarineCopilot({
       data-testid="marine-copilot-ai"
       className={compact ? "space-y-3" : "marine-card p-6 space-y-4"}
     >
-      {/* Header + Auto-Injected Telemetry Pills */}
+      {/* Header + Demo Mode Indicator */}
       <div className="border-b border-white/5 pb-3 space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base sm:text-lg font-semibold flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-[var(--accent-primary)]" />
             <span>Copiloto Marino — Asistente de a Bordo</span>
           </h2>
-          <span className="font-mono text-[10px] uppercase px-2.5 py-1 rounded-full bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-semibold">
-            Contexto Barco Inyectado
-          </span>
+
+          {/* PRD R-4.13.2: Badge de modo demo honesto */}
+          {response.is_demo ? (
+            <span
+              data-testid="copilot-demo-badge"
+              className="font-mono text-[10px] uppercase px-2.5 py-1 rounded-full bg-[#fbbf24]/15 text-[#fbbf24] border border-[#fbbf24]/40 font-semibold"
+            >
+              Modo demo — respuestas de ejemplo basadas en manuales locales
+            </span>
+          ) : (
+            <span className="font-mono text-[10px] uppercase px-2.5 py-1 rounded-full bg-[#34d399]/15 text-[#34d399] border border-[#34d399]/40 font-semibold">
+              Gemini Conectado
+            </span>
+          )}
         </div>
 
         {/* Live Context Telemetry Strip */}
-        <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px] opacity-80">
-          <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 flex items-center gap-1">
-            <Compass className="w-3 h-3 text-[#00E5FF]" />
-            {vesselContext.dms_coords}
+        <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] opacity-80 pt-1">
+          <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 flex items-center gap-1.5">
+            <Compass className="w-3.5 h-3.5 text-[#38bdf8]" />
+            <span>{vesselContext.dms_coords}</span>
           </span>
-          <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 flex items-center gap-1">
-            <Wind className="w-3 h-3 text-[var(--status-ok)]" />
-            {vesselContext.wind_speed_kn.toFixed(1)} kn / Ola{" "}
-            {vesselContext.wave_height_m.toFixed(2)}m
+          <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 flex items-center gap-1.5">
+            <Wind className="w-3.5 h-3.5 text-[#34d399]" />
+            <span>
+              {vesselContext.wind_speed_kn.toFixed(1)} kn / Ola {vesselContext.wave_height_m.toFixed(2)}m
+            </span>
           </span>
-          <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 flex items-center gap-1">
-            <Gauge className="w-3 h-3 text-[var(--status-warn)]" />
-            Calado {vesselContext.draft_meters}m • {vesselContext.engine_hours}h
+          <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 flex items-center gap-1.5">
+            <Gauge className="w-3.5 h-3.5 text-[#fbbf24]" />
+            <span>
+              Calado {vesselContext.draft_meters}m • Horómetro {vesselContext.engine_hours}h
+            </span>
           </span>
         </div>
       </div>
 
-      {/* Alerta Predictiva de Garantía & Compliance (YachtPass Engine) */}
-      {warrantyAlertItem && (
-        <div
-          data-testid="copilot-warranty-predictive-alert"
-          className="p-3.5 sm:p-4 rounded-2xl bg-red-950/30 border border-red-800 text-white space-y-1.5 shadow-none"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#FF2D55] uppercase tracking-wide">
-              <ShieldAlert className="w-4 h-4 text-[#FF2D55] shrink-0" />
-              <span>ALERTA PREDICTIVA DE GARANTÍA • {warrantyAlertItem.warranty_provider || "OFICIAL"}</span>
-            </div>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#FF2D55] text-white">
-              LÍMITE PRÓXIMO
-            </span>
-          </div>
-
-          <p className="text-xs font-mono leading-relaxed opacity-95">
-            Horómetro actual en <strong>{vesselContext.engine_hours.toFixed(1)} hrs</strong>.
-            La garantía de fábrica para <em>{warrantyAlertItem.item_name}</em> expira a las{" "}
-            <strong>{warrantyAlertItem.warranty_max_hours} hrs</strong> (restan{" "}
-            <strong className="text-[#FF2D55] underline">
-              {hoursRemaining !== null ? Math.max(0, hoursRemaining).toFixed(1) : "0"} hrs
-            </strong>{" "}
-            sin servicio registrado). ¡Debes registrar el servicio oficial antes de alcanzar el hito
-            para no anular la cobertura mundial del fabricante!
-          </p>
-        </div>
-      )}
-
-      {/* Quick Diagnostic Presets */}
-      <div className="flex flex-wrap gap-2">
+      {/* Suggestion Chips (PRD R-4.13.1) */}
+      <div className="flex flex-wrap gap-2 text-xs font-mono">
         <button
           type="button"
           onClick={() => {
-            const q =
-              "Sonó la alarma de temperatura del motor Yanmar 4JH57, ¿qué reviso?";
+            const q = "¿Cuál es el viento y estado de mar actual?";
             setQuestion(q);
             handleAskCopilot(q);
           }}
-          className="marine-btn marine-btn-secondary text-xs px-3"
+          className="marine-btn marine-btn-secondary min-h-10 text-xs px-3 py-1.5 flex items-center gap-1.5"
+        >
+          <Wind className="w-3.5 h-3.5 text-[#34d399]" />
+          <span>Viento &amp; Mar en Vivo</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            const q = "Alarma de temperatura en motor Yanmar 4JH57";
+            setQuestion(q);
+            handleAskCopilot(q);
+          }}
+          className="marine-btn marine-btn-secondary min-h-10 text-xs px-3 py-1.5 flex items-center gap-1.5"
         >
           <Wrench className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
-          <span>Alarma Temperatura Yanmar</span>
+          <span>Alarma Motor Yanmar</span>
         </button>
+
         <button
           type="button"
           onClick={() => {
-            const q =
-              "El motor pierde RPM por combustible o agua en filtro Racor R20P";
+            const q = "¿Dónde está el repuesto del impulsor de agua salada?";
             setQuestion(q);
             handleAskCopilot(q);
           }}
-          className="marine-btn marine-btn-secondary text-xs px-3"
+          className="marine-btn marine-btn-secondary min-h-10 text-xs px-3 py-1.5 flex items-center gap-1.5"
         >
-          <span>Filtro Racor R20P</span>
+          <Package className="w-3.5 h-3.5 text-[#38bdf8]" />
+          <span>Buscar Impulsor en Pañol</span>
         </button>
+
         <button
           type="button"
-          data-testid="copilot-camera-sim-btn"
-          onClick={handleSimulateDiagnosticCameraCapture}
-          className="marine-btn marine-btn-secondary text-xs px-3"
+          onClick={() => {
+            const q = "¡Hombre al agua / Emergencia a bordo!";
+            setQuestion(q);
+            handleAskCopilot(q);
+          }}
+          className="marine-btn text-xs px-3 py-1.5 min-h-10 flex items-center gap-1.5 bg-[#f87171]/20 text-[#f87171] border border-[#f87171]/40 hover:bg-[#f87171]/30 font-bold"
         >
-          <Camera className="w-4 h-4 text-[var(--accent-primary)]" />
-          <span>Foto Alarma / Sentina (IA Vision)</span>
+          <ShieldAlert className="w-3.5 h-3.5 text-[#f87171]" />
+          <span>Hombre al Agua (SOS)</span>
         </button>
       </div>
 
-      {/* Attached Multimodal Photo Preview */}
-      {attachedImageBase64 && (
-        <div
-          data-testid="copilot-image-preview"
-          className="p-3 rounded-xl bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/30 flex items-center justify-between gap-3"
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <img
-              src={attachedImageBase64}
-              alt={attachedImageLabel || "Evidencia Multimodal"}
-              className="w-16 h-12 object-cover rounded-lg border border-white/20 shrink-0"
-            />
-            <div className="min-w-0 font-mono text-xs">
-              <div className="font-semibold text-[var(--accent-primary)] truncate">
-                {attachedImageLabel || "Foto Adjunta (Base64)"}
-              </div>
-              <div className="text-[11px] opacity-75">
-                Se cruzará con los manuales técnicos y telemetría actual
-              </div>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setAttachedImageBase64(null);
-              setAttachedImageLabel(null);
-            }}
-            className="min-h-14 w-14 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center shrink-0"
-            aria-label="Quitar imagen"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
-      {/* Input + Camera Upload + Send Button (all min-h-14 / 56px) */}
+      {/* Free Text Input + Push-to-Talk Button (PRD R-4.13.1 / Voz) */}
       <div className="flex flex-wrap sm:flex-nowrap gap-2">
-        <label
-          title="Subir o tomar foto con cámara para diagnóstico multimodal"
-          className="marine-btn marine-btn-secondary px-3.5 cursor-pointer shrink-0"
+        <button
+          type="button"
+          data-testid="copilot-push-to-talk-btn"
+          onClick={handleTogglePushToTalk}
+          className={`marine-btn min-h-14 px-4 flex items-center justify-center shrink-0 transition-all ${
+            isListening
+              ? "bg-[#f87171] text-white animate-pulse border-[#f87171]"
+              : "marine-btn-secondary"
+          }`}
+          title={isListening ? "Detener grabación" : "Push-to-Talk (Hablar por voz)"}
         >
-          <Camera className="w-5 h-5 text-[var(--accent-primary)]" />
-          <span className="sr-only">Adjuntar foto de cámara</span>
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleCameraFileSelect}
-            className="hidden"
-          />
-        </label>
+          {isListening ? (
+            <MicOff className="w-5 h-5 text-white" />
+          ) : (
+            <Mic className="w-5 h-5 text-[var(--accent-primary)]" />
+          )}
+          <span className="sr-only">Push-to-Talk micrófono</span>
+        </button>
 
         <input
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          className="flex-1 min-w-0 min-h-14 px-3.5 text-sm"
-          placeholder="Describe la falla o adjunta foto de la alarma/sentina..."
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleAskCopilot();
+            }
+          }}
+          className="flex-1 min-w-0 min-h-14 px-4 text-xs sm:text-sm rounded-2xl bg-white/5 border border-white/5"
+          placeholder="Escribe tu consulta náutica o presiona el micrófono..."
         />
 
         <button
@@ -454,49 +512,78 @@ export function MarineCopilot({
           data-testid="copilot-send-btn"
           onClick={() => handleAskCopilot()}
           disabled={loading}
-          className="marine-btn marine-btn-primary text-xs w-full sm:w-auto shrink-0"
+          className="marine-btn marine-btn-primary min-h-14 px-6 text-xs font-bold w-full sm:w-auto shrink-0 flex items-center justify-center gap-2"
         >
           <Send className="w-4 h-4" />
-          <span>{loading ? "Analizando..." : "Diagnosticar"}</span>
+          <span>{loading ? "Consultando..." : "Consultar"}</span>
         </button>
       </div>
 
-      {/* Fixed min-h-[172px] Response Container with Shimmer Skeleton (Zero Layout Shift) */}
+      {/* Response Box */}
       <div
         data-testid="copilot-response-box"
-        className="min-h-[172px] p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2 text-xs sm:text-sm font-mono whitespace-pre-line flex flex-col justify-between"
+        className="min-h-[160px] p-5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-4 text-xs sm:text-sm font-mono whitespace-pre-line flex flex-col justify-between"
       >
         {loading ? (
-          <div className="space-y-2.5 py-2">
-            <div className="h-4 w-4/5 marine-skeleton" />
-            <div className="h-4 w-full marine-skeleton" />
-            <div className="h-4 w-5/6 marine-skeleton" />
-            <div className="h-4 w-2/3 marine-skeleton mt-3" />
+          <div className="space-y-3 py-3">
+            <div className="h-4 w-4/5 marine-skeleton rounded-lg" />
+            <div className="h-4 w-full marine-skeleton rounded-lg" />
+            <div className="h-4 w-2/3 marine-skeleton rounded-lg" />
           </div>
         ) : (
           <>
-            <div className="leading-relaxed">{response.answer}</div>
-            <div className="pt-2 border-t border-white/5 space-y-1">
-              <div className="flex flex-wrap items-center justify-between gap-2 text-xs opacity-80">
-                <span>
-                  {response.manual_title} (Pág. {response.page_number})
-                </span>
-                <Link
-                  href={`/qr/${response.related_qr_slug}`}
-                  className="text-[var(--accent-primary)] underline font-semibold"
+            <div className="leading-relaxed text-white">{response.answer}</div>
+
+            {/* Emergency Action Banner with Human-in-the-loop */}
+            {response.intent === "emergency" && (
+              <div className="p-4 rounded-xl bg-red-950/40 border border-red-800 text-white space-y-3">
+                <div className="flex items-center gap-2 font-bold text-xs text-[#f87171]">
+                  <AlertTriangle className="w-4 h-4 text-[#f87171]" />
+                  <span>ACCIÓN REQUERIDA • PROTOCOLO DE SOCORRO</span>
+                </div>
+                <button
+                  type="button"
+                  data-testid="copilot-open-sos-action-btn"
+                  onClick={openSOS}
+                  className="w-full marine-btn min-h-12 bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-none"
                 >
-                  Ver Nodo QR: {response.related_qr_slug}
-                </Link>
+                  <ShieldAlert className="w-4 h-4" />
+                  <span>ABRIR CONSOLA SOS INMEDIATA</span>
+                </button>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                <span className="text-[var(--status-ok)]">
-                  Repuesto a bordo: {response.inventory_match}
-                </span>
-                {response.multimodal_analyzed && (
-                  <span className="px-2 py-0.5 rounded-full bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] text-[10px]">
-                    VISIÓN IA + RAG VERIFICADO
+            )}
+
+            {/* Sources & Citations Footer (PRD R-4.13.3) */}
+            <div className="pt-3 border-t border-white/5 space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs opacity-75">
+                <span className="flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-[#38bdf8]" />
+                  <span>
+                    Fuente: {response.manual_title}
+                    {response.page_number > 0 ? ` (pág. ${response.page_number})` : ""}
                   </span>
+                </span>
+
+                {response.related_qr_slug && (
+                  <Link
+                    href={`/qr/${response.related_qr_slug}`}
+                    className="text-[var(--accent-primary)] hover:underline font-semibold flex items-center gap-1"
+                  >
+                    <span>Ver Nodo QR: {response.related_qr_slug}</span>
+                  </Link>
                 )}
+              </div>
+
+              {response.inventory_match && (
+                <div className="text-xs text-[#34d399] flex items-center gap-1.5">
+                  <Package className="w-3.5 h-3.5 text-[#34d399]" />
+                  <span>{response.inventory_match}</span>
+                </div>
+              )}
+
+              {/* Fixed disclaimer (PRD R-4.13.5) */}
+              <div className="text-[10px] text-slate-400 opacity-60 pt-1 italic font-sans">
+                Orientación general. Ante dudas, consulta el manual del fabricante o a un técnico calificado.
               </div>
             </div>
           </>

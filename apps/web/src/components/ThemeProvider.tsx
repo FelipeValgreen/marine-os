@@ -95,6 +95,7 @@ interface ThemeContextValue {
   requestedVesselSubView: "digital_twin" | "damage_control" | "service_book" | null;
   clearRequestedVesselSubView: () => void;
   openCommandCenter: () => void;
+  openSOS: () => void;
   isOffline: boolean;
   setSimulatedOffline: (offline: boolean) => void;
   dataMode: "SIMULADO" | "EN_VIVO";
@@ -627,6 +628,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         requestedVesselSubView,
         clearRequestedVesselSubView: () => setRequestedVesselSubView(null),
         openCommandCenter: () => setCommandCenterOpen(true),
+        openSOS: activateSOSZafarrancho,
         isOffline,
         setSimulatedOffline,
         dataMode,

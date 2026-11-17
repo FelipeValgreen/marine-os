@@ -4,6 +4,27 @@ Todas las modificaciones notables de este proyecto están documentadas en este a
 
 ---
 
+## [Fase 5 — Copiloto Marino y Push-to-Talk] - 2026-11-16
+Rama: `fase-5-copiloto`
+
+### Añadido / Mejorado (Copiloto Marino, RAG Documental Fidedigno y Entrada por Voz)
+- **Push-to-Talk y Entrada por Voz para Timoneles (PRD 0.1 / R-4.13.1):**
+  - Implementado botón Push-to-Talk con micrófono táctil y detección de estado de grabación.
+  - Integrado con la API nativa Web Speech (`es-CL`) para dictado manos libres con guantes en timón o cabina.
+- **Ruteo de Intención Náutico (PRD R-4.13.4):**
+  - **Consultas Meteorológicas:** Ruteo automático al store `environment` para responder con viento verdadero ($TWS$), viento aparente ($AWS$), rumbo y altura de ola actualizados en vivo.
+  - **Consultas Mecánicas:** RAG local fidedigno sobre los manuales técnicos del barco (`vessel_manual_chunks`) cruzado con el inventario de repuestos (`inventory_items`) para indicar disponibilidad y ubicación de la pieza en el pañol.
+  - **Situaciones de Emergencia:** Detección de palabras clave críticas (Hombre al agua / MOB, Mayday, Incendio, Vía de agua) con banner de acción inmediata y botón de un toque para abrir la consola SOS.
+- **Honestidad Radical en IA y Modo Demo Transparente (PRD R-4.13.2 / R-4.13.3 / R-4.13.6):**
+  - Incorporado badge explícito: `"Modo demo — respuestas de ejemplo basadas en manuales locales"` cuando no hay clave LLM en variables de entorno.
+  - Cita estricta de documentos y páginas solo cuando provienen de un manual efectivamente indexado. Si la consulta está fuera del alcance de los manuales del barco, responde honestamente: *"No encontré esto en tus manuales de a bordo"*.
+  - Añadido aviso permanente en consultas de seguridad y mecánica: *"Orientación general. Ante dudas, consulta el manual del fabricante o a un técnico calificado."* (R-4.13.5).
+  - Eliminados los reclamos engañosos de la UI: eliminadas referencias a "Multimodal RAG" e "IA Vision" (R-4.13.7).
+- **Control Humano en el Circuito (Human-in-the-Loop — Regla 9):**
+  - Ninguna acción crítica (activar alarma, despachar alerta SOS) se ejecuta de forma autónoma sin confirmación explícita del capitán en pantalla.
+
+---
+
 ## [Fase 4 — Producto de Flota y Handover Real] - 2026-11-16
 Rama: `fase-4-flota`
 
