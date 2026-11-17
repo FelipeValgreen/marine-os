@@ -75,6 +75,11 @@ import { DamageControl } from "@/components/DamageControl";
 import { FleetManager } from "@/components/FleetManager";
 import { CrewDirectory } from "@/components/CrewDirectory";
 import { IntegrationHub } from "@/components/IntegrationHub";
+import { useNavigationMode } from "@/context/NavigationModeContext";
+import { GimbalUI } from "@/components/GimbalUI";
+import { FlashChecklist } from "@/components/FlashChecklist";
+import { DigitalVHF } from "@/components/DigitalVHF";
+import { FloatingPTTButton } from "@/components/FloatingPTTButton";
 
 interface LiveMarineWeatherState {
   source: string;
@@ -191,11 +196,17 @@ export default function MarineOSHomePage() {
     requestedVesselSubView,
     clearRequestedVesselSubView,
     openCommandCenter,
+    openSOS,
     isOffline,
     pushToast,
     relaunchSeaTrials,
   } = useMarineContext();
   const isNight = theme === "night-red-shift";
+
+  const { isAtSeaMode, toggleNavigationMode, setNavigationMode } = useNavigationMode();
+  const [isFlashChecklistOpen, setIsFlashChecklistOpen] = useState<boolean>(false);
+  const [isDigitalVHFOpen, setIsDigitalVHFOpen] = useState<boolean>(false);
+  const [tacticalViewMode, setTacticalViewMode] = useState<"gimbal" | "chart">("gimbal");
 
   // Live Dexie IndexedDB Queries
   const userPrefs = useLiveQuery(() => db.user_preferences.get("default"), []);
@@ -1219,29 +1230,45 @@ export default function MarineOSHomePage() {
   if (activeSection === "bridge") {
     return (
       <div className="relative w-screen h-screen overflow-hidden select-none">
-        {/* 100vw x 100vh Fullscreen Real Cartography (Carto Dark Matter + OpenSeaMap) */}
-        <NauticalMap
-          fullScreen={true}
-          waypoints={parsedRoute.waypoints}
-          anchorages={anchorages}
-          selectedAnchorage={selectedAnchorage}
-          vesselPosition={{
-            lat: effectiveVesselLat,
-            lon: effectiveVesselLon,
-          }}
-          anchorPosition={{ lat: anchorLat, lon: anchorLon }}
-          swingRadiusMeters={scopeCalc.swingRadiusMeters}
-          isDragging={anchorWatch.isDragging}
-          isNight={isNight}
-          trackPoints={
-            isRecordingTrack ? recordedPoints : activeReplayTrack?.points || []
-          }
-          onSelectAnchorage={(a) => {
-            setSelectedAnchorageSlug(a.slug);
-            setDrawerTab("anchorage");
-            setDrawerOpen(true);
-          }}
-        />
+        {/* Render GimbalUI if in Alta Mar Mode and gimbal view is chosen */}
+        {isAtSeaMode && tacticalViewMode === "gimbal" ? (
+          <div className="pt-20 sm:pt-24 px-3 sm:px-6 pb-24 sm:pb-10 w-full max-w-7xl mx-auto h-screen overflow-y-auto">
+            <GimbalUI
+              telemetry={telemetry}
+              twsKn={telemetry.aws_kn || 18.5}
+              twdDeg={telemetry.awa_deg || 225}
+              depthM={telemetry.depth_m}
+              sogKn={telemetry.sog_kn}
+              cogDeg={telemetry.cog_deg}
+              onOpenSOS={openSOS}
+              onOpenFlashChecklist={() => setIsFlashChecklistOpen(true)}
+              onOpenDigitalVHF={() => setIsDigitalVHFOpen(true)}
+            />
+          </div>
+        ) : (
+          <NauticalMap
+            fullScreen={true}
+            waypoints={parsedRoute.waypoints}
+            anchorages={anchorages}
+            selectedAnchorage={selectedAnchorage}
+            vesselPosition={{
+              lat: effectiveVesselLat,
+              lon: effectiveVesselLon,
+            }}
+            anchorPosition={{ lat: anchorLat, lon: anchorLon }}
+            swingRadiusMeters={scopeCalc.swingRadiusMeters}
+            isDragging={anchorWatch.isDragging}
+            isNight={isNight}
+            trackPoints={
+              isRecordingTrack ? recordedPoints : activeReplayTrack?.points || []
+            }
+            onSelectAnchorage={(a) => {
+              setSelectedAnchorageSlug(a.slug);
+              setDrawerTab("anchorage");
+              setDrawerOpen(true);
+            }}
+          />
+        )}
 
         {/* FLOATING TOP ACTIVE VOYAGE PILL / CTA */}
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-30 hidden md:flex items-center">
@@ -1339,6 +1366,54 @@ export default function MarineOSHomePage() {
 
           {/* Top-Right: Quick Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto self-end sm:self-auto overflow-x-auto max-w-[calc(100vw-1rem)] no-scrollbar py-0.5">
+            {/* Prominent Bimodal Switch: MODO TIERRA vs MODO ALTA MAR (FASE 1) */}
+            <button
+              type="button"
+              data-testid="bimodal-navigation-mode-toggle"
+              onClick={() => {
+                toggleNavigationMode();
+                pushToast({
+                  title: !isAtSeaMode ? "Modo Alta Mar Activado" : "Modo Tierra Activado",
+                  subtitle: !isAtSeaMode
+                    ? "UI Táctica: Telemetría gigante, Horizon Lock, PTT y VHF"
+                    : "UI Administrativa: Flota, Finanzas, Gastos y Documentos",
+                  tone: !isAtSeaMode ? "coral" : "cyan",
+                });
+              }}
+              className={`min-h-[44px] sm:min-h-14 px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-full flex items-center gap-2 font-mono text-xs font-bold transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${
+                isAtSeaMode
+                  ? "bg-[#C2410C] hover:bg-[#D94A1A] text-white border border-orange-400/50 shadow-lg"
+                  : "bg-[#1E293B] hover:bg-[#334155] text-slate-300 border border-white/10"
+              }`}
+              title="Alternar entre Modo Tierra (Administrativo) y Modo Alta Mar (Táctico)"
+            >
+              <span
+                className={`w-2.5 h-2.5 rounded-full ${
+                  isAtSeaMode ? "bg-white animate-pulse" : "bg-slate-400"
+                }`}
+              />
+              <span className="hidden sm:inline">
+                {isAtSeaMode ? "MODO ALTA MAR" : "MODO TIERRA"}
+              </span>
+              <span className="sm:hidden">
+                {isAtSeaMode ? "ALTA MAR" : "TIERRA"}
+              </span>
+            </button>
+
+            {/* Tactical View Switch (Gimbal vs Carta) in Alta Mar Mode */}
+            {isAtSeaMode && (
+              <button
+                type="button"
+                data-testid="tactical-view-toggle-btn"
+                onClick={() =>
+                  setTacticalViewMode((prev) => (prev === "gimbal" ? "chart" : "gimbal"))
+                }
+                className="marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-4 py-1.5 sm:py-2.5 flex items-center gap-1.5 text-xs font-mono font-bold text-cyan-400 border-cyan-500/40"
+              >
+                <span>{tacticalViewMode === "gimbal" ? "VER CARTA" : "VER GIMBAL"}</span>
+              </button>
+            )}
+
             {/* Operational Vessel State Pill (PRD R-4.2) */}
             <button
               type="button"
@@ -1950,6 +2025,24 @@ export default function MarineOSHomePage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Flash-Checklist Modal */}
+        <FlashChecklist
+          isOpen={isFlashChecklistOpen}
+          onClose={() => setIsFlashChecklistOpen(false)}
+        />
+
+        {/* Digital VHF / Radar Social Drawer */}
+        <DigitalVHF
+          isOpen={isDigitalVHFOpen}
+          onClose={() => setIsDigitalVHFOpen(false)}
+        />
+
+        {/* Global Floating Push-to-Talk Button */}
+        <FloatingPTTButton
+          onOpenSOS={openSOS}
+          onOpenDigitalVHF={() => setIsDigitalVHFOpen(true)}
+        />
       </div>
     );
   }
@@ -2390,6 +2483,61 @@ export default function MarineOSHomePage() {
             </div>
           </div>
         )}
+      </div>
+    );
+  }
+
+  // ===========================================================================
+  // BIMODAL GUARD: BLOCK ADMINISTRATIVE MODULES AT SEA (FASE 1)
+  // ===========================================================================
+  if (isAtSeaMode) {
+    return (
+      <div className="min-h-[85vh] p-4 sm:p-8 flex flex-col items-center justify-center text-center bg-[#040B16] text-white">
+        <div className="p-8 sm:p-10 rounded-3xl bg-[#081220] border border-white/10 max-w-lg space-y-5 shadow-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center mx-auto">
+            <Ship className="w-7 h-7" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black font-mono tracking-wider uppercase text-white">
+              MÓDULO ADMINISTRATIVO BLOQUEADO
+            </h2>
+            <div className="text-xs font-mono text-orange-400 mt-1">
+              ESTADO ACTUAL: MODO ALTA MAR (TÁCTICO)
+            </div>
+          </div>
+          <p className="text-sm font-sans text-white/70 leading-relaxed">
+            Durante la navegación en alta mar, MarinOS bloquea la visualización de finanzas, contratos y gestión administrativa para evitar distracciones en el puente. Solo están activos los módulos tácticos, telemetría y averías.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setActiveSection("bridge")}
+              className="py-3 px-4 rounded-xl bg-[#0E1B2E] hover:bg-[#142640] border border-white/10 font-mono font-bold text-xs text-cyan-300"
+            >
+              IR A PUENTE TÁCTICO
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setNavigationMode(false);
+                pushToast({
+                  title: "Modo Tierra Activado",
+                  subtitle: "Acceso a módulos administrativos restaurado",
+                  tone: "cyan",
+                });
+              }}
+              className="py-3 px-4 rounded-xl bg-orange-600 hover:bg-orange-500 font-mono font-bold text-xs text-white"
+            >
+              CAMBIAR A MODO TIERRA
+            </button>
+          </div>
+        </div>
+
+        {/* Global Floating Push-to-Talk Button */}
+        <FloatingPTTButton
+          onOpenSOS={openSOS}
+          onOpenDigitalVHF={() => setIsDigitalVHFOpen(true)}
+        />
       </div>
     );
   }
@@ -3873,6 +4021,24 @@ export default function MarineOSHomePage() {
             </div>
           </div>
         )}
+
+      {/* Flash-Checklist Modal */}
+      <FlashChecklist
+        isOpen={isFlashChecklistOpen}
+        onClose={() => setIsFlashChecklistOpen(false)}
+      />
+
+      {/* Digital VHF / Radar Social Drawer */}
+      <DigitalVHF
+        isOpen={isDigitalVHFOpen}
+        onClose={() => setIsDigitalVHFOpen(false)}
+      />
+
+      {/* Global Floating Push-to-Talk Button */}
+      <FloatingPTTButton
+        onOpenSOS={openSOS}
+        onOpenDigitalVHF={() => setIsDigitalVHFOpen(true)}
+      />
     </>
   );
 }

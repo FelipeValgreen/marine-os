@@ -51,6 +51,7 @@ import {
   OFFLINE_GUEST_PROFILE,
   authenticateWithGoogleOrHydrateLocal,
 } from "@/lib/supabase";
+import { useNavigationMode } from "@/context/NavigationModeContext";
 
 export type MarineTheme =
   | "midnight-ocean"
@@ -233,6 +234,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     () => db.user_preferences.get("default"),
     []
   );
+
+  const { isAtSeaMode, toggleNavigationMode } = useNavigationMode();
+
+  useEffect(() => {
+    if (isAtSeaMode && !["bridge", "vessel"].includes(activeSection)) {
+      setActiveSectionState("bridge");
+    }
+  }, [isAtSeaMode, activeSection]);
 
   const pushToast = (toast: Omit<ToastNotification, "id">) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -741,9 +750,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
               </button>
             </div>
 
-            {/* Center 6 Navigation Items */}
+            {/* Center Navigation Items (Filtered in Alta Mar Mode) */}
             <nav className="flex flex-col gap-1.5 w-full px-1.5">
-              {NAV_ITEMS.map((item) => {
+              {(isAtSeaMode
+                ? NAV_ITEMS.filter((item) => item.id === "bridge" || item.id === "vessel")
+                : NAV_ITEMS
+              ).map((item) => {
                 const Icon = item.icon;
                 const isCurrent = pathname === "/" && activeSection === item.id;
                 return (
@@ -794,6 +806,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   </div>
                 );
               })}
+
+              {isAtSeaMode && (
+                <div className="p-1.5 w-full">
+                  <button
+                    type="button"
+                    onClick={toggleNavigationMode}
+                    className={`w-full py-2 rounded-xl bg-orange-950/60 border border-orange-500/40 text-orange-400 font-mono text-[10px] font-bold uppercase tracking-wider flex items-center justify-center ${
+                      sidebarCollapsed ? "px-1" : "px-3"
+                    }`}
+                    title="Desactivar Modo Alta Mar y volver a Modo Tierra"
+                  >
+                    {sidebarCollapsed ? "TIERRA" : "← VOLVER A TIERRA"}
+                  </button>
+                </div>
+              )}
             </nav>
 
             {/* Bottom Controls: Expand Sidebar, Passport Avatar, Offline Sync, Theme & Logout */}
@@ -1137,62 +1164,104 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 : "backdrop-blur-2xl bg-[#060b14]/95 border-white/5 text-slate-200"
             }`}
           >
-            {[
-              { id: "bridge" as MarineSection, shortLabel: "Puente", icon: Compass },
-              { id: "vessel" as MarineSection, shortLabel: "Barco", icon: Ship },
-              { id: "voyages" as MarineSection, shortLabel: "Viajes", icon: FileCheck2 },
-              { id: "fleet" as MarineSection, shortLabel: "Flota", icon: Anchor },
-            ].map((item) => {
-              const Icon = item.icon;
-              const isCurrent = pathname === "/" && activeSection === item.id;
-              return (
+            {isAtSeaMode ? (
+              <>
                 <button
-                  key={item.id}
                   type="button"
-                  data-testid={`mobile-nav-${item.id}`}
-                  onClick={() => {
-                    setActiveSection(item.id);
-                    setMobileMoreOpen(false);
-                  }}
-                  className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
-                    isCurrent
-                      ? isNight
-                        ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
-                        : isDaylight
-                        ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
-                        : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
-                      : "text-slate-400 opacity-70 hover:opacity-100"
+                  data-testid="mobile-nav-bridge"
+                  onClick={() => setActiveSection("bridge")}
+                  className={`flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
+                    activeSection === "bridge"
+                      ? "text-orange-400 font-bold bg-orange-950/30 border-b-2 border-orange-500"
+                      : "text-slate-400 opacity-70"
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="truncate">{item.shortLabel}</span>
+                  <Compass className="w-5 h-5 text-orange-400" />
+                  <span>Puente Táctico</span>
                 </button>
-              );
-            })}
+                <button
+                  type="button"
+                  data-testid="mobile-nav-vessel"
+                  onClick={() => setActiveSection("vessel")}
+                  className={`flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
+                    activeSection === "vessel"
+                      ? "text-orange-400 font-bold bg-orange-950/30 border-b-2 border-orange-500"
+                      : "text-slate-400 opacity-70"
+                  }`}
+                >
+                  <Ship className="w-5 h-5" />
+                  <span>Averías</span>
+                </button>
+                <button
+                  type="button"
+                  data-testid="mobile-nav-exit-at-sea"
+                  onClick={toggleNavigationMode}
+                  className="flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-slate-300 hover:text-white"
+                >
+                  <Anchor className="w-5 h-5 text-slate-400" />
+                  <span>Modo Tierra</span>
+                </button>
+              </>
+            ) : (
+              <>
+                {[
+                  { id: "bridge" as MarineSection, shortLabel: "Puente", icon: Compass },
+                  { id: "vessel" as MarineSection, shortLabel: "Barco", icon: Ship },
+                  { id: "voyages" as MarineSection, shortLabel: "Viajes", icon: FileCheck2 },
+                  { id: "fleet" as MarineSection, shortLabel: "Flota", icon: Anchor },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isCurrent = pathname === "/" && activeSection === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      data-testid={`mobile-nav-${item.id}`}
+                      onClick={() => {
+                        setActiveSection(item.id);
+                        setMobileMoreOpen(false);
+                      }}
+                      className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
+                        isCurrent
+                          ? isNight
+                            ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
+                            : isDaylight
+                            ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
+                            : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
+                          : "text-slate-400 opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="truncate">{item.shortLabel}</span>
+                    </button>
+                  );
+                })}
 
-            {/* 5th Item: Más */}
-            {(() => {
-              const isMoreActive = ["crew", "logbook", "integrations", "handover", "academy"].includes(activeSection);
-              return (
-                <button
-                  type="button"
-                  data-testid="mobile-nav-more"
-                  onClick={() => setMobileMoreOpen((prev) => !prev)}
-                  className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
-                    isMoreActive || mobileMoreOpen
-                      ? isNight
-                        ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
-                        : isDaylight
-                        ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
-                        : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
-                      : "text-slate-400 opacity-70 hover:opacity-100"
-                  }`}
-                >
-                  <MoreHorizontal className="w-5 h-5" />
-                  <span className="truncate">Más</span>
-                </button>
-              );
-            })()}
+                {/* 5th Item: Más */}
+                {(() => {
+                  const isMoreActive = ["crew", "logbook", "integrations", "handover", "academy"].includes(activeSection);
+                  return (
+                    <button
+                      type="button"
+                      data-testid="mobile-nav-more"
+                      onClick={() => setMobileMoreOpen((prev) => !prev)}
+                      className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
+                        isMoreActive || mobileMoreOpen
+                          ? isNight
+                            ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
+                            : isDaylight
+                            ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
+                            : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
+                          : "text-slate-400 opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <MoreHorizontal className="w-5 h-5" />
+                      <span className="truncate">Más</span>
+                    </button>
+                  );
+                })()}
+              </>
+            )}
           </nav>
         )}
       </div>

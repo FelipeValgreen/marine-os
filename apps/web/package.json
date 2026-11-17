@@ -11,7 +11,9 @@
     "test": "node --test src/lib/nautical/nautical.test.ts"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.121",
     "@supabase/supabase-js": "^2.119.0",
+    "ai": "^7.0.173",
     "clsx": "^2.1.1",
     "dexie": "^4.0.10",
     "dexie-react-hooks": "^1.1.7",
