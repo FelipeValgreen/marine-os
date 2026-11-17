@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Compass,
@@ -381,8 +382,6 @@ export function CommandCenter({
     setSelectedIndex(0);
   }, [query]);
 
-  if (!isOpen) return null;
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       e.preventDefault();
@@ -415,160 +414,176 @@ export function CommandCenter({
   };
 
   return (
-    <div
-      data-testid="command-center-modal"
-      onKeyDown={handleKeyDown}
-      className="fixed inset-0 z-[90] flex items-start justify-center pt-12 sm:pt-20 px-4 bg-black/75 backdrop-blur-xl select-none"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="w-full max-w-2xl marine-card overflow-hidden border-2 border-[var(--border-subtle)] shadow-[0_25px_80px_rgba(0,0,0,0.85)]">
-        {/* Top Command Input Bar */}
-        <div className="flex items-center gap-3 px-4 border-b border-[var(--border-subtle)]">
-          <Search className="w-5 h-5 text-[var(--accent-primary)] shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            data-testid="command-center-input"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Comando rápido... (Ej. 'Ir a motor', 'Registrar gasto', 'Vía de agua', 'Red-Shift')"
-            className="w-full min-h-[64px] bg-transparent border-none focus:outline-none text-sm sm:text-base font-medium px-1"
-          />
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Cerrar Command Center"
-            className="min-h-14 px-3 rounded-xl bg-white/5 hover:bg-white/10 font-mono text-xs flex items-center gap-1 shrink-0"
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="command-center-backdrop"
+          data-testid="command-center-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.16 }}
+          onKeyDown={handleKeyDown}
+          className="fixed inset-0 z-[90] flex items-start justify-center pt-12 sm:pt-20 px-4 bg-black/75 backdrop-blur-xl select-none"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
+        >
+          <motion.div
+            key="command-center-panel"
+            initial={{ opacity: 0, scale: 0.96, y: -14 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: -14 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="w-full max-w-2xl marine-card overflow-hidden border border-white/5 shadow-2xl shadow-black/80"
           >
-            <span>ESC</span>
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Inline Quick Expense Entry Sub-Mode */}
-        {quickExpenseMode ? (
-          <form
-            data-testid="command-quick-expense-form"
-            onSubmit={handleSaveQuickExpense}
-            className="p-5 space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <div className="font-mono text-xs uppercase tracking-widest text-[var(--accent-primary)] font-bold">
-                ACCIÓN DIRECTA • REGISTRAR GASTO EN INDEXEDDB
-              </div>
+            {/* Top Command Input Bar */}
+            <div className="flex items-center gap-3 px-4 border-b border-white/5">
+              <Search className="w-5 h-5 text-[var(--accent-primary)] shrink-0" />
+              <input
+                ref={inputRef}
+                type="text"
+                data-testid="command-center-input"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Comando rápido... (Ej. 'Ir a motor', 'Registrar gasto', 'Vía de agua', 'Red-Shift')"
+                className="w-full min-h-[64px] bg-transparent border-none focus:outline-none text-sm sm:text-base font-semibold tracking-tight px-1"
+              />
               <button
                 type="button"
-                onClick={() => setQuickExpenseMode(false)}
-                className="marine-btn marine-btn-secondary text-xs px-3"
+                onClick={onClose}
+                aria-label="Cerrar Command Center"
+                className="min-h-14 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold flex items-center gap-1 shrink-0"
               >
-                Volver a Comandos
+                <span className="font-mono text-[11px] opacity-70">ESC</span>
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="sm:col-span-2">
-                <label className="block font-mono text-[11px] uppercase opacity-70 mb-1">
-                  Concepto del Gasto
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={expenseTitle}
-                  onChange={(e) => setExpenseTitle(e.target.value)}
-                  className="w-full min-h-[64px] px-3.5 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block font-mono text-[11px] uppercase opacity-70 mb-1">
-                  Monto (USD $)
-                </label>
-                <input
-                  type="number"
-                  required
-                  value={expenseUsd}
-                  onChange={(e) => setExpenseUsd(e.target.value)}
-                  className="w-full min-h-[64px] px-3.5 font-mono text-base font-bold"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              data-testid="command-save-expense-btn"
-              className="w-full min-h-[64px] marine-btn marine-btn-primary text-sm font-bold"
-            >
-              <PlusCircle className="w-5 h-5" />
-              <span>Guardar Gasto en Bitácora Local-First (IndexedDB)</span>
-            </button>
-          </form>
-        ) : (
-          /* Command Palette Results List */
-          <div className="max-h-[62vh] overflow-y-auto p-2.5 space-y-1.5">
-            {filteredCommands.length === 0 ? (
-              <div className="p-8 text-center font-mono text-xs opacity-65">
-                Sin comandos coincidentes para &ldquo;{query}&rdquo;. Prueba con
-                &ldquo;motor&rdquo;, &ldquo;gasto&rdquo; o &ldquo;SOS&rdquo;.
-              </div>
-            ) : (
-              filteredCommands.map((item, idx) => {
-                const Icon = item.icon;
-                const isSelected = idx === selectedIndex;
-                return (
+            {/* Inline Quick Expense Entry Sub-Mode */}
+            {quickExpenseMode ? (
+              <form
+                data-testid="command-quick-expense-form"
+                onSubmit={handleSaveQuickExpense}
+                className="p-5 space-y-4"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)]">
+                    ACCIÓN DIRECTA • REGISTRAR GASTO EN INDEXEDDB
+                  </div>
                   <button
-                    key={item.id}
                     type="button"
-                    data-testid={item.id}
-                    onMouseEnter={() => setSelectedIndex(idx)}
-                    onClick={() => {
-                      triggerHapticFeedback(14);
-                      item.action();
-                    }}
-                    className={`w-full min-h-[64px] px-4 py-2.5 rounded-xl flex items-center justify-between gap-3 text-left transition ${
-                      isSelected
-                        ? "bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/50"
-                        : "hover:bg-white/5 border border-transparent"
-                    }`}
+                    onClick={() => setQuickExpenseMode(false)}
+                    className="marine-btn marine-btn-secondary text-xs px-3"
                   >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 border border-[var(--border-subtle)] flex items-center justify-center shrink-0">
-                        <Icon className="w-5 h-5 text-[var(--accent-primary)]" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-sm font-bold truncate">
-                          {item.title}
-                        </div>
-                        <div className="text-xs opacity-70 truncate mt-0.5">
-                          {item.subtitle}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0 font-mono text-[11px]">
-                      <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-white/5 border border-[var(--border-subtle)] opacity-75">
-                        {item.category}
-                      </span>
-                      <span className="px-2 py-1 rounded bg-white/10 font-bold flex items-center gap-1">
-                        <span>{item.shortcut}</span>
-                        <CornerDownLeft className="w-3 h-3 opacity-70" />
-                      </span>
-                    </div>
+                    Volver a Comandos
                   </button>
-                );
-              })
-            )}
-          </div>
-        )}
+                </div>
 
-        {/* Footer Hint Bar */}
-        <div className="px-4 py-2.5 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] opacity-70">
-          <span>
-            ↑↓ Navegar • ↵ Ejecutar • ESC Cerrar • 100% Local-First IndexedDB
-          </span>
-          <span>MARINOS COMMAND CENTER (⌘K)</span>
-        </div>
-      </div>
-    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-semibold tracking-tight opacity-70 mb-1">
+                      Concepto del Gasto
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={expenseTitle}
+                      onChange={(e) => setExpenseTitle(e.target.value)}
+                      className="w-full min-h-[64px] px-3.5 text-sm font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold tracking-tight opacity-70 mb-1">
+                      Monto (USD $)
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={expenseUsd}
+                      onChange={(e) => setExpenseUsd(e.target.value)}
+                      className="w-full min-h-[64px] px-3.5 font-mono text-base font-bold"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  data-testid="command-save-expense-btn"
+                  className="w-full min-h-[64px] marine-btn marine-btn-primary text-sm font-bold tracking-tight"
+                >
+                  <PlusCircle className="w-5 h-5" />
+                  <span>Guardar Gasto en Bitácora Local-First (IndexedDB)</span>
+                </button>
+              </form>
+            ) : (
+              /* Command Palette Results List */
+              <div className="max-h-[62vh] overflow-y-auto p-2.5 space-y-1.5">
+                {filteredCommands.length === 0 ? (
+                  <div className="p-8 text-center text-xs opacity-65 font-medium">
+                    Sin comandos coincidentes para &ldquo;{query}&rdquo;. Prueba con
+                    &ldquo;motor&rdquo;, &ldquo;gasto&rdquo; o &ldquo;SOS&rdquo;.
+                  </div>
+                ) : (
+                  filteredCommands.map((item, idx) => {
+                    const Icon = item.icon;
+                    const isSelected = idx === selectedIndex;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        data-testid={item.id}
+                        onMouseEnter={() => setSelectedIndex(idx)}
+                        onClick={() => {
+                          triggerHapticFeedback(14);
+                          item.action();
+                        }}
+                        className={`w-full min-h-[64px] px-4 py-2.5 rounded-xl flex items-center justify-between gap-3 text-left transition-all ${
+                          isSelected
+                            ? "bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/40 shadow-lg shadow-[var(--accent-primary)]/10"
+                            : "hover:bg-white/5 border border-transparent"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center shrink-0">
+                            <Icon className="w-5 h-5 text-[var(--accent-primary)]" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-sm font-semibold tracking-tight truncate">
+                              {item.title}
+                            </div>
+                            <div className="text-xs opacity-70 truncate mt-0.5 font-normal">
+                              {item.subtitle}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-white/5 border border-white/5 text-[10px] font-bold tracking-[0.15em] opacity-75 uppercase">
+                            {item.category}
+                          </span>
+                          <span className="px-2 py-1 rounded bg-white/10 font-mono text-[11px] font-bold flex items-center gap-1">
+                            <span>{item.shortcut}</span>
+                            <CornerDownLeft className="w-3 h-3 opacity-70" />
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            )}
+
+            {/* Footer Hint Bar */}
+            <div className="px-4 py-2.5 border-t border-white/5 flex flex-wrap items-center justify-between gap-2 text-[11px] opacity-70">
+              <span className="font-normal">
+                ↑↓ Navegar • ↵ Ejecutar • ESC Cerrar • Local-First IndexedDB
+              </span>
+              <span className="font-mono text-[10px] tracking-wider uppercase">MARINOS COMMAND CENTER (⌘K)</span>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

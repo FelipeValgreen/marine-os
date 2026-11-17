@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   QrCode,
@@ -1463,14 +1464,18 @@ export default function MarineOSHomePage() {
           </div>
 
           {/* 4. COLLAPSIBLE RIGHT DRAWER (w-96, Anchorage Matcher + Marine Copilot AI) */}
-          <div
-            data-testid="anchorage-weather-drawer"
-            className={`fixed top-20 bottom-20 lg:bottom-6 right-3 sm:right-4 w-[calc(100vw-1.5rem)] sm:w-96 z-40 transition-all duration-300 ease-out ${drawerOpen
-              ? "translate-x-0 opacity-100 pointer-events-auto"
-              : "translate-x-[420px] opacity-0 pointer-events-none"
-              }`}
-          >
-            <div className="marine-card h-full p-5 flex flex-col justify-between overflow-y-auto space-y-4">
+          <AnimatePresence>
+            {drawerOpen && (
+              <motion.div
+                key="anchorage-weather-drawer"
+                data-testid="anchorage-weather-drawer"
+                initial={{ x: 420, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 420, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="fixed top-20 bottom-20 lg:bottom-6 right-3 sm:right-4 w-[calc(100vw-1.5rem)] sm:w-96 z-40"
+              >
+                <div className="marine-card h-full p-5 flex flex-col justify-between overflow-y-auto space-y-4 border border-white/5 shadow-2xl shadow-black/80">
               <div className="space-y-4">
                 {/* Drawer Mode Switcher + Close Button */}
                 <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
@@ -1862,9 +1867,11 @@ export default function MarineOSHomePage() {
                 </label>
               </div>
             </div>
-          </div>
-        </div>
-        );
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+    );
   }
 
         // ===========================================================================
@@ -2236,32 +2243,32 @@ export default function MarineOSHomePage() {
         return (
           <>
             <div className="space-y-6">
-          {/* Top Row: Apple Wallet Style Digital Nautical Passport + Sea Time Counter */}
+          {/* Top Row: Apple Wallet Style Digital Nautical Passport + Sea Time Counter — Bento Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left 7 cols: Apple Wallet Digital Nautical License Card */}
             <div
               data-testid="digital-nautical-passport-wallet"
-              className={`lg:col-span-7 rounded-3xl p-6 sm:p-8 border shadow-2xl flex flex-col justify-between space-y-6 ${isNight
+              className={`lg:col-span-7 rounded-3xl p-6 sm:p-8 border border-white/5 shadow-2xl shadow-black/60 flex flex-col justify-between space-y-6 ${isNight
                 ? "bg-black border-[#FF1E1E]"
-                : "bg-gradient-to-br from-[#0F1E36]/95 via-[#0A1424]/95 to-[#060C16]/95 border-[var(--accent-primary)]/35 backdrop-blur-2xl"
+                : "bg-gradient-to-br from-[#0F1E36]/95 via-[#0A1424]/95 to-[#060C16]/95 border-[var(--accent-primary)]/30 backdrop-blur-2xl"
                 }`}
             >
               {/* Wallet Top Header + Expiration Semaphore Pill */}
-              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-4">
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/5 pb-4">
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${isNight
                             ? "bg-[#FF1E1E] text-black"
-                            : "bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40"
+                            : "bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30"
                             }`}
                         >
                           <ShieldCheck className="w-6 h-6" />
                         </div>
                         <div>
-                          <div className="text-[10px] font-mono uppercase tracking-widest opacity-70">
+                          <div className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)] opacity-90">
                             REPÚBLICA DE CHILE • DIRECTEMAR — APPLE WALLET NÁUTICO
                           </div>
-                          <h1 className="text-lg sm:text-xl font-bold tracking-tight mt-0.5">
+                          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white mt-0.5">
                             {activeAccount.licenseType}
                           </h1>
                         </div>
@@ -2278,14 +2285,14 @@ export default function MarineOSHomePage() {
                           }`}
                       >
                         <span
-                          className={`w-2.5 h-2.5 rounded-full ${semaphore.tone === "green"
+                          className={`w-2 h-2 rounded-full ${semaphore.tone === "green"
                             ? "bg-[#00E676]"
                             : semaphore.tone === "amber"
                               ? "bg-[#FF9F0A]"
                               : "bg-[#FF2D55]"
                             }`}
                         />
-                        <span>{semaphore.badgeLabel}</span>
+                        <span className="tracking-wide uppercase text-[11px]">{semaphore.badgeLabel}</span>
                       </div>
                     </div>
 
@@ -2293,44 +2300,44 @@ export default function MarineOSHomePage() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                       <div className="space-y-3 flex-1">
                         <div>
-                          <div className="text-[10px] font-mono uppercase opacity-60">
+                          <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">
                             TITULAR DEL PASAPORTE NÁUTICO
                           </div>
-                          <div className="text-2xl font-bold tracking-tight mt-0.5">
+                          <div className="text-2xl font-bold tracking-tight text-white mt-0.5">
                             {activeAccount.name}
                           </div>
-                          <div className="font-mono text-xs opacity-75">
+                          <div className="text-xs opacity-75 font-medium text-slate-300">
                             {activeAccount.email || "filipo.valverde@gmail.com"} •{" "}
-                            {activeAccount.roleBadge}
+                            <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 font-mono text-xs pt-1">
-                          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10">
-                            <div className="text-[10px] opacity-60">DOCUMENTO</div>
-                            <div className="font-semibold mt-0.5">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs pt-1">
+                          <div className="p-3 rounded-2xl bg-white/[0.025] border border-white/5">
+                            <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">DOCUMENTO</div>
+                            <div className="font-mono font-semibold mt-1 text-white">
                               {activeAccount.documentType} {activeAccount.documentNumber}
                             </div>
                           </div>
-                          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10">
-                            <div className="text-[10px] opacity-60">Nº REGISTRO</div>
-                            <div className="font-semibold mt-0.5 text-[var(--accent-primary)]">
+                          <div className="p-3 rounded-2xl bg-white/[0.025] border border-white/5">
+                            <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">Nº REGISTRO</div>
+                            <div className="font-mono font-semibold mt-1 text-[var(--accent-primary)]">
                               {activeAccount.licenseNumber}
                             </div>
                           </div>
-                          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 col-span-2 sm:col-span-1">
-                            <div className="text-[10px] opacity-60">VENCIMIENTO</div>
-                            <div className="font-semibold mt-0.5">
+                          <div className="p-3 rounded-2xl bg-white/[0.025] border border-white/5 col-span-2 sm:col-span-1">
+                            <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">VENCIMIENTO</div>
+                            <div className="font-mono font-semibold mt-1 text-white">
                               {activeAccount.licenseExpiry}
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2 font-mono text-xs opacity-85">
-                          <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10">
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="px-2.5 py-1 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-[11px] text-slate-300">
                             Atribución Máx: {activeAccount.maxLoaMeters}m LOA
                           </span>
-                          <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10">
+                          <span className="px-2.5 py-1 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-[11px] text-slate-300">
                             {activeAccount.vhfOperatorCert}
                           </span>
                         </div>
@@ -2539,51 +2546,51 @@ export default function MarineOSHomePage() {
                     </div>
                   </div>
 
-                  {/* Right 5 cols: Total Nautical Miles (Sea Time Log) & Certification Summary */}
-                  <div className="lg:col-span-5 marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5">
+                  {/* Right 5 cols: Total Nautical Miles (Sea Time Log) & Certification Summary — Bento Card */}
+                  <div className="lg:col-span-5 marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/60">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-mono uppercase tracking-widest text-[var(--accent-primary)]">
+                        <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)]">
                           SEA TIME LOG • BITÁCORA CERTIFICADA
                         </span>
                         <Compass className="w-5 h-5 text-[var(--accent-primary)]" />
                       </div>
-                      <h2 className="text-lg font-semibold">
+                      <h2 className="text-lg font-bold tracking-tight text-white">
                         Millas Náuticas Totales Acumuladas
                       </h2>
-                      <p className="text-xs opacity-70">
+                      <p className="text-xs text-slate-300 opacity-80 leading-relaxed font-normal">
                         Suma automática de tu historial base certificado más todas las
                         travesías GPS grabadas en IndexedDB.
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 font-mono space-y-2">
-                      <div className="text-xs opacity-65 uppercase">
+                    <div className="p-5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2">
+                      <div className="text-[10px] font-bold tracking-[0.15em] uppercase opacity-65 text-slate-300">
                         TOTAL SEA TIME (INDEXEDDB + TRACKS)
                       </div>
                       <div
                         data-testid="sea-time-total-miles"
-                        className="text-4xl sm:text-5xl font-bold tracking-tight text-[#00E5FF]"
+                        className="text-4xl sm:text-5xl font-mono font-bold tracking-tight text-[#00E5FF]"
                       >
                         {totalSeaTimeMilesNm.toLocaleString("es-CL")}{" "}
-                        <span className="text-base font-normal opacity-70">MN</span>
+                        <span className="text-base font-normal font-sans text-slate-400">MN</span>
                       </div>
-                      <div className="text-xs text-[#00E676] pt-1">
+                      <div className="text-xs text-[#00E676] pt-1 font-mono">
                         • Base histórica: {activeAccount.loggedMilesNm} MN + Travesías
                         grabadas: +{loggedTrackMilesNm} MN ({savedTracks.length} piernas)
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 font-mono text-xs">
-                      <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
-                        <div className="text-[10px] opacity-60">TRAVESÍAS GRABADAS</div>
-                        <div className="text-lg font-semibold mt-1">
-                          {savedTracks.length} Piernas
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
+                        <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">TRAVESÍAS GRABADAS</div>
+                        <div className="text-lg font-mono font-bold mt-1 text-white">
+                          {savedTracks.length} <span className="text-xs font-sans font-normal opacity-60">Piernas</span>
                         </div>
                       </div>
-                      <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10">
-                        <div className="text-[10px] opacity-60">PROVEEDOR AUTH</div>
-                        <div className="text-sm font-semibold mt-1 uppercase text-[#00E676]">
+                      <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
+                        <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">PROVEEDOR AUTH</div>
+                        <div className="text-xs font-mono font-semibold mt-1 uppercase text-[#00E676] truncate">
                           {activeAccount.authProvider || "GOOGLE OAUTH"}
                         </div>
                       </div>

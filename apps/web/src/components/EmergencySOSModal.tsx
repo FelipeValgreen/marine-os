@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   AlertOctagon,
@@ -89,29 +90,39 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div
+    <motion.div
+      key="emergency-sos-backdrop"
       data-testid="emergency-sos-modal"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
       className={`fixed inset-0 z-[80] w-screen h-screen overflow-y-auto p-4 sm:p-8 flex items-center justify-center select-none ${
         isNight
           ? "bg-black text-[#FF1E1E]"
-          : "bg-[#040B16]/95 backdrop-blur-2xl text-slate-100"
+          : "bg-black/85 backdrop-blur-2xl text-slate-100"
       }`}
     >
-      <div
-        className={`w-full max-w-6xl rounded-3xl p-6 sm:p-8 border-2 shadow-2xl space-y-6 ${
+      <motion.div
+        key="emergency-sos-panel"
+        initial={{ opacity: 0, scale: 0.95, y: 14 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 14 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className={`w-full max-w-6xl rounded-3xl p-6 sm:p-8 border shadow-2xl shadow-black/80 space-y-6 ${
           isNight
             ? "bg-black border-[#FF1E1E]"
-            : "bg-slate-950/95 border-[#FF2D55] shadow-[0_0_60px_rgba(255,69,58,0.3)]"
+            : "bg-[#040B16]/98 border-[#FF2D55]/60 shadow-[0_24px_70px_rgba(255,45,85,0.25)]"
         }`}
       >
         {/* Top Emergency Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/15 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-4">
           <div className="flex items-center gap-3.5">
             <div className="w-14 h-14 rounded-2xl bg-[#FF2D55] text-white flex items-center justify-center animate-pulse shrink-0">
               <AlertOctagon className="w-8 h-8" />
             </div>
             <div>
-              <div className="font-mono text-xs uppercase tracking-widest text-[#FF2D55] font-bold">
+              <div className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#FF2D55]">
                  CONSOLA DE EMERGENCIA MARÍTIMA • MRCC CHILE / DIRECTEMAR
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
@@ -335,7 +346,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

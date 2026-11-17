@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   Ship,
@@ -8,7 +9,6 @@ import {
   Edit2,
   Trash2,
   CheckCircle2,
-  Anchor,
   Fuel,
   Droplets,
   Ruler,
@@ -263,15 +263,22 @@ export function FleetManager() {
   return (
     <div data-testid="fleet-manager-view" className="space-y-6">
       {/* Header Banner */}
-      <div className="marine-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="marine-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/5 shadow-2xl shadow-black/50">
         <div>
-          <div className="flex items-center gap-2">
-            <Ship className="w-5 h-5 text-[var(--accent-primary)]" />
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-              Fleet &amp; Vessel Manager
-            </h1>
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-2xl bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/30 flex items-center justify-center shrink-0">
+              <Ship className="w-5 h-5 text-[var(--accent-primary)]" />
+            </div>
+            <div>
+              <div className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)]">
+                ARMADURÍA &amp; ESPECIFICACIONES NAVALES
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white mt-0.5">
+                Fleet &amp; Vessel Manager
+              </h1>
+            </div>
           </div>
-          <p className="text-xs sm:text-sm font-mono opacity-70 mt-1">
+          <p className="text-xs sm:text-sm text-slate-300 opacity-80 mt-2 font-normal leading-relaxed max-w-2xl">
             Administra la flota de tu armaduría: cambia el barco activo, edita especificaciones náuticas o registra una nueva embarcación.
           </p>
         </div>
@@ -280,7 +287,7 @@ export function FleetManager() {
           type="button"
           data-testid="create-new-vessel-btn"
           onClick={handleOpenCreate}
-          className="marine-btn marine-btn-primary text-xs sm:text-sm px-5 shrink-0 self-start sm:self-auto"
+          className="marine-btn marine-btn-primary text-xs sm:text-sm px-6 shrink-0 self-start sm:self-auto font-bold tracking-tight shadow-xl"
         >
           <Plus className="w-4 h-4" />
           <span>Nuevo Barco</span>
@@ -288,9 +295,26 @@ export function FleetManager() {
       </div>
 
       {/* Vessel Creation / Edit Modal */}
-      {isEditing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-          <div className="w-full max-w-2xl marine-card p-6 sm:p-8 space-y-6 my-8">
+      <AnimatePresence>
+        {isEditing && (
+          <motion.div
+            key="edit-vessel-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.16 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto"
+            onClick={() => setIsEditing(false)}
+          >
+            <motion.div
+              key="edit-vessel-panel"
+              initial={{ opacity: 0, scale: 0.96, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 14 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="w-full max-w-2xl marine-card p-6 sm:p-8 space-y-6 my-8 border border-white/5 shadow-2xl shadow-black/80"
+              onClick={(e) => e.stopPropagation()}
+            >
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div className="flex items-center gap-3">
                 <div
@@ -513,7 +537,7 @@ export function FleetManager() {
                 </div>
               </div>
 
-              <div className="pt-3 flex flex-wrap items-center justify-end gap-3 border-t border-white/10">
+              <div className="pt-3 flex flex-wrap items-center justify-end gap-3 border-t border-white/5">
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
@@ -524,19 +548,20 @@ export function FleetManager() {
                 <button
                   type="submit"
                   data-testid="save-vessel-submit-btn"
-                  className="marine-btn marine-btn-primary text-xs sm:text-sm px-6"
+                  className="marine-btn marine-btn-primary text-xs sm:text-sm px-6 font-bold tracking-tight shadow-xl"
                 >
                   <Save className="w-4 h-4" />
                   <span>Guardar Barco en IndexedDB</span>
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+    </AnimatePresence>
 
-      {/* Fleet Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Fleet Cards Grid — Bento Box Hierarchy */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {vessels?.map((v) => {
           const isActive = v.id === activeVesselId;
           const isConfirmingDelete = deleteConfirmId === v.id;
@@ -545,41 +570,43 @@ export function FleetManager() {
             <div
               key={v.id}
               data-testid={`fleet-vessel-card-${v.id}`}
-              className={`marine-card p-6 flex flex-col justify-between space-y-5 transition-all ${
+              className={`marine-card p-6 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/60 transition-all ${
                 isActive
                   ? isNight
                     ? "border-[#FF0000] shadow-[0_0_24px_rgba(255,0,0,0.3)]"
-                    : "border-[var(--accent-primary)] shadow-[0_4px_30px_rgba(255,87,34,0.2)]"
-                  : ""
+                    : "border-[var(--accent-primary)]/50 shadow-[0_12px_40px_rgba(255,87,34,0.18)]"
+                  : "hover:border-white/10"
               }`}
             >
               <div className="space-y-4">
-                {/* Card Header */}
-                <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
+                {/* Bento Row 1: Header + Active State Badge */}
+                <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-3.5">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
                         isActive
                           ? isNight
                             ? "bg-[#FF0000] text-black"
-                            : "bg-[var(--accent-primary)] text-white shadow-lg"
-                          : "bg-white/5 border border-white/10"
+                            : "bg-[var(--accent-primary)] text-white shadow-lg shadow-[var(--accent-primary)]/30"
+                          : "bg-white/5 border border-white/5 text-slate-300"
                       }`}
                     >
                       <Ship className="w-6 h-6" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-bold tracking-tight">{v.name}</h2>
+                        <h2 className="text-lg font-bold tracking-tight text-white">{v.name}</h2>
                         {isActive && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold mo-tint-ok">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-[0.12em] bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/40 uppercase">
                             <CheckCircle2 className="w-3 h-3" />
                             <span>ACTIVO</span>
                           </span>
                         )}
                       </div>
-                      <div className="text-xs font-mono opacity-70">
-                        {v.registration_number} • {typeLabels[v.vessel_type]}
+                      <div className="text-xs text-slate-400 mt-0.5 font-medium flex items-center gap-1.5">
+                        <span className="font-mono text-[11px] text-[var(--accent-primary)]">{v.registration_number}</span>
+                        <span className="opacity-40">•</span>
+                        <span>{typeLabels[v.vessel_type]}</span>
                       </div>
                     </div>
                   </div>
@@ -590,7 +617,7 @@ export function FleetManager() {
                       data-testid={`edit-vessel-${v.id}`}
                       onClick={() => handleOpenEdit(v)}
                       title="Editar especificaciones"
-                      className="w-10 min-h-14 rounded-xl border border-white/10 hover:bg-white/10 flex items-center justify-center text-xs opacity-75 hover:opacity-100"
+                      className="w-10 min-h-14 rounded-xl border border-white/5 hover:bg-white/10 flex items-center justify-center text-xs opacity-75 hover:opacity-100 transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -599,7 +626,7 @@ export function FleetManager() {
                       data-testid={`delete-vessel-${v.id}`}
                       onClick={() => setDeleteConfirmId(v.id)}
                       title="Eliminar barco"
-                      className="w-10 min-h-14 rounded-xl border border-white/10 hover:bg-[#FF2D55]/20 flex items-center justify-center text-xs opacity-75 hover:opacity-100 text-[#FF2D55]"
+                      className="w-10 min-h-14 rounded-xl border border-white/5 hover:bg-[#FF2D55]/20 flex items-center justify-center text-xs opacity-75 hover:opacity-100 text-[#FF2D55] transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -608,26 +635,26 @@ export function FleetManager() {
 
                 {/* Delete Confirmation Inline Banner */}
                 {isConfirmingDelete && (
-                  <div className="p-3.5 rounded-xl mo-tint-danger text-xs space-y-2">
-                    <div className="font-bold flex items-center gap-1.5">
+                  <div className="p-3.5 rounded-2xl bg-[#FF2D55]/15 border border-[#FF2D55]/30 text-xs space-y-2">
+                    <div className="font-bold flex items-center gap-1.5 text-[#FF2D55]">
                       <AlertTriangle className="w-4 h-4" />
                       <span>¿Confirmar eliminación de {v.name}?</span>
                     </div>
-                    <p className="text-[11px] opacity-85">
-                      Esta acción eliminará el barco de IndexedDB. Se recomienda mantener al menos una nave registrada.
+                    <p className="text-[11px] opacity-85 leading-relaxed">
+                      Esta acción eliminará la nave de IndexedDB. Se recomienda mantener al menos una embarcación en la flota.
                     </p>
                     <div className="flex items-center gap-2 pt-1">
                       <button
                         type="button"
                         onClick={() => handleDeleteVessel(v.id)}
-                        className="px-3 py-1.5 rounded-lg bg-[#FF2D55] text-white font-bold text-xs"
+                        className="px-3.5 py-2 rounded-xl bg-[#FF2D55] text-white font-bold text-xs"
                       >
                         Sí, Eliminar
                       </button>
                       <button
                         type="button"
                         onClick={() => setDeleteConfirmId(null)}
-                        className="px-3 py-1.5 rounded-lg bg-white/10 text-xs"
+                        className="px-3.5 py-2 rounded-xl bg-white/10 text-xs font-semibold"
                       >
                         Cancelar
                       </button>
@@ -635,88 +662,102 @@ export function FleetManager() {
                   </div>
                 )}
 
-                {/* Specs Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 font-mono text-xs">
-                  <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
-                    <div className="text-[10px] opacity-60 flex items-center gap-1">
-                      <Ruler className="w-3 h-3" />
-                      <span>ESLORA / MANGA</span>
+                {/* Bento Grid: Precision Specs */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                  {/* Bento Cell 1: Eslora & Manga (2 cols) */}
+                  <div className="col-span-2 p-3.5 rounded-2xl bg-white/[0.025] border border-white/5 flex items-center justify-between">
+                    <div className="space-y-1">
+                      <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60 flex items-center gap-1.5">
+                        <Ruler className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                        <span>DIMENSIONES NAVALES</span>
+                      </div>
+                      <div className="text-sm font-semibold tracking-tight text-white font-mono">
+                        {v.loa_meters.toFixed(2)}m <span className="opacity-40 font-sans font-normal text-xs">LOA ×</span> {v.beam_meters.toFixed(2)}m <span className="opacity-40 font-sans font-normal text-xs">Manga</span>
+                      </div>
                     </div>
-                    <div className="font-semibold mt-1">
-                      {v.loa_meters}m × {v.beam_meters}m
+                    <div className="text-right pl-2">
+                      <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-50">CALADO</div>
+                      <div className="font-mono text-base font-bold text-[var(--accent-primary)]">
+                        {v.draft_meters.toFixed(2)}m
+                      </div>
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
-                    <div className="text-[10px] opacity-60 flex items-center gap-1">
-                      <Anchor className="w-3 h-3" />
-                      <span>CALADO MÁX</span>
-                    </div>
-                    <div className="font-semibold mt-1 text-[var(--accent-primary)]">
-                      {v.draft_meters}m
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
-                    <div className="text-[10px] opacity-60 flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
+                  {/* Bento Cell 2: Horómetro */}
+                  <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-1">
+                    <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-[#00E5FF]" />
                       <span>HORÓMETRO</span>
                     </div>
-                    <div className="font-semibold mt-1">{v.engine_hours_current} hrs</div>
+                    <div className="font-mono text-sm font-bold text-white">
+                      {v.engine_hours_current} <span className="text-[10px] font-normal opacity-60 font-sans">hrs</span>
+                    </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
-                    <div className="text-[10px] opacity-60 flex items-center gap-1">
-                      <Fuel className="w-3 h-3 text-[#FF9F0A]" />
-                      <span>ESTANQUE DIÉSEL</span>
+                  {/* Bento Cell 3: Mástil */}
+                  <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-1">
+                    <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60 flex items-center gap-1">
+                      <Compass className="w-3.5 h-3.5 text-[#00E676]" />
+                      <span>MÁSTIL</span>
                     </div>
-                    <div className="font-semibold mt-1">{v.fuel_capacity_l} L</div>
+                    <div className="font-mono text-sm font-bold text-white">
+                      {v.mast_height_meters || 18.5} <span className="text-[10px] font-normal opacity-60 font-sans">m</span>
+                    </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
-                    <div className="text-[10px] opacity-60 flex items-center gap-1">
-                      <Droplets className="w-3 h-3 text-[#00E5FF]" />
-                      <span>AGUA DULCE</span>
+                  {/* Bento Cell 4: Tanques (Diésel & Agua) 4 cols full width */}
+                  <div className="col-span-2 sm:col-span-4 p-3.5 rounded-2xl bg-white/[0.025] border border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-[#FF9F0A]/15 border border-[#FF9F0A]/20 flex items-center justify-center shrink-0">
+                        <Fuel className="w-4 h-4 text-[#FF9F0A]" />
+                      </div>
+                      <div>
+                        <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">ESTANQUE DIÉSEL</div>
+                        <div className="font-mono text-xs font-bold text-white">{v.fuel_capacity_l} L</div>
+                      </div>
                     </div>
-                    <div className="font-semibold mt-1">{v.water_capacity_l} L</div>
-                  </div>
 
-                  <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
-                    <div className="text-[10px] opacity-60 flex items-center gap-1">
-                      <Compass className="w-3 h-3" />
-                      <span>MÁSTIL (AIRE)</span>
+                    <div className="h-6 w-px bg-white/10" />
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-[#00E5FF]/15 border border-[#00E5FF]/20 flex items-center justify-center shrink-0">
+                        <Droplets className="w-4 h-4 text-[#00E5FF]" />
+                      </div>
+                      <div>
+                        <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">AGUA DULCE</div>
+                        <div className="font-mono text-xs font-bold text-white">{v.water_capacity_l} L</div>
+                      </div>
                     </div>
-                    <div className="font-semibold mt-1">{v.mast_height_meters}m</div>
                   </div>
                 </div>
 
-                {/* YachtPass Warranty & Compliance Strip */}
-                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
-                  <div className="flex items-center justify-between text-[10px] font-mono">
-                    <span className="uppercase tracking-wider text-[var(--accent-primary)] font-semibold flex items-center gap-1">
-                      <ShieldCheck className="w-3 h-3" />
+                {/* Bento Cell 5: Warranty & Compliance Strip */}
+                <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)] flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5" />
                       <span>GARANTÍAS &amp; COMPLIANCE ACTIVO</span>
                     </span>
-                    <span className="opacity-60 text-[9px]">YachtPass Engine</span>
+                    <span className="opacity-50 font-mono text-[9px]">YachtPass Engine</span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[11px]">
-                    <div className="p-2 rounded-lg bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                      <div className="truncate">
-                        <div className="font-semibold text-white/90">Motor Yanmar 4JH57</div>
-                        <div className="text-[9px] opacity-60">Garantía hasta 1.500h</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-white/[0.025] border border-white/5 flex items-center justify-between">
+                      <div className="truncate pr-2">
+                        <div className="font-semibold text-white/90 text-xs">Motor Yanmar 4JH57</div>
+                        <div className="text-[10px] opacity-60 font-mono">Garantía hasta 1.500h</div>
                       </div>
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FF9F0A]/20 text-[#FF9F0A] border border-[#FF9F0A]/30">
+                      <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-[#FF9F0A]/15 text-[#FF9F0A] border border-[#FF9F0A]/30 shrink-0">
                         {Math.max(0, Math.round((1500 - v.engine_hours_current) * 10) / 10)}h restan
                       </span>
                     </div>
 
-                    <div className="p-2 rounded-lg bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                      <div className="truncate">
-                        <div className="font-semibold text-white/90">Fischer Panda 5000i</div>
-                        <div className="text-[9px] opacity-60">Garantía hasta 800h</div>
+                    <div className="p-2.5 rounded-xl bg-white/[0.025] border border-white/5 flex items-center justify-between">
+                      <div className="truncate pr-2">
+                        <div className="font-semibold text-white/90 text-xs">Fischer Panda 5000i</div>
+                        <div className="text-[10px] opacity-60 font-mono">Garantía hasta 800h</div>
                       </div>
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#00E676]/20 text-[#00E676] border border-[#00E676]/30">
+                      <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30 shrink-0">
                         Vigente
                       </span>
                     </div>
@@ -725,12 +766,12 @@ export function FleetManager() {
               </div>
 
               {/* Action Bottom */}
-              <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+              <div className="pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
                 <button
                   type="button"
                   data-testid={`genesis-transfer-${v.id}`}
                   onClick={() => handleOpenGenesisHandover(v)}
-                  className="marine-btn text-xs px-3 bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/40 hover:bg-[#00E5FF]/25 font-semibold flex items-center gap-1.5"
+                  className="marine-btn text-xs px-3.5 bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/30 hover:bg-[#00E5FF]/20 font-semibold flex items-center gap-1.5 transition-all"
                 >
                   <KeyRound className="w-3.5 h-3.5 text-[#00E5FF]" />
                   <span>Genesis Handover (Traspaso)</span>
@@ -741,7 +782,7 @@ export function FleetManager() {
                     type="button"
                     data-testid={`activate-vessel-${v.id}`}
                     onClick={() => handleSelectActiveVessel(v.id)}
-                    className="marine-btn marine-btn-secondary text-xs px-4"
+                    className="marine-btn marine-btn-secondary text-xs px-4 font-semibold"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 text-[#00E676]" />
                     <span>Establecer como Barco Activo</span>
@@ -754,15 +795,26 @@ export function FleetManager() {
       </div>
 
       {/* Genesis Handover Modal (Dealer / Astillero -> Dueño) */}
-      {genesisVessel && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in"
-          onClick={() => setGenesisVessel(null)}
-        >
-          <div
-            className="w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-3xl bg-[#040B16] border-2 border-[#00E5FF]/50 p-6 sm:p-7 shadow-2xl shadow-[#00E5FF]/20 relative space-y-5"
-            onClick={(e) => e.stopPropagation()}
+      <AnimatePresence>
+        {genesisVessel && (
+          <motion.div
+            key="genesis-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.16 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+            onClick={() => setGenesisVessel(null)}
           >
+            <motion.div
+              key="genesis-modal-panel"
+              initial={{ opacity: 0, scale: 0.96, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 14 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-3xl bg-[#040B16] border border-[#00E5FF]/40 p-6 sm:p-7 shadow-2xl shadow-black/80 relative space-y-5"
+              onClick={(e) => e.stopPropagation()}
+            >
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2">
@@ -922,9 +974,10 @@ export function FleetManager() {
                 Cerrar
               </button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
-    </div>
+    </AnimatePresence>
+  </div>
   );
 }

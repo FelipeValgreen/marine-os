@@ -11,13 +11,16 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
+    "clsx": "^2.1.1",
     "dexie": "^4.0.10",
     "dexie-react-hooks": "^1.1.7",
+    "framer-motion": "^14.14.0",
     "lucide-react": "^0.468.0",
     "maplibre-gl": "^4.7.1",
     "next": "^15.1.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
