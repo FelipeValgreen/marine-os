@@ -4,6 +4,32 @@ Todas las modificaciones notables de este proyecto están documentadas en este a
 
 ---
 
+## [Fase 6 — Rendimiento, Radio Comunidad, Validación Costa/Agua y Offline] - 2026-11-16
+Rama: `fase-6-offline`
+
+### Añadido / Mejorado (Radio Comunidad con TTL 24h, Cartografía Náutica y Resiliencia Offline)
+- **Radio Comunidad y Reportes Locales con TTL de 24 Horas (PRD 0.1 / R-4.11):**
+  - Implementado filtro temporal estricto de 24 horas (`TTL = 24 * 60 * 60 * 1000`) para los reportes de capitanes en `NauticalMap.tsx`.
+  - Añadido selector táctil en el mapa para alternar entre "Filtro: 24h TTL" (reportes vigentes) e "Histórico".
+  - Popup de cristal táctico enriquecido:
+    - Indicador de vigencia restante (`⏱️ Hace Xh (Vigente por Yh más)`) o aviso explícito de reporte expirado (`⚠️ EXPIRADO (>24h) — Archivo`).
+    - Cálculo geodésico en vivo de la distancia desde la proa del barco actual (`📍 A X.X NM de proa`) mediante fórmula de Haversine pura.
+    - Eliminado el claim comercial engañoso "WAZE NÁUTICO MARINOS" y sustituido por "RADIO COMUNIDAD • MARINOS".
+    - Resguardo estricto de privacidad: transmisiones comunitarias descentralizadas sin exposición de datos personales ni RUT.
+- **Validación de Derrota Costa / Agua y Cartografía Náutica (PRD Sección 9):**
+  - Creado documento oficial `docs/CARTOGRAFIA.md` detallando:
+    - Fuentes cartográficas oficiales: SHOA (Cartas 7100, 7111, 7112, 7200, 7220, 7300).
+    - Descargo obligatorio permanente: *"Carta referencial — no apta para navegación oficial. Usa cartas oficiales SHOA y tu plotter."*
+    - Reglas de validación costa/agua en Seno de Reloncaví y Archipiélago de Chiloé para garantizar que ninguna derrota predeterminada cruce tierra firme.
+    - Análisis hidrográfico de amplitudes mareales extremas (6 a 7.2 metros en sicigia), corrientes violentas en Canal Chacao y Paso Queullín (hasta 9 nudos), y riesgos meteorológicos de viento Norte (Travesía) y viento Puelche catabático.
+- **Caché Offline y Service Worker Resiliente:**
+  - Verificada la estrategia `Cache-First` para teselas vectoriales de Carto Dark Matter y teselas raster de balizamiento OpenSeaMap (`sw.js`).
+  - Capacidad de navegación táctica, consulta de manuales, checklist y bitácora 100% operativa en fondeaderos sin cobertura celular.
+- **Eliminación Total de Términos Prohibidos (Grep = 0):**
+  - Verificado grep con 0 coincidencias en código fuente de: `"legalmente vinculante"`, `"DIRECTEMAR Verificado"`, `"PredictWind"`, `"Apple Maps"`, `"plusvalía"`.
+
+---
+
 ## [Fase 5 — Copiloto Marino y Push-to-Talk] - 2026-11-16
 Rama: `fase-5-copiloto`
 

@@ -1372,7 +1372,7 @@ export async function ensureDemoSeedData(): Promise<void> {
               chain_payout_m: 60,
               seabed_type: "Arena dura / Cascajo",
               upvotes: 18,
-              created_at: new Date(Date.now() - 86400000).toISOString(),
+              created_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
             },
             {
               id: "report-la-arena-holding",
@@ -1390,7 +1390,7 @@ export async function ensureDemoSeedData(): Promise<void> {
               chain_payout_m: 35,
               seabed_type: "Fango compacto",
               upvotes: 24,
-              created_at: new Date(Date.now() - 172800000).toISOString(),
+              created_at: new Date(Date.now() - 7 * 3600 * 1000).toISOString(),
             },
             {
               id: "report-tenglo-shoal",
@@ -1408,7 +1408,7 @@ export async function ensureDemoSeedData(): Promise<void> {
               chain_payout_m: 20,
               seabed_type: "Arena y conchuela",
               upvotes: 31,
-              created_at: new Date(Date.now() - 259200000).toISOString(),
+              created_at: new Date(Date.now() - 15 * 3600 * 1000).toISOString(),
             },
             {
               id: "report-poyo-puelche",
@@ -1426,7 +1426,25 @@ export async function ensureDemoSeedData(): Promise<void> {
               chain_payout_m: 45,
               seabed_type: "Arcilla volcánica",
               upvotes: 15,
-              created_at: new Date(Date.now() - 345600000).toISOString(),
+              created_at: new Date(Date.now() - 21 * 3600 * 1000).toISOString(),
+            },
+            {
+              id: "report-castro-historico",
+              author_name: "Cap. Matías Edwards",
+              author_license: "Capitán Costero",
+              vessel_name: "SV Travesía",
+              anchorage_slug: "fiordo-castro",
+              lat: -42.4820,
+              lon: -73.7650,
+              report_type: "shelter_tip",
+              title: "Registro Histórico Fondeo Castro",
+              content:
+                "Fondeo tranquilo frente a los palafitos con marea media. Reporte archivado de temporada anterior.",
+              wind_conditions: "8 kn NW",
+              chain_payout_m: 25,
+              seabed_type: "Fango",
+              upvotes: 9,
+              created_at: new Date(Date.now() - 52 * 3600 * 1000).toISOString(),
             },
           ]);
         }

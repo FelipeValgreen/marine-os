@@ -1607,7 +1607,7 @@ export default function MarineOSHomePage() {
                           WEATHER ROUTING • EVOLUCIÓN 48 HORAS
                         </div>
                         <h3 className="text-base font-sans font-bold mt-0.5">
-                          Planificador de Zarpe (PredictWind Engine)
+                          Planificador de Zarpe (Pronóstico Open-Meteo)
                         </h3>
                       </div>
 
@@ -2589,7 +2589,7 @@ export default function MarineOSHomePage() {
                           <span>🛡️</span> Fondeo Seguro: 10 Noches
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 text-white border border-white/20 font-semibold shadow-sm">
-                          <span>🇨🇱</span> DIRECTEMAR Verificado
+                          <span>🇨🇱</span> Título Deportivo (Declaración Capitán)
                         </span>
                       </div>
                     </div>

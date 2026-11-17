@@ -312,7 +312,7 @@ export function IntegrationHub() {
         </div>
 
         {/* ===================================================================
-            CARD 3: PREDICTWIND & OPEN-METEO
+            CARD 3: METEOROLOGÍA OPEN-METEO
         =================================================================== */}
         <div
           data-testid="integration-card-meteo"

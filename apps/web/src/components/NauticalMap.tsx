@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useLiveQuery } from "dexie-react-hooks";
-import type { GPXWaypoint } from "@/lib/nautical";
+import { haversineDistanceMeters, type GPXWaypoint } from "@/lib/nautical";
 import {
   db,
   type AnchorageSpatialRecord,
@@ -76,9 +76,25 @@ export function NauticalMap({
 }: NauticalMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const [filter24hOnly, setFilter24hOnly] = useState(true);
+
+  const vesselPositionRef = useRef(vesselPosition);
+  useEffect(() => {
+    vesselPositionRef.current = vesselPosition;
+  }, [vesselPosition]);
 
   const liveReports = useLiveQuery(() => db.community_reports.toArray(), [], []);
-  const effectiveReports = communityReports || liveReports || [];
+  const allReports = communityReports || liveReports || [];
+
+  const effectiveReports = useMemo(() => {
+    if (!filter24hOnly) return allReports;
+    const now = Date.now();
+    const ttlMs = 24 * 60 * 60 * 1000;
+    return allReports.filter((r) => {
+      const age = now - new Date(r.created_at).getTime();
+      return age >= 0 && age <= ttlMs;
+    });
+  }, [allReports, filter24hOnly]);
 
   const addNauticalOverlays = (map: maplibregl.Map) => {
     if (!map.getSource("openseamap-seamarks")) {
@@ -252,6 +268,8 @@ export function NauticalMap({
               seabed_type: r.seabed_type || "",
               upvotes: r.upvotes,
               created_at: r.created_at,
+              lat: r.lat,
+              lon: r.lon,
             },
             geometry: {
               type: "Point" as const,
@@ -396,14 +414,37 @@ export function NauticalMap({
         const geom = feature.geometry as GeoJSON.Point;
         const coordinates = geom.coordinates.slice() as [number, number];
 
+        const createdAtStr = String(p.created_at || "");
+        const createdMs = createdAtStr ? new Date(createdAtStr).getTime() : 0;
+        const ageMs = createdMs ? Math.max(0, Date.now() - createdMs) : 0;
+        const ageHours = Math.floor(ageMs / (3600 * 1000));
+        const remainingHours = Math.max(0, 24 - ageHours);
+        const isExpired = ageHours >= 24;
+
+        let distanceBadge = "";
+        if (vesselPositionRef.current && p.lat && p.lon) {
+          const dMeters = haversineDistanceMeters(
+            vesselPositionRef.current.lat,
+            vesselPositionRef.current.lon,
+            Number(p.lat),
+            Number(p.lon)
+          );
+          const dNm = (dMeters / 1852).toFixed(1);
+          distanceBadge = ` • 📍 A ${dNm} NM de proa`;
+        }
+
+        const validityHtml = isExpired
+          ? `<span style="color: #FF453A; font-weight: 600;">⚠️ EXPIRADO (>24h) — Archivo</span>`
+          : `<span style="color: #30D158; font-weight: 600;">⏱️ Hace ${ageHours}h (Vigente por ${remainingHours}h)</span>`;
+
         const popupHtml = `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #FFFFFF; min-width: 250px; max-width: 320px; padding: 4px;">
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #FFFFFF; min-width: 260px; max-width: 320px; padding: 4px;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
               <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; color: #FF5722; background: rgba(255, 87, 34, 0.16); border: 1px solid rgba(255, 87, 34, 0.45); border-radius: 999px; padding: 2px 8px;">
-                ⚓ REPORTE DE CAPITÁN
+                📻 RADIO COMUNIDAD
               </span>
-              <span style="font-size: 10px; font-family: monospace; opacity: 0.65;">
-                ${p.created_at ? new Date(String(p.created_at)).toLocaleDateString('es-CL', { month: 'short', day: 'numeric' }) : 'Reciente'}
+              <span style="font-size: 10px; font-family: monospace; opacity: 0.85;">
+                ${validityHtml}
               </span>
             </div>
 
@@ -412,7 +453,7 @@ export function NauticalMap({
             </div>
 
             <div style="font-size: 11px; font-family: monospace; color: #00E5FF; margin-bottom: 8px;">
-              👤 ${p.author_name} • ⛵ ${p.vessel_name}
+              👤 ${p.author_name} • ⛵ ${p.vessel_name}${distanceBadge}
             </div>
 
             <p style="font-size: 12px; line-height: 1.45; opacity: 0.92; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
@@ -421,11 +462,11 @@ export function NauticalMap({
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; font-family: monospace; margin-bottom: 8px;">
               <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
-                <div style="opacity: 0.55;">VIENTO</div>
+                <div style="opacity: 0.55;">CONDICIÓN VIENTO</div>
                 <div style="font-weight: bold; color: #FF9F0A;">${p.wind_conditions || 'Calma'}</div>
               </div>
               <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
-                <div style="opacity: 0.55;">CADENA & FONDO</div>
+                <div style="opacity: 0.55;">CADENA & TENEDERO</div>
                 <div style="font-weight: bold; color: #00E676;">${p.chain_payout_m ? p.chain_payout_m + 'm ' : ''}${p.seabed_type || 'Arena'}</div>
               </div>
             </div>
@@ -434,7 +475,9 @@ export function NauticalMap({
               <span style="color: #00E676; font-weight: bold;">
                 ▲ ${p.upvotes || 18} confirmaciones
               </span>
-              <span style="color: #FF5722; font-weight: 600;">WAZE NÁUTICO MARINOS</span>
+              <span style="color: rgba(255,255,255,0.5); font-weight: 500;">
+                TTL 24H • LOCAL
+              </span>
             </div>
           </div>
         `;
@@ -558,6 +601,8 @@ export function NauticalMap({
             seabed_type: r.seabed_type || "",
             upvotes: r.upvotes,
             created_at: r.created_at,
+            lat: r.lat,
+            lon: r.lon,
           },
           geometry: {
             type: "Point" as const,
@@ -611,6 +656,19 @@ export function NauticalMap({
       }
     >
       <div ref={mapContainerRef} className="w-full h-full" />
+      {/* Tactical Radio Comunidad TTL Filter Pill */}
+      <div className="absolute top-3 left-3 z-10 flex items-center gap-2 bg-[#040B16]/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono shadow-xl">
+        <span className="w-2 h-2 rounded-full bg-[#FF5722] animate-pulse" />
+        <span className="text-white/90 font-medium">Radio Comunidad</span>
+        <button
+          type="button"
+          onClick={() => setFilter24hOnly((prev) => !prev)}
+          className="ml-1 text-[11px] px-2 py-0.5 rounded border border-white/15 bg-white/5 hover:bg-white/10 text-orange-400 font-mono transition-colors"
+          title="Alternar entre reportes de las últimas 24h o historial completo"
+        >
+          {filter24hOnly ? "Filtro: 24h TTL" : "Filtro: Histórico"}
+        </button>
+      </div>
       {/* Safety Nautical Disclaimer - R-4.8.1 */}
       <div
         data-testid="nautical-map-disclaimer"
