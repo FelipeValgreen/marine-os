@@ -28,7 +28,7 @@ import {
   Sparkles,
   ShieldCheck,
   Compass,
-  LogOut,
+  Ship,
   Mic,
   UserCog,
   ShoppingBag,
@@ -69,7 +69,6 @@ import {
   MarineCopilot,
   type CopilotTelemetryContext,
 } from "@/components/MarineCopilot";
-import { ContextualTooltip } from "@/components/ContextualTooltip";
 import { VesselServiceBook } from "@/components/VesselServiceBook";
 import { MarineAcademy } from "@/components/MarineAcademy";
 import { DamageControl } from "@/components/DamageControl";
@@ -175,13 +174,18 @@ import { getApiBaseUrl } from "@/lib/api";
 
 const API_URL = getApiBaseUrl();
 
+export type VesselOperationalState =
+  | "AMARRADO"
+  | "FONDEADO"
+  | "NAVEGANDO_MOTOR"
+  | "NAVEGANDO_VELA";
+
 export default function MarineOSHomePage() {
   const {
     theme,
     setTheme,
     activeAccount,
     updatePassportProfile,
-    logoutSession,
     activeSection,
     setActiveSection,
     requestedVesselSubView,
@@ -229,6 +233,10 @@ export default function MarineOSHomePage() {
     [],
     []
   );
+
+  // Operational Vessel State Machine (PRD 3.1)
+  const [vesselOperationalState, setVesselOperationalState] =
+    useState<VesselOperationalState>("FONDEADO");
 
   // Passport & Marketplace State
   const [logbookTab, setLogbookTab] = useState<"entries" | "marketplace">("entries");
@@ -779,7 +787,7 @@ export default function MarineOSHomePage() {
     });
     pushToast({
       title: `Horómetro Actualizado: ${nextHours} hrs`,
-      subtitle: "Sincronizado en IndexedDB (vessels)",
+      subtitle: "Sincronizado en el barco",
       tone: "cyan",
     });
   };
@@ -866,7 +874,7 @@ export default function MarineOSHomePage() {
       payload: entry,
     });
     pushToast({
-      title: "Bitácora de Voz Registrada (Zero Data Entry)",
+      title: "Bitácora de Voz Registrada (Manos Libres)",
       subtitle: `"${transcribedText}" • ${currentDms.combined} • ${currentHorometer}h`,
       tone: "emerald",
     });
@@ -1093,7 +1101,7 @@ export default function MarineOSHomePage() {
         setReplayIndex(0);
         pushToast({
           title: `Sea Time Log +${distNm} MN Registradas`,
-          subtitle: `${recordedPoints.length} puntos guardados en IndexedDB`,
+          subtitle: `${recordedPoints.length} puntos guardados en el dispositivo`,
           tone: "emerald",
         });
       }
@@ -1264,36 +1272,30 @@ export default function MarineOSHomePage() {
           )}
         </div>
 
-        {/* 1. TOP-LEFT COMPACT PILL + LIVE YANMAR 4JH57 SIGNAL K CAPSULE */}
-        <div className="fixed top-4 left-3 lg:left-20 z-30 flex flex-wrap items-center gap-2 max-w-[calc(100vw-9rem)]">
-          <div className="marine-pill px-3.5 py-2 flex flex-wrap items-center gap-2.5">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#00E676] animate-pulse" />
-              <span className="font-semibold text-xs sm:text-sm tracking-tight truncate max-w-[140px] sm:max-w-none">
+        {/* 1 & 2. RESPONSIVE BRIDGE TOP BAR (PRD 5.4 - Coordenadas 100% visibles en 390px) */}
+        <header className="fixed top-2 sm:top-4 inset-x-2 sm:inset-x-4 lg:left-20 z-30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 pointer-events-none">
+          {/* Top-Left: Vessel + Coordenadas DMS */}
+          <div className="flex flex-wrap items-center gap-1.5 pointer-events-auto">
+            <div className="marine-pill px-3 py-1.5 sm:px-3.5 sm:py-2 flex items-center gap-2 max-w-[calc(100vw-1rem)] sm:max-w-none">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] animate-pulse shrink-0" />
+              <span className="font-semibold text-xs sm:text-sm tracking-tight truncate max-w-[100px] sm:max-w-none">
                 {vessel?.name || "SV Albatros"}
               </span>
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-black">
-                v2.4
+              <span className="opacity-25">|</span>
+              <span
+                data-testid="nautical-dms-coords"
+                className="font-mono text-xs sm:text-sm font-bold text-[var(--color-data)] truncate"
+              >
+                {currentDms.combined}
               </span>
             </div>
 
-            <span className="opacity-25">|</span>
-
-            <span
-              data-testid="nautical-dms-coords"
-              className="font-mono text-xs sm:text-sm font-medium text-[#00E5FF] truncate"
-            >
-              {currentDms.combined}
-            </span>
-
-            <span className="hidden sm:inline opacity-25">|</span>
-
-            <div className="relative inline-flex items-center rounded-full bg-black/40 p-1 border border-white/5">
+            <div className="hidden sm:inline-flex relative items-center rounded-full bg-black/40 p-0.5 sm:p-1 border border-white/5 marine-pill">
               <button
                 type="button"
                 data-testid="gps-mode-simulator-btn"
                 onClick={() => setGpsMode("simulator")}
-                className={`min-h-14 px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "simulator"
+                className={`min-h-[36px] px-2.5 sm:px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "simulator"
                   ? "bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-bold"
                   : "opacity-60 hover:opacity-100"
                   }`}
@@ -1304,169 +1306,166 @@ export default function MarineOSHomePage() {
                 type="button"
                 data-testid="gps-mode-native-btn"
                 onClick={() => setGpsMode("native_gps")}
-                className={`min-h-14 px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "native_gps"
+                className={`min-h-[36px] px-2.5 sm:px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "native_gps"
                   ? "bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-bold"
                   : "opacity-60 hover:opacity-100"
                   }`}
               >
                 GPS REAL
               </button>
-              <ContextualTooltip
-                preferenceKey="tooltip_gps_seen"
-                title="Conmutador GPS Real / Simulador"
-                description="Alterna en vivo entre el GPS Nativo del dispositivo (watchPosition) y el Simulador del Seno de Reloncaví."
-                positionClass="top-full left-0 mt-3"
-              />
+            </div>
+
+            <div
+              data-testid="signalk-engine-pill"
+              className="hidden xl:flex marine-pill px-3.5 py-2 items-center gap-3 font-mono text-xs"
+            >
+              <Activity className="w-3.5 h-3.5 text-[#34D399]" />
+              <span>YANMAR {telemetry.rpm} RPM</span>
+              <span className="opacity-25">•</span>
+              <span>{telemetry.coolant_temp_c.toFixed(1)}°C</span>
+              <span className="opacity-25">•</span>
+              <span>{telemetry.oil_pressure_kpa} kPa</span>
+              <span className="opacity-25">•</span>
+              <span className="text-[var(--color-data)]">
+                {telemetry.alternator_voltage_v.toFixed(1)}V
+              </span>
             </div>
           </div>
 
-          <div
-            data-testid="signalk-engine-pill"
-            className="hidden xl:flex marine-pill px-3.5 py-2 items-center gap-3 font-mono text-xs"
-          >
-            <Activity className="w-3.5 h-3.5 text-[#00E676]" />
-            <span>YANMAR {telemetry.rpm} RPM</span>
-            <span className="opacity-25">•</span>
-            <span>{telemetry.coolant_temp_c.toFixed(1)}°C</span>
-            <span className="opacity-25">•</span>
-            <span>{telemetry.oil_pressure_kpa} kPa</span>
-            <span className="opacity-25">•</span>
-            <span className="text-[#00E5FF]">
-              {telemetry.alternator_voltage_v.toFixed(1)}V
-            </span>
-          </div>
-        </div>
-
-        {/* 2. TOP-RIGHT FLOATING BUTTONS ("⌘K", "Planificador 48h", "Copiloto IA" + "Fondeo & Clima") */}
-        <div className="fixed top-4 right-3 sm:right-4 z-30 flex items-center gap-2">
-          <button
-            type="button"
-            data-testid="vessel-operational-state-pill"
-            onClick={() => {
-              const nextState: VesselOperationalState =
-                vesselOperationalState === "AMARRADO"
-                  ? "FONDEADO"
-                  : vesselOperationalState === "FONDEADO"
-                  ? "NAVEGANDO_MOTOR"
-                  : vesselOperationalState === "NAVEGANDO_MOTOR"
-                  ? "NAVEGANDO_VELA"
-                  : "AMARRADO";
-              setVesselOperationalState(nextState);
-              pushToast({
-                title: `Estado Operacional: ${nextState.replace("_", " ")}`,
-                subtitle: "Máquina de estados actualizada",
-                tone: "cyan",
-              });
-            }}
-            className="marine-pill min-h-14 px-3 sm:px-4 py-2.5 flex items-center gap-2 text-xs font-mono font-bold"
-            title="Alternar estado operacional del barco"
-          >
-            <Ship className="w-3.5 h-3.5 text-[var(--accent-primary)] shrink-0" />
-            <span className="hidden sm:inline">{vesselOperationalState.replace("_", " ")}</span>
-            <span className="sm:hidden">{vesselOperationalState.slice(0, 3)}</span>
-          </button>
-
-          {/* One-Touch Scotopic Night Mode Toggle (PRD 5.1) */}
-          <button
-            type="button"
-            data-testid="bridge-night-mode-toggle-btn"
-            onClick={() => {
-              if (theme === "night-red-shift") {
-                setTheme("midnight-ocean");
+          {/* Top-Right: Quick Actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto self-end sm:self-auto overflow-x-auto max-w-[calc(100vw-1rem)] no-scrollbar py-0.5">
+            {/* Operational Vessel State Pill (PRD R-4.2) */}
+            <button
+              type="button"
+              data-testid="vessel-operational-state-pill"
+              onClick={() => {
+                const nextState: VesselOperationalState =
+                  vesselOperationalState === "AMARRADO"
+                    ? "FONDEADO"
+                    : vesselOperationalState === "FONDEADO"
+                    ? "NAVEGANDO_MOTOR"
+                    : vesselOperationalState === "NAVEGANDO_MOTOR"
+                    ? "NAVEGANDO_VELA"
+                    : "AMARRADO";
+                setVesselOperationalState(nextState);
                 pushToast({
-                  title: "Modo Océano Activado",
-                  subtitle: "Visión normal de puente",
+                  title: `Estado Operacional: ${nextState.replace("_", " ")}`,
+                  subtitle: "Máquina de estados actualizada",
                   tone: "cyan",
                 });
-              } else {
-                setTheme("night-red-shift");
-                pushToast({
-                  title: "Modo Noche (Red-Shift) Activado",
-                  subtitle: "Preservación estricta de visión escotópica",
-                  tone: "coral",
-                });
-              }
-            }}
-            className={`marine-pill min-h-14 px-3 sm:px-3.5 py-2.5 flex items-center gap-1.5 font-mono text-xs font-bold transition ${
-              theme === "night-red-shift"
-                ? "border-red-600 bg-red-950/60 text-red-500"
-                : ""
-            }`}
-            title="Atajo de un toque: Modo Noche (Rojo Escotópico)"
-            aria-label="Alternar modo noche rojo escotópico"
-          >
-            <Eye className="w-4 h-4 text-red-500 shrink-0" />
-            <span className="hidden xl:inline">{theme === "night-red-shift" ? "Noche ON" : "Noche"}</span>
-          </button>
+              }}
+              className="marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-4 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2 text-xs font-mono font-bold"
+              title="Alternar estado operacional del barco"
+            >
+              <Ship className="w-3.5 h-3.5 text-[var(--accent-primary)] shrink-0" />
+              <span className="hidden sm:inline">{vesselOperationalState.replace("_", " ")}</span>
+              <span className="sm:hidden">{vesselOperationalState.slice(0, 3)}</span>
+            </button>
 
-          <button
-            type="button"
-            data-testid="bridge-cmd-k-btn"
-            onClick={openCommandCenter}
-            title="Abrir Command Center (⌘K)"
-            className="marine-pill min-h-14 px-3.5 py-2.5 flex items-center gap-1.5 font-mono text-xs font-bold"
-          >
-            <span className="text-[var(--accent-primary)]">⌘K</span>
-            <span className="hidden lg:inline">Comando</span>
-          </button>
-
-          <button
-            type="button"
-            data-testid="open-passage-planner-btn"
-            onClick={() => {
-              setDrawerTab("routing");
-              setDrawerOpen(true);
-            }}
-            className={`marine-pill min-h-14 px-3.5 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${drawerOpen && drawerTab === "routing"
-              ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
-              : ""
+            {/* One-Touch Scotopic Night Mode Toggle (PRD 5.1) */}
+            <button
+              type="button"
+              data-testid="bridge-night-mode-toggle-btn"
+              onClick={() => {
+                if (theme === "night-red-shift") {
+                  setTheme("midnight-ocean");
+                  pushToast({
+                    title: "Modo Océano Activado",
+                    subtitle: "Visión normal de puente",
+                    tone: "cyan",
+                  });
+                } else {
+                  setTheme("night-red-shift");
+                  pushToast({
+                    title: "Modo Noche (Red-Shift) Activado",
+                    subtitle: "Preservación estricta de visión escotópica",
+                    tone: "coral",
+                  });
+                }
+              }}
+              className={`marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-3.5 py-1.5 sm:py-2.5 flex items-center gap-1.5 font-mono text-xs font-bold transition ${
+                theme === "night-red-shift"
+                  ? "border-red-600 bg-red-950/60 text-red-500"
+                  : ""
               }`}
-          >
-            <Compass className="w-4 h-4 text-[#00E676] shrink-0" />
-            <span className="hidden md:inline">Planificador 48h</span>
-          </button>
+              title="Atajo de un toque: Modo Noche (Rojo Escotópico)"
+              aria-label="Alternar modo noche rojo escotópico"
+            >
+              <Eye className="w-4 h-4 text-red-500 shrink-0" />
+              <span className="hidden xl:inline">{theme === "night-red-shift" ? "Noche ON" : "Noche"}</span>
+            </button>
 
-          <button
-            type="button"
-            data-testid="open-copilot-drawer-btn"
-            onClick={() => {
-              setDrawerTab("copilot");
-              setDrawerOpen(true);
-            }}
-            className={`marine-pill min-h-14 px-4 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${drawerOpen && drawerTab === "copilot"
-              ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
-              : ""
-              }`}
-          >
-            <Sparkles className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
-            <span className="hidden sm:inline">Copiloto IA</span>
-          </button>
+            {/* Desktop Only ⌘K (PRD 5.4) */}
+            <button
+              type="button"
+              data-testid="bridge-cmd-k-btn"
+              onClick={openCommandCenter}
+              title="Abrir Command Center (⌘K)"
+              className="hidden lg:flex marine-pill min-h-14 px-3.5 py-2.5 items-center gap-1.5 font-mono text-xs font-bold"
+            >
+              <span className="text-[var(--accent-primary)]">⌘K</span>
+              <span>Comando</span>
+            </button>
 
-          <button
-            type="button"
-            data-testid="toggle-anchorage-drawer-btn"
-            onClick={() => {
-              if (drawerOpen && drawerTab === "anchorage") {
-                setDrawerOpen(false);
-              } else {
-                setDrawerTab("anchorage");
+            <button
+              type="button"
+              data-testid="open-passage-planner-btn"
+              onClick={() => {
+                setDrawerTab("routing");
                 setDrawerOpen(true);
-              }
-            }}
-            className={`marine-pill min-h-14 px-4 sm:px-5 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${anchorWatch.isDragging
-              ? "bg-[#FF2D55] text-white border-[#FF2D55] animate-pulse"
-              : drawerOpen && drawerTab === "anchorage"
-                ? "border-[var(--accent-primary)]/50 text-[var(--accent-primary)]"
+              }}
+              className={`marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-3.5 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition ${drawerOpen && drawerTab === "routing"
+                ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
                 : ""
-              }`}
-          >
-            <CloudSun className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
-            <span>Fondeo & Clima</span>
-            <span className="hidden sm:inline font-mono text-xs px-2 py-0.5 rounded-full bg-white/10">
-              {liveWeather.windSpeedKn.toFixed(1)} kn • {liveWeather.score}%
-            </span>
-          </button>
-        </div>
+                }`}
+            >
+              <Compass className="w-4 h-4 text-[#34D399] shrink-0" />
+              <span className="hidden md:inline">Planificador 48h</span>
+            </button>
+
+            <button
+              type="button"
+              data-testid="open-copilot-drawer-btn"
+              onClick={() => {
+                setDrawerTab("copilot");
+                setDrawerOpen(true);
+              }}
+              className={`marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-4 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition ${drawerOpen && drawerTab === "copilot"
+                ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
+                : ""
+                }`}
+            >
+              <Sparkles className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
+              <span className="hidden sm:inline">Copiloto IA</span>
+            </button>
+
+            <button
+              type="button"
+              data-testid="toggle-anchorage-drawer-btn"
+              onClick={() => {
+                if (drawerOpen && drawerTab === "anchorage") {
+                  setDrawerOpen(false);
+                } else {
+                  setDrawerTab("anchorage");
+                  setDrawerOpen(true);
+                }
+              }}
+              className={`marine-pill min-h-[44px] sm:min-h-14 px-3 sm:px-5 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition ${anchorWatch.isDragging
+                ? "bg-[#FF2D55] text-white border-[#FF2D55] animate-pulse"
+                : drawerOpen && drawerTab === "anchorage"
+                  ? "border-[var(--accent-primary)]/50 text-[var(--accent-primary)]"
+                  : ""
+                }`}
+            >
+              <CloudSun className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
+              <span className="hidden xs:inline">Fondeo & Clima</span>
+              <span className="xs:hidden">Fondeo</span>
+              <span className="hidden sm:inline font-mono text-xs px-2 py-0.5 rounded-full bg-white/10">
+                {liveWeather.windSpeedKn.toFixed(1)} kn • {liveWeather.score}%
+              </span>
+            </button>
+          </div>
+        </header>
 
         {/* 3. BOTTOM-LEFT MINIMALIST TELEMETRY HUD (4 Clean Numbers: SOG, COG, PROF, VIENTO) */}
         <div className="fixed bottom-20 lg:bottom-6 left-3 right-3 sm:right-auto lg:left-20 z-30">
@@ -2164,7 +2163,7 @@ export default function MarineOSHomePage() {
                     {inventoryItems.length})
                   </h2>
                   <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-white/5 border border-white/5">
-                    IndexedDB Sync
+                    Guardado en el Barco
                   </span>
                 </div>
 
@@ -2372,16 +2371,40 @@ export default function MarineOSHomePage() {
             {/* Middle Body: Captain Metadata + Simulated Official QR Code */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="space-y-3 flex-1">
-                <div>
-                  <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">
-                    TITULAR DEL PASAPORTE NÁUTICO
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">
+                      TITULAR DEL PASAPORTE NÁUTICO
+                    </div>
+                    <div className="text-2xl font-bold tracking-tight text-white mt-0.5">
+                      {activeAccount.name}
+                    </div>
+                    <div className="text-xs opacity-75 font-medium text-slate-300">
+                      {activeAccount.email || "filipo.valverde@gmail.com"} •{" "}
+                      <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
+                    </div>
                   </div>
-                  <div className="text-2xl font-bold tracking-tight text-white mt-0.5">
-                    {activeAccount.name}
-                  </div>
-                  <div className="text-xs opacity-75 font-medium text-slate-300">
-                    {activeAccount.email || "filipo.valverde@gmail.com"} •{" "}
-                    <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      data-testid="edit-passport-profile-btn"
+                      onClick={handleOpenEditProfile}
+                      className="marine-btn marine-btn-secondary min-h-10 text-xs px-3 py-1.5 flex items-center gap-1.5"
+                      title="Editar perfil náutico"
+                    >
+                      <UserCog className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                      <span className="hidden sm:inline">Editar Perfil</span>
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="share-digital-trophy-btn"
+                      onClick={() => setIsSharingPassport(true)}
+                      className="marine-btn marine-btn-primary min-h-10 text-xs px-3 py-1.5 flex items-center gap-1.5"
+                      title="Compartir trofeo digital"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Compartir</span>
+                    </button>
                   </div>
                 </div>
 
@@ -2720,13 +2743,13 @@ export default function MarineOSHomePage() {
                 </h2>
                 <p className="text-xs text-slate-300 opacity-80 leading-relaxed font-normal">
                   Suma automática de tu historial base certificado más todas las
-                  travesías GPS grabadas en IndexedDB.
+                  travesías GPS grabadas en el dispositivo.
                 </p>
               </div>
 
               <div className="p-5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2">
                 <div className="text-[10px] font-bold tracking-[0.15em] uppercase opacity-65 text-slate-300">
-                  TOTAL SEA TIME (INDEXEDDB + TRACKS)
+                  TOTAL TIEMPO DE MAR (HORAS Y MILLAS)
                 </div>
                 <div
                   data-testid="sea-time-total-miles"
@@ -3324,6 +3347,7 @@ export default function MarineOSHomePage() {
             </div>
           )}
         </div>
+      </div>
 
         {/* Profile Edit Modal */}
         {isEditingProfile && (
@@ -3406,62 +3430,49 @@ export default function MarineOSHomePage() {
                       }
                       className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/5"
                     >
-                      <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-4">
-                        <div>
-                          <h3 className="text-xl font-bold flex items-center gap-2">
-                            <UserCog className="w-5 h-5 text-[var(--accent-primary)]" />
-                            <span>Editar Perfil Náutico &amp; Credencial</span>
-                          </h3>
-                          <p className="text-xs font-mono opacity-70 mt-1">
-                            Modifica tus datos de oficial de navegación y credencial náutica en el Pasaporte Digital
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingProfile(false)}
-                          className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-mono uppercase opacity-70">
-                          Nº Documento / RUT
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={profileFormData.documentNumber || ""}
-                          onChange={(e) =>
-                            setProfileFormData({
-                              ...profileFormData,
-                              documentNumber: e.target.value,
-                            })
-                          }
-                          className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
-                          placeholder="12.345.678-9"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-mono uppercase opacity-70">
-                          Nacionalidad
-                        </label>
-                        <input
-                          type="text"
-                          value={profileFormData.nationality || "Chilena"}
-                          onChange={(e) =>
-                            setProfileFormData({
-                              ...profileFormData,
-                              nationality: e.target.value,
-                            })
-                          }
-                          className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
-                          placeholder="Chilena"
-                        />
-                      </div>
+                      <option value="RUT">RUT (Chile)</option>
+                      <option value="PASSPORT">Pasaporte</option>
+                      <option value="DNI">DNI Extranjero</option>
+                    </select>
                   </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-mono uppercase opacity-70">
+                      Nº Documento / RUT
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={profileFormData.documentNumber || ""}
+                      onChange={(e) =>
+                        setProfileFormData({
+                          ...profileFormData,
+                          documentNumber: e.target.value,
+                        })
+                      }
+                      className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
+                      placeholder="12.345.678-9"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-mono uppercase opacity-70">
+                      Nacionalidad
+                    </label>
+                    <input
+                      type="text"
+                      value={profileFormData.nationality || "Chilena"}
+                      onChange={(e) =>
+                        setProfileFormData({
+                          ...profileFormData,
+                          nationality: e.target.value,
+                        })
+                      }
+                      className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
+                      placeholder="Chilena"
+                    />
+                  </div>
+                </div>
 
                   <div className="space-y-1">
                     <label className="text-xs font-mono uppercase opacity-70">
@@ -3660,46 +3671,6 @@ export default function MarineOSHomePage() {
                   </div>
                 </div>
 
-                {/* Top Badge */}
-                <div className="flex justify-center">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 uppercase">
-                    BITÁCORA OFICIAL CERTIFICADA
-                  </span>
-                </div>
-
-                {/* Captain Avatar & Name */}
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="w-20 h-20 rounded-full border-2 border-[var(--accent-primary)]/60 p-1">
-                    <div className="w-full h-full rounded-full bg-[#040B16] flex items-center justify-center font-bold text-2xl text-white font-mono">
-                      {activeAccount.name.slice(0, 2).toUpperCase()}
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold tracking-tight text-white">
-                      {activeAccount.name}
-                    </h4>
-                    <div className="text-xs font-mono text-[var(--accent-primary)] mt-0.5">
-                      {activeAccount.licenseType}
-                    </div>
-                    <div className="text-[11px] font-mono opacity-60">
-                      Reg. {activeAccount.licenseNumber} • {activeAccount.documentType} {activeAccount.documentNumber}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Big Sea Time Counter */}
-                <div className="py-3 px-4 rounded-xl bg-white/[0.04] border border-white/5 space-y-1">
-                  <div className="text-[10px] font-mono uppercase tracking-widest opacity-60">
-                    TOTAL SEA TIME ACUMULADO
-                  </div>
-                  <div className="text-3xl font-extrabold font-mono text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[var(--accent-primary)]">
-                    {totalSeaTimeMilesNm.toFixed(1)} MN
-                  </div>
-                  <div className="text-[11px] font-mono opacity-70">
-                    Embarcación habitual: SV Albatros (14.2m LOA)
-                  </div>
-                </div>
-
                 {/* Achievement Badges Trophy Showcase */}
                 <div className="space-y-2 text-left">
                   <div className="text-[10px] font-mono uppercase tracking-widest opacity-60 text-center">
@@ -3743,70 +3714,38 @@ export default function MarineOSHomePage() {
                   <span>HASH: SHA256-e8f491c2</span>
                 </div>
               </div>
-            </div>
-            <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
-              <span className="text-base">⚓</span>
-              <div>
-                <div className="font-bold text-white text-[10px]">Veterano Chiloé</div>
-                <div className="text-[9px] opacity-60">1500+ MN Navegadas</div>
-              </div>
-            </div>
-            <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
-              <span className="text-base">🛡️</span>
-              <div>
-                <div className="font-bold text-white text-[10px]">Fondeo Seguro</div>
-                <div className="text-[9px] opacity-60">10 Noches Sin Garreo</div>
-              </div>
-            </div>
-            <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
-              <span className="text-base">🇨🇱</span>
-              <div>
-                <div className="font-bold text-white text-[10px]">DIRECTEMAR</div>
-                <div className="text-[9px] opacity-60">Firma Criptográfica</div>
+
+              {/* Action Buttons */}
+              <div className="space-y-2 pt-2">
+                <button
+                  type="button"
+                  data-testid="copy-trophy-text-btn"
+                  onClick={handleCopyTrophyText}
+                  className="w-full marine-btn marine-btn-primary min-h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-none"
+                >
+                  {copiedShareLink ? (
+                    <>
+                      <Check className="w-4 h-4 text-black" />
+                      <span>¡Copiado para Instagram / WhatsApp!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      <span>Copiar Trofeo para Compartir</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSharingPassport(false)}
+                  className="w-full marine-btn marine-btn-secondary min-h-11 text-xs"
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>
-              </div>
-
-      {/* Cryptographic Seal */}
-      <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[9px] font-mono opacity-60">
-        <span>MARINOS DECENTRALIZED LEDGER</span>
-        <span>HASH: SHA256-e8f491c2</span>
-      </div>
-    </div >
-
-      {/* Action Buttons */ }
-      < div className = "space-y-2 pt-2" >
-              <button
-                type="button"
-                data-testid="copy-trophy-text-btn"
-                onClick={handleCopyTrophyText}
-                className="w-full marine-btn marine-btn-primary min-h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-none"
-              >
-                {copiedShareLink ? (
-                  <>
-                    <Check className="w-4 h-4 text-black" />
-                    <span>¡Copiado para Instagram / WhatsApp!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    <span>Copiar Trofeo para Compartir</span>
-                  </>
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsSharingPassport(false)}
-                className="w-full marine-btn marine-btn-secondary min-h-11 text-xs"
-              >
-                Cerrar
-              </button>
-            </div >
-          </div >
-        </div >
-      )
-}
+        )}
     </>
   );
 }

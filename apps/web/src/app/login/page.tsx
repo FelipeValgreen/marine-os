@@ -129,9 +129,9 @@ export default function MarineOSLoginPage() {
           </h1>
           <p className="text-xs sm:text-sm opacity-75 leading-relaxed">
             Sincroniza tu{" "}
-            <strong>Pasaporte Náutico DIRECTEMAR</strong>, bitácora por voz (
-            <em>Sea Time Log</em>) y el gemelo digital del{" "}
-            <strong>SV Albatros (CB-4582)</strong> en IndexedDB.
+            <strong>Perfil Náutico</strong>, bitácora de navegación (
+            <em>Sea Time Log</em>) y los sistemas del{" "}
+            <strong>SV Albatros (CB-4582)</strong> en tu dispositivo.
           </p>
         </div>
 
@@ -139,11 +139,11 @@ export default function MarineOSLoginPage() {
         <div className="space-y-2.5 font-mono text-xs">
           <div className="p-3.5 rounded-xl bg-white/[0.03] border border-[var(--border-subtle)] flex items-center gap-3">
             <Compass className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
-            <span>Cartografía OpenSeaMap 100vw/100vh + HUD Táctico</span>
+            <span>Cartografía Náutica + HUD Táctico</span>
           </div>
           <div className="p-3.5 rounded-xl bg-white/[0.03] border border-[var(--border-subtle)] flex items-center gap-3">
             <ShieldCheck className="w-4 h-4 text-[var(--status-ok)] shrink-0" />
-            <span>E-Zarpe DIRECTEMAR + Sello Criptográfico SHA-256</span>
+            <span>Zarpe Electrónico + Sello Criptográfico SHA-256</span>
           </div>
           <div className="p-3.5 rounded-xl bg-white/[0.03] border border-[var(--border-subtle)] flex items-center gap-3">
             <Sparkles className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
@@ -176,7 +176,7 @@ export default function MarineOSLoginPage() {
             </svg>
             <span>
               {signingIn
-                ? "Sincronizando con Supabase & IndexedDB..."
+                ? "Iniciando sesión..."
                 : "Continuar con Google"}
             </span>
           </button>
@@ -197,7 +197,7 @@ export default function MarineOSLoginPage() {
         <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] font-mono opacity-65">
           <span className="flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-[var(--status-ok)]" />
-            Supabase OAuth + Dexie IndexedDB
+            Almacenamiento Local Seguro
           </span>
           <span>41° 28.3&apos; S • Reloncaví</span>
         </div>

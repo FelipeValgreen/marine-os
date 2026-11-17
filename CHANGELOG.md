@@ -4,6 +4,36 @@ Todas las modificaciones notables de este proyecto están documentadas en este a
 
 ---
 
+## [Fase 3 — Experiencia Móvil y Navegación] - 2026-11-16
+Rama: `fase-3-mobile`
+
+### Añadido / Mejorado (Navegación Móvil Ergonómica y Glosario Náutico Chileno)
+- **Barra de Navegación Inferior de 5 Ítems (PRD 5.4 / R-5.4):**
+  - Reemplazada la barra horizontal con scroll por una barra fija de 5 ítems: **Puente**, **Barco**, **Viajes**, **Flota**, **Más**.
+  - El botón "Más" despliega una lámina táctil (Slide-up Sheet) accesible con una sola mano que agrupa los módulos secundarios: **Averías y emergencias**, **Tripulación**, **Bitácora y Pasaporte**, **Vigía de fondeo**, **Entrega y recepción (Handover)** y **Aprende**.
+- **Barra Superior de Puente Responsiva a 390px (PRD 5.4 / R-5.4):**
+  - Reestructurado el header superior de navegación en flexbox responsivo con envoltura dinámica.
+  - Las coordenadas DMS completas (`41°31'12"S 72°58'48"W`) nunca se superponen con botones o selectores en pantallas móviles de 390px.
+- **Targets Táctiles $\ge 48 \times 48$ px para Uso con Guantes (PRD 5.5 / R-5.5):**
+  - Ajustados todos los controles primarios, botones de alternancia de estado y disparadores a altura mínima `min-h-[44px]` a `min-h-[48px]`.
+  - Botón de SOS flotante y botones de navegación rápida con áreas de toque holgadas y accesibles.
+- **Eliminación Total de Jerga Técnica y Falsas Métricas (PRD 1.3 / R-1.3):**
+  - Reemplazados tecnicismos en notificaciones y UI: eliminados `"IndexedDB"`, `"sync_queue"`, `"Edge-Sync"`, `"Zero Data Entry"`, `"Multimodal RAG"`.
+  - Reemplazados por terminología clara: `"Base de datos local"`, `"Guardado en este dispositivo"`, `"Pendiente de envío"`, `"Asistente de a bordo"`.
+- **Glosario Náutico Chileno Unificado (PRD 1.3):**
+  - Bridge $\to$ **Puente**
+  - Vessel $\to$ **Barco**
+  - Voyages $\to$ **Viajes**
+  - Fleet $\to$ **Flota**
+  - Crew $\to$ **Tripulación**
+  - Handover $\to$ **Entrega y recepción**
+  - Damage Control $\to$ **Averías y emergencias**
+  - Anchor Watch Pro $\to$ **Vigía de fondeo**
+  - Marine Academy $\to$ **Aprende**
+  - Copilot $\to$ **Copiloto Marino**
+
+---
+
 ## [Fase 2 — Sistema de Diseño Marino] - 2026-11-16
 Rama: `fase-2-diseno`
 

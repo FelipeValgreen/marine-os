@@ -45,21 +45,21 @@ const MICRO_LESSONS: MicroLesson[] = [
   },
   {
     id: "lesson-offline-first",
-    title: "Cómo funciona el modo Offline (IndexedDB + sync_queue)",
+    title: "Cómo funciona el modo Sin Conexión (Guardado Local a Bordo)",
     duration: "0:50s",
     category: "Arquitectura Local-First",
     summary:
       "Navega en canales patagónicos sin señal celular manteniendo 100% operativos los check-ins, bitácora y cartas.",
     steps: [
-      "1. Toda escritura se guarda primero en IndexedDB mediante Dexie.js.",
-      "2. Las mutaciones quedan encoladas en 'sync_queue' y las cartas se sirven desde el Service Worker Cache-First.",
-      "3. Al recuperar conexión en puerto, Edge-Sync reconcilia automáticamente los datos con Supabase y FastAPI.",
+      "1. Toda acción se guarda primero en la memoria del dispositivo.",
+      "2. Las operaciones pendientes quedan registradas localmente y las cartas náuticas se sirven desde la memoria de a bordo.",
+      "3. Al recuperar señal en puerto o marina, el sistema sincroniza automáticamente los datos.",
     ],
     icon: WifiOff,
   },
   {
     id: "lesson-anchor-watch",
-    title: "Cómo configurar el Anchor Watch Pro y la sirena de garreo",
+    title: "Cómo configurar el Vigía de fondeo y la sirena de garreo",
     duration: "0:40s",
     category: "Seguridad en Fondeo",
     summary:
@@ -102,7 +102,7 @@ export function MarineAcademy({
     "¿Cómo agrego un gasto con OCR y cómo se divide entre la tripulación?"
   );
   const [supportAnswer, setSupportAnswer] = useState<string>(
-    "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINOS?\n1. Ve a la sección 'Pasaporte Náutico & Bitácora' (ícono de libro en el rail izquierdo).\n2. En la tarjeta 'Gastos de Travesía & OCR Boletas', pulsa 'OCR Boleta Diésel' o 'OCR Víveres'.\n3. El sistema extrae automáticamente el monto en CLP/USD, número de boleta y divide el total equitativamente entre los tripulantes inscritos, guardándolo primero en IndexedDB."
+    "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINOS?\n1. Ve a la sección 'Pasaporte Náutico & Bitácora' (ícono de libro en el rail izquierdo).\n2. En la tarjeta 'Gastos de Travesía & OCR Boletas', pulsa 'OCR Boleta Diésel' o 'OCR Víveres'.\n3. El sistema extrae automáticamente el monto en CLP/USD, número de boleta y divide el total equitativamente entre los tripulantes inscritos, guardándolo primero en el dispositivo."
   );
   const [supportLoading, setSupportLoading] = useState<boolean>(false);
 
@@ -166,15 +166,15 @@ export function MarineAcademy({
       );
     } else if (q.includes("offline") || q.includes("internet")) {
       setSupportAnswer(
-        "¿CÓMO FUNCIONA EL MODO OFFLINE EN ALTA MAR?\n1. Toda operación se guarda primero en IndexedDB (Dexie.js).\n2. Cada cambio se encola en sync_queue y el Service Worker mantiene las cartas en caché.\n3. Al recuperar señal, sincroniza automáticamente con FastAPI."
+        "¿CÓMO FUNCIONA EL MODO SIN CONEXIÓN EN ALTA MAR?\n1. Toda operación se guarda primero en la memoria del teléfono.\n2. Cada cambio queda registrado y la memoria de a bordo mantiene las cartas en caché.\n3. Al recuperar señal, sincroniza automáticamente."
       );
     } else if (q.includes("zarpe") || q.includes("pdf")) {
       setSupportAnswer(
-        "¿CÓMO GENERAR EL ZARPE OFICIAL?\n1. Entra a Voyages & Zarpe en el rail lateral.\n2. Escanea los documentos con OCR y pulsa 'Descargar PDF de Zarpe Oficial'."
+        "¿CÓMO GENERAR EL ZARPE OFICIAL?\n1. Entra a Viajes y Zarpes en el menú lateral.\n2. Escanea los documentos con OCR y pulsa 'Descargar PDF de Zarpe Oficial'."
       );
     } else {
       setSupportAnswer(
-        "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINOS?\n1. Ve a 'Pasaporte Náutico & Bitácora'.\n2. En 'Gastos de Travesía & OCR Boletas', pulsa 'OCR Boleta Diésel' o 'OCR Víveres'.\n3. El gasto se guarda en IndexedDB y se divide entre toda la tripulación."
+        "¿CÓMO AGREGAR UN GASTO CON OCR EN MARINOS?\n1. Ve a 'Pasaporte Náutico & Bitácora'.\n2. En 'Gastos de Travesía & OCR Boletas', pulsa 'OCR Boleta Diésel' o 'OCR Víveres'.\n3. El gasto se guarda en el dispositivo y se divide entre toda la tripulación."
       );
     }
     setSupportLoading(false);

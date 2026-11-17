@@ -336,7 +336,7 @@ export function HandoverWizard({
     setSavedNotice(
       `Acta ${inspectionType.toUpperCase()} sellada por ${
         activeAccount.name
-      } en IndexedDB + sync_queue.`
+      } en el dispositivo (pendiente de sincronizar).`
     );
     setWizardStep(4);
     pushToast({
@@ -370,7 +370,7 @@ export function HandoverWizard({
             <p className="text-xs font-mono opacity-75 mt-1">
               Inspector: {activeAccount.name} • Horómetro:{" "}
               {vessel?.engine_hours_current || 1420.5} hrs •{" "}
-              {isOffline ? "MODO OFFLINE (IndexedDB)" : "ONLINE EDGE-SYNC"}
+              {isOffline ? "MODO SIN CONEXIÓN" : "SINCRONIZACIÓN ACTIVA"}
             </p>
           </div>
 
@@ -611,7 +611,7 @@ export function HandoverWizard({
             >
               <ShieldCheck className="w-5 h-5 shrink-0" />
               <span>
-                Sellar Acta {inspectionType.toUpperCase()} con SHA-256 (IndexedDB)
+                Sellar Acta {inspectionType.toUpperCase()} con SHA-256 (Local)
               </span>
             </button>
           </div>
@@ -622,7 +622,7 @@ export function HandoverWizard({
         <h3 className="text-sm font-semibold flex items-center gap-2">
           <WifiOff className="w-4 h-4 text-[var(--accent-primary)]" />
           <span>
-            Historial de Actas Criptográficas en IndexedDB ({pastInspections.length})
+            Historial de Actas en el Dispositivo ({pastInspections.length})
           </span>
         </h3>
         {pastInspections.length === 0 ? (

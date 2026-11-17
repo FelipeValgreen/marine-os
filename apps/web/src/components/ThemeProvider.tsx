@@ -30,6 +30,8 @@ import {
   Users,
   Sliders,
   Anchor,
+  MoreHorizontal,
+  X,
 } from "lucide-react";
 import {
   db,
@@ -123,64 +125,64 @@ const NAV_ITEMS: {
 }[] = [
     {
       id: "bridge",
-      label: "Bridge • Carta & HUD",
-      shortLabel: "Bridge",
+      label: "Puente • Carta y HUD",
+      shortLabel: "Puente",
       shortcut: "⌘1",
       icon: Compass,
     },
     {
       id: "vessel",
-      label: "Vessel • Gemelo & Averías",
-      shortLabel: "Vessel",
+      label: "Barco • Sistemas y Averías",
+      shortLabel: "Barco",
       shortcut: "⌘2",
       icon: Ship,
     },
     {
       id: "voyages",
-      label: "Voyages • E-Zarpe OCR",
-      shortLabel: "Zarpe",
+      label: "Viajes • Zarpes y Rutas",
+      shortLabel: "Viajes",
       shortcut: "⌘3",
       icon: FileCheck2,
     },
     {
       id: "fleet",
-      label: "Fleet • Gestor de Flota",
+      label: "Flota • Gestión de Embarcaciones",
       shortLabel: "Flota",
       shortcut: "⌘4",
       icon: Anchor,
     },
     {
       id: "crew",
-      label: "Crew • Libreta Tripulación",
-      shortLabel: "Tripulantes",
+      label: "Tripulación • Rol y Guardia",
+      shortLabel: "Tripulación",
       shortcut: "⌘5",
       icon: Users,
     },
     {
       id: "logbook",
-      label: "Pasaporte & Bitácora Voz",
-      shortLabel: "Passport",
+      label: "Pasaporte y Bitácora",
+      shortLabel: "Pasaporte",
       shortcut: "⌘6",
       icon: BookOpen,
     },
     {
       id: "integrations",
-      label: "Integraciones • NMEA & Sat",
-      shortLabel: "Hub",
+      label: "Integraciones • NMEA y Satelital",
+      shortLabel: "Integraciones",
       shortcut: "⌘7",
       icon: Sliders,
     },
     {
       id: "handover",
-      label: "Handover • Sello SHA-256",
-      shortLabel: "Handover",
+      label: "Entrega y recepción • Sello SHA-256",
+      shortLabel: "Entrega",
       shortcut: "⌘8",
       icon: ShieldCheck,
     },
     {
       id: "academy",
-      label: "Marine Academy 🛟",
-      shortLabel: "Academy",
+      label: "Aprende • Seguridad Marítima",
+      shortLabel: "Aprende",
       shortcut: "⌘9",
       icon: LifeBuoy,
     },
@@ -208,6 +210,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [browserOffline, setBrowserOffline] = useState<boolean>(false);
   const [isSeeded, setIsSeeded] = useState<boolean>(false);
   const [forceSeaTrials, setForceSeaTrials] = useState<boolean>(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState<boolean>(false);
   const [sosModalOpen, setSosModalOpen] = useState<boolean>(false);
   const [sosHoldProgress, setSosHoldProgress] = useState<number>(0);
   const [sosHoldHintVisible, setSosHoldHintVisible] = useState<boolean>(false);
@@ -410,7 +413,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(true);
     pushToast({
       title: `Bienvenido a bordo, ${profile.name}`,
-      subtitle: "Pasaporte Náutico sincronizado desde Supabase a IndexedDB",
+      subtitle: "Perfil náutico guardado en el dispositivo",
       tone: "emerald",
     });
     router.push("/");
@@ -425,7 +428,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(true);
     pushToast({
       title: "Modo Invitado Offline Activo",
-      subtitle: "Operando 100% en IndexedDB local",
+      subtitle: "Operando 100% en modo local a bordo",
       tone: "cyan",
     });
     router.push("/");
@@ -462,7 +465,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setActiveAccount(updated);
     pushToast({
       title: "Pasaporte Náutico Actualizado",
-      subtitle: "Guardado en IndexedDB y encolado en sync_queue",
+      subtitle: "Guardado en el teléfono y pendiente de sincronizar",
       tone: "emerald",
     });
   };
@@ -586,8 +589,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const count = await flushSyncQueue();
     if (count > 0) {
       pushToast({
-        title: `Edge-Sync Completado (${count} registros)`,
-        subtitle: "Cola IndexedDB sincronizada con FastAPI",
+        title: `Sincronización Completada (${count} registros)`,
+        subtitle: "Datos guardados sincronizados con el servidor",
         tone: "emerald",
       });
     }
@@ -835,10 +838,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                     setSimulatedOffline(next);
                     pushToast({
                       title: next
-                        ? "Modo Offline Activado (IndexedDB)"
-                        : "Modo Online (Edge-Sync Activo)",
+                        ? "Modo Sin Conexión Activado"
+                        : "Modo Conectado (Sincronización Activa)",
                       subtitle: next
-                        ? "Operaciones encoladas localmente en sync_queue"
+                        ? "Operaciones guardadas en el teléfono para sincronizar"
                         : "Conectado a Supabase, FastAPI & Open-Meteo",
                       tone: next ? "amber" : "emerald",
                     });
@@ -1037,40 +1040,157 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         )}
 
         {/* ===================================================================
-            PERSISTENT TRANSLUCENT MOBILE BOTTOM TAB BAR (backdrop-blur-2xl bg-black/80)
+            MOBILE "MÁS" MENU SHEET (PRD 5.4)
+        =================================================================== */}
+        {mobileMoreOpen && (
+          <div
+            className="lg:hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-md flex flex-col justify-end"
+            onClick={() => setMobileMoreOpen(false)}
+          >
+            <div
+              className={`p-5 rounded-t-3xl border-t space-y-4 max-h-[80vh] overflow-y-auto ${
+                isNight
+                  ? "bg-black border-[#FF0000]/50 text-[#FF0000]"
+                  : isDaylight
+                  ? "bg-[#F0F4F8] border-slate-300 text-[#0A192F]"
+                  : "bg-[#060b14] border-white/10 text-slate-100"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between pb-2 border-b border-white/5">
+                <div className="font-bold text-sm tracking-wide uppercase opacity-75">
+                  Más Módulos y Ajustes
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileMoreOpen(false)}
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                {[
+                  { id: "crew", label: "Tripulación", icon: Users, desc: "Rol y guardia" },
+                  { id: "logbook", label: "Pasaporte", icon: BookOpen, desc: "Bitácora de a bordo" },
+                  { id: "integrations", label: "Integraciones", icon: Sliders, desc: "NMEA y satelital" },
+                  { id: "handover", label: "Entrega", icon: ShieldCheck, desc: "Acta y sello SHA-256" },
+                  { id: "academy", label: "Aprende", icon: LifeBuoy, desc: "Seguridad marítima" },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isCurrent = activeSection === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      data-testid={`mobile-more-${item.id}`}
+                      onClick={() => {
+                        setActiveSection(item.id as MarineSection);
+                        setMobileMoreOpen(false);
+                      }}
+                      className={`min-h-[56px] p-3 rounded-2xl border text-left flex items-center gap-3 transition ${
+                        isCurrent
+                          ? "bg-[var(--accent-primary)]/20 border-[var(--accent-primary)] text-[var(--accent-primary)]"
+                          : "bg-white/[0.04] border-white/5 hover:bg-white/[0.08]"
+                      }`}
+                    >
+                      <Icon className="w-5 h-5 shrink-0 text-[var(--accent-primary)]" />
+                      <div>
+                        <div className="text-xs font-bold">{item.label}</div>
+                        <div className="text-[10px] opacity-60">{item.desc}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Quick Action: Toggle Scotopic Night Mode */}
+              <button
+                type="button"
+                onClick={() => {
+                  toggleTheme();
+                  setMobileMoreOpen(false);
+                }}
+                className="w-full min-h-[52px] rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center gap-2 text-xs font-bold"
+              >
+                <Eye className="w-4 h-4 text-red-500" />
+                <span>Cambiar Tema (Día / Noche / Sol)</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ===================================================================
+            PERSISTENT TRANSLUCENT MOBILE BOTTOM TAB BAR (5 ITEMS - PRD 5.4)
         =================================================================== */}
         {!isLoginRoute && (
           <nav
-            aria-label="Mobile Bottom Navigation"
-            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t flex items-center overflow-x-auto no-scrollbar px-1 py-0.5 justify-start sm:justify-center gap-1 ${isNight
-              ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
-              : isDaylight
+            aria-label="Navegación móvil"
+            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t flex items-center justify-around px-1 py-1 ${
+              isNight
+                ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
+                : isDaylight
                 ? "bg-[#F0F4F8]/95 backdrop-blur-2xl border-slate-300 text-[#0A192F]"
-                : "backdrop-blur-2xl bg-black/90 border-white/5 text-slate-200"
-              }`}
+                : "backdrop-blur-2xl bg-[#060b14]/95 border-white/5 text-slate-200"
+            }`}
           >
-            {NAV_ITEMS.map((item) => {
+            {[
+              { id: "bridge" as MarineSection, shortLabel: "Puente", icon: Compass },
+              { id: "vessel" as MarineSection, shortLabel: "Barco", icon: Ship },
+              { id: "voyages" as MarineSection, shortLabel: "Viajes", icon: FileCheck2 },
+              { id: "fleet" as MarineSection, shortLabel: "Flota", icon: Anchor },
+            ].map((item) => {
               const Icon = item.icon;
               const isCurrent = pathname === "/" && activeSection === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setActiveSection(item.id)}
-                  className={`min-h-[60px] min-w-[62px] px-2 flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold shrink-0 transition rounded-xl ${isCurrent
-                    ? isNight
-                      ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
-                      : isDaylight
+                  data-testid={`mobile-nav-${item.id}`}
+                  onClick={() => {
+                    setActiveSection(item.id);
+                    setMobileMoreOpen(false);
+                  }}
+                  className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
+                    isCurrent
+                      ? isNight
+                        ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
+                        : isDaylight
                         ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
                         : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
-                    : "text-slate-400 opacity-60 hover:opacity-100"
-                    }`}
+                      : "text-slate-400 opacity-70 hover:opacity-100"
+                  }`}
                 >
-                  <Icon className="w-4 h-4" />
-                  <span className="truncate max-w-[64px]">{item.shortLabel}</span>
+                  <Icon className="w-5 h-5" />
+                  <span className="truncate">{item.shortLabel}</span>
                 </button>
               );
             })}
+
+            {/* 5th Item: Más */}
+            {(() => {
+              const isMoreActive = ["crew", "logbook", "integrations", "handover", "academy"].includes(activeSection);
+              return (
+                <button
+                  type="button"
+                  data-testid="mobile-nav-more"
+                  onClick={() => setMobileMoreOpen((prev) => !prev)}
+                  className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
+                    isMoreActive || mobileMoreOpen
+                      ? isNight
+                        ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
+                        : isDaylight
+                        ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
+                        : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
+                      : "text-slate-400 opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <MoreHorizontal className="w-5 h-5" />
+                  <span className="truncate">Más</span>
+                </button>
+              );
+            })()}
           </nav>
         )}
       </div>

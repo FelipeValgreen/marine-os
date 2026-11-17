@@ -297,7 +297,7 @@ export function MarineCopilot({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base sm:text-lg font-semibold flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-[var(--accent-primary)]" />
-            <span>Marine Copilot AI — Contextual & Multimodal RAG</span>
+            <span>Copiloto Marino — Asistente de a Bordo</span>
           </h2>
           <span className="font-mono text-[10px] uppercase px-2.5 py-1 rounded-full bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-semibold">
             Contexto Barco Inyectado

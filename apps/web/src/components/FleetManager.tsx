@@ -226,7 +226,7 @@ export function FleetManager() {
 
     pushToast({
       title: isNew ? "Barco Creado" : "Barco Actualizado",
-      subtitle: `${record.name} (${record.registration_number}) guardado en IndexedDB`,
+      subtitle: `${record.name} (${record.registration_number}) guardado en el dispositivo`,
       tone: "emerald",
     });
 
@@ -261,7 +261,7 @@ export function FleetManager() {
 
     pushToast({
       title: "Barco Eliminado",
-      subtitle: "Registro eliminado de IndexedDB",
+      subtitle: "Registro eliminado del dispositivo",
       tone: "amber",
     });
     setDeleteConfirmId(null);
@@ -613,7 +613,7 @@ export function FleetManager() {
                     className="marine-btn marine-btn-primary text-xs sm:text-sm px-6 font-bold tracking-tight shadow-xl"
                   >
                     <Save className="w-4 h-4" />
-                    <span>Guardar Barco en IndexedDB</span>
+                    <span>Guardar Barco en el Dispositivo</span>
                   </button>
                 </div>
               </form>
@@ -707,7 +707,7 @@ export function FleetManager() {
                       <span>¿Confirmar eliminación de {v.name}?</span>
                     </div>
                     <p className="text-[11px] opacity-85 leading-relaxed">
-                      Esta acción eliminará la nave de IndexedDB. Se recomienda mantener al menos una embarcación en la flota.
+                      Esta acción eliminará la nave del dispositivo local. Se recomienda mantener al menos una embarcación en la flota.
                     </p>
                     <div className="flex items-center gap-2 pt-1">
                       <button

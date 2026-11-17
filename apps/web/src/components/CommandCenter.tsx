@@ -112,7 +112,7 @@ export function CommandCenter({
     triggerHapticFeedback([15, 30, 15]);
     pushToast({
       title: `Gasto Registrado: ${record.title}`,
-      subtitle: `USD $${usd} ($${clp.toLocaleString("es-CL")} CLP) en IndexedDB`,
+      subtitle: `USD $${usd} ($${clp.toLocaleString("es-CL")} CLP) guardado en el teléfono`,
       tone: "emerald",
     });
     onNavigateSection("logbook");
@@ -174,7 +174,7 @@ export function CommandCenter({
       {
         id: "cmd-expense",
         title: "Registrar gasto de travesía (1-Toque / Inline)",
-        subtitle: "Añadir combustible, víveres o recalada directamente en IndexedDB",
+        subtitle: "Añadir combustible, víveres o recalada en el dispositivo",
         category: "ACCIONES DIRECTAS",
         keywords: "registrar gasto boleta diesel viveres factura dinero usd clp",
         shortcut: "C E",
@@ -185,10 +185,10 @@ export function CommandCenter({
       },
       {
         id: "cmd-damage",
-        title: "Diagnóstico de Averías & Damage Control",
-        subtitle: "Árbol de decisión: Pérdida de RPM, Vía de Agua y Sourcing",
+        title: "Diagnóstico de Averías y Emergencias",
+        subtitle: "Árbol de decisión: Pérdida de RPM, Vía de Agua y Repuestos",
         category: "NAVEGACIÓN",
-        keywords: "damage control falla motor perdida rpm via de agua sentina",
+        keywords: "averias emergencias falla motor perdida rpm via de agua sentina",
         shortcut: "G D",
         icon: Wrench,
         action: () => {
@@ -198,10 +198,10 @@ export function CommandCenter({
       },
       {
         id: "cmd-bridge",
-        title: "Ir a Bridge (Carta Náutica Full-Screen & HUD)",
-        subtitle: "Mapa OpenSeaMap 100vw/100vh, Anchor Watch Pro y Clima Open-Meteo",
+        title: "Ir a Puente (Carta Náutica y HUD)",
+        subtitle: "Carta náutica, Vigía de fondeo y Clima",
         category: "NAVEGACIÓN",
-        keywords: "bridge mapa carta gps fondeo clima radar hud",
+        keywords: "puente carta mapa gps fondeo clima radar hud",
         shortcut: "G B",
         icon: Compass,
         action: () => {
@@ -211,8 +211,8 @@ export function CommandCenter({
       },
       {
         id: "cmd-voice-log",
-        title: "Registrar entrada en Bitácora por Voz (Zero Data Entry)",
-        subtitle: "Captura audio + GPS + horómetro actual en logbook_entries",
+        title: "Registrar entrada en Bitácora por Voz (Manos libres)",
+        subtitle: "Captura audio + GPS + horómetro en bitácora de a bordo",
         category: "ACCIONES DIRECTAS",
         keywords: "bitacora voz microfono dictar logbook guardia",
         shortcut: "V L",
@@ -221,10 +221,10 @@ export function CommandCenter({
       },
       {
         id: "cmd-zarpe",
-        title: "Ir a Voyages & Transmitir E-Zarpe DIRECTEMAR",
-        subtitle: "Escáner OCR de tripulación, PDF oficial y Token QR de Zarpe",
+        title: "Ir a Viajes y Zarpes",
+        subtitle: "Escáner OCR de tripulación y borrador de zarpe",
         category: "NAVEGACIÓN",
-        keywords: "zarpe directemar voyages tripulacion ocr pdf qr",
+        keywords: "zarpe viajes tripulacion ocr pdf qr",
         shortcut: "G Z",
         icon: FileCheck2,
         action: () => {
@@ -513,7 +513,7 @@ export function CommandCenter({
                   className="w-full min-h-[64px] marine-btn marine-btn-primary text-sm font-bold tracking-tight"
                 >
                   <PlusCircle className="w-5 h-5" />
-                  <span>Guardar Gasto en Bitácora Local-First (IndexedDB)</span>
+                  <span>Guardar Gasto en Bitácora (En el dispositivo)</span>
                 </button>
               </form>
             ) : (
@@ -577,7 +577,7 @@ export function CommandCenter({
             {/* Footer Hint Bar */}
             <div className="px-4 py-2.5 border-t border-white/5 flex flex-wrap items-center justify-between gap-2 text-[11px] opacity-70">
               <span className="font-normal">
-                ↑↓ Navegar • ↵ Ejecutar • ESC Cerrar • Local-First IndexedDB
+                ↑↓ Navegar • ↵ Ejecutar • ESC Cerrar • Guardado local a bordo
               </span>
               <span className="font-mono text-[10px] tracking-wider uppercase">MARINOS COMMAND CENTER (⌘K)</span>
             </div>

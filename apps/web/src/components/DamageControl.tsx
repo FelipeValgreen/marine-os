@@ -248,7 +248,7 @@ export function DamageControl() {
 
     pushToast({
       title: `Orden de Repuesto Creada en ${destinationPort}`,
-      subtitle: `${newOrder.part_name} (USD $${newOrder.estimated_price_usd}) encolada en sync_queue`,
+      subtitle: `${newOrder.part_name} (USD $${newOrder.estimated_price_usd}) pendiente de sincronizar`,
       tone: "emerald",
     });
   };
@@ -324,7 +324,7 @@ export function DamageControl() {
                 </div>
                 <p className="text-xs font-mono opacity-85">
                   Registra el incidente en la Bitácora de Voz para actualizar el
-                  historial del motor en IndexedDB.
+                  historial del motor en el dispositivo.
                 </p>
               </div>
             ) : (

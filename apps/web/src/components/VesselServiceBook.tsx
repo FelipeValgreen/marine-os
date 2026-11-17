@@ -206,7 +206,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
 
     pushToast({
       title: "Servicio Firmado Criptográficamente",
-      subtitle: `Registro #${newRecord.id.slice(-6)} grabado con SHA-256 en IndexedDB`,
+      subtitle: `Registro #${newRecord.id.slice(-6)} grabado con SHA-256 en el dispositivo`,
       tone: "emerald",
     });
   };
@@ -651,7 +651,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                 <ShieldCheck className="w-4 h-4 text-[var(--accent-primary)] shrink-0 mt-0.5" />
                 <span className="opacity-80">
                   Al firmar, MarinOS generará una huella criptográfica SHA-256 basada en la hora de motor,
-                  embarcación y repuestos, sellando el registro en IndexedDB.
+                  embarcación y repuestos, sellando el registro en el historial inmutable.
                 </span>
               </div>
 
