@@ -1270,6 +1270,9 @@ export default function MarineOSHomePage() {
               <span className="font-semibold text-xs sm:text-sm tracking-tight truncate max-w-[140px] sm:max-w-none">
                 {vessel?.name || "SV Albatros"}
               </span>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-black">
+                v2.4
+              </span>
             </div>
 
             <span className="opacity-25">|</span>

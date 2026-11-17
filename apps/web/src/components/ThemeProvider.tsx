@@ -356,7 +356,30 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       window.addEventListener("offline", handleOffline);
 
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/sw.js").catch(() => {});
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then((registration) => {
+            registration.update().catch(() => {});
+            registration.onupdatefound = () => {
+              const installingWorker = registration.installing;
+              if (installingWorker) {
+                installingWorker.onstatechange = () => {
+                  if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
+                    installingWorker.postMessage({ type: "SKIP_WAITING" });
+                  }
+                };
+              }
+            };
+          })
+          .catch(() => {});
+
+        let isRefreshing = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (!isRefreshing) {
+            isRefreshing = true;
+            window.location.reload();
+          }
+        });
       }
 
       return () => {
@@ -652,14 +675,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   sidebarCollapsed ? "justify-center" : "justify-between px-1"
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={() => setActiveSection("bridge")}
-                  title="MarinOS — SV Albatros (CB-4582)"
-                  className="min-h-14 flex items-center justify-center rounded-xl px-1"
-                >
-                  <Logo collapsed={sidebarCollapsed} size="sm" />
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setActiveSection("bridge")}
+                    title="MarinOS — SV Albatros (CB-4582)"
+                    className="min-h-14 flex items-center justify-center rounded-xl px-1"
+                  >
+                    <Logo collapsed={sidebarCollapsed} size="sm" />
+                  </button>
+                  {!sidebarCollapsed && (
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-bold">
+                      v2.4
+                    </span>
+                  )}
+                </div>
 
                 {!sidebarCollapsed && (
                   <button

@@ -1,5 +1,5 @@
-const APP_CACHE_NAME = "marine-os-app-shell-v2";
-const TILE_CACHE_NAME = "marine-os-nautical-tiles-v2";
+const APP_CACHE_NAME = "marinos-app-shell-v3.2-tactical";
+const TILE_CACHE_NAME = "marinos-nautical-tiles-v3";
 
 const PRECACHE_ROUTES = [
   "/",
@@ -50,6 +50,7 @@ self.addEventListener("activate", (event) => {
         Promise.all(
           keys.map((key) => {
             if (key !== APP_CACHE_NAME && key !== TILE_CACHE_NAME) {
+              console.log("[SW] Deleting stale cache:", key);
               return caches.delete(key);
             }
             return Promise.resolve();
@@ -58,6 +59,12 @@ self.addEventListener("activate", (event) => {
       ),
     ])
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("fetch", (event) => {
