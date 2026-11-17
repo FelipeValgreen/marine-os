@@ -95,6 +95,8 @@ interface ThemeContextValue {
   openCommandCenter: () => void;
   isOffline: boolean;
   setSimulatedOffline: (offline: boolean) => void;
+  dataMode: "SIMULADO" | "EN_VIVO";
+  setDataMode: (mode: "SIMULADO" | "EN_VIVO") => void;
   pendingSyncCount: number;
   triggerManualSync: () => Promise<number>;
   isSeeded: boolean;
@@ -201,6 +203,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [authChecked, setAuthChecked] = useState<boolean>(false);
   const [activeSection, setActiveSectionState] =
     useState<MarineSection>("bridge");
+  const [dataMode, setDataMode] = useState<"SIMULADO" | "EN_VIVO">("SIMULADO");
   const [simulatedOffline, setSimulatedOffline] = useState<boolean>(false);
   const [browserOffline, setBrowserOffline] = useState<boolean>(false);
   const [isSeeded, setIsSeeded] = useState<boolean>(false);
@@ -620,6 +623,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         openCommandCenter: () => setCommandCenterOpen(true),
         isOffline,
         setSimulatedOffline,
+        dataMode,
+        setDataMode,
         pendingSyncCount: pendingSyncItems.length,
         triggerManualSync,
         isSeeded: isSeeded && authChecked,
@@ -945,6 +950,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ===================================================================
+            PERSISTENT SIMULATION BANNER - R-4.1.2
+        =================================================================== */}
+        {!isLoginRoute && dataMode === "SIMULADO" && (
+          <div
+            data-testid="simulation-mode-banner"
+            className={`${
+              sidebarCollapsed ? "lg:pl-16" : "lg:pl-60"
+            } w-full bg-[#D94A1A] text-white py-1 px-4 text-center font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase shadow-md flex items-center justify-center gap-2 relative z-40 transition-all duration-200`}
+          >
+            <span>⚠️ MODO SIMULACIÓN — datos ficticios, no usar para navegar</span>
           </div>
         )}
 

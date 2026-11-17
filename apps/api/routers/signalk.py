@@ -66,7 +66,7 @@ async def get_signalk_telemetry():
     t = time.time()
     return {
         "vessel_id": "22222222-2222-2222-2222-222222222222",
-        "source": "Signal K NMEA2000 Bus (can0 / Actisense NGT-1)",
+        "source": "simulator",
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "navigation": {
             "sog_kn": round(6.8 + 0.2 * math.sin(t / 5.0), 1),

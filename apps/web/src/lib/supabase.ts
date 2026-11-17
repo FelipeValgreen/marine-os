@@ -21,23 +21,23 @@ export const supabase: SupabaseClient = createClient(
 );
 
 export const DEFAULT_GOOGLE_AUTHENTICATED_PROFILE: UserProfileAccount = {
-  id: "acc-felipe-valverde",
-  name: "Cap. Felipe Valverde",
-  email: "filipo.valverde@gmail.com",
+  id: "acc-capitan-demo",
+  name: "Capitán Demo",
+  email: "demo@marinos.app",
   authProvider: "google",
-  shortLabel: "Cap. Felipe Valverde",
+  shortLabel: "Capitán Demo",
   role: "fleet_admin",
   roleBadge: "Capitán & Armador Titular",
   documentType: "RUT",
-  documentNumber: "13.452.890-1",
+  documentNumber: "11.111.111-1",
   nationality: "CL",
   licenseType: "Capitán Deportivo de Alta Mar (DIRECTEMAR)",
-  licenseNumber: "CDAM-2021-9042",
+  licenseNumber: "CDAM-DEMO-001",
   licenseExpiry: "2031-06-30",
   maxLoaMeters: 30.0,
-  vhfOperatorCert: "Operador GMDSS Restringido #CL-4410",
+  vhfOperatorCert: "Operador GMDSS Restringido #CL-DEMO",
   loggedMilesNm: 8420,
-  avatarInitials: "FV",
+  avatarInitials: "CD",
 };
 
 export const OFFLINE_GUEST_PROFILE: UserProfileAccount = {

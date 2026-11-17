@@ -463,37 +463,37 @@ export function VoyagesZarpeView({
 
     setAuthorityApproval({
       approval_token: token,
-      authority: "Capitanía de Puerto de Puerto Montt (DIRECTEMAR)",
+      authority: "Simulador de Despacho (Modo Demo)",
       transmitted_at: now,
       sha256_manifest_seal: digest,
       pob_count: crewList?.length || 1,
     });
 
     setStampOverlay({
-      title: "DESPACHO AUTORIZADO • DIRECTEMAR",
-      subtitle: `Token Oficial: ${token} • POB: ${crewList?.length || 1}`,
+      title: "BORRADOR DE APOYO • ZARPE DEMO",
+      subtitle: `Token Simulado: ${token} • POB: ${crewList?.length || 1}`,
       sha256Hash: digest,
-      tokenBadge: token,
+      tokenBadge: "SIMULADO",
     });
 
     setTransmittingZarpe(false);
 
     pushToast({
-      title: "Zarpe Transmitido & Autorizado",
-      subtitle: `Token ${token} emitido por Capitanía de Puerto`,
+      title: "Simulación de Zarpe Registrada",
+      subtitle: "Borrador de apoyo guardado (No válido ante Autoridad Marítima)",
       tone: "emerald",
     });
   };
 
   const handleDownloadPDF = async () => {
-    setPdfStatus("Compilando Rol de Zarpe Oficial DIRECTEMAR...");
+    setPdfStatus("Generando Documento de Zarpe (PDF)...");
     const digest = await computeSHA256Hex(JSON.stringify(crewList));
-    setPdfStatus(`Rol oficial emitido (${crewList.length} tripulantes) • SHA-256: ${digest.slice(0, 16)}...`);
+    setPdfStatus(`Documento compilado (${crewList.length} tripulantes) • Resumen SHA-256: ${digest.slice(0, 16)}...`);
     setStampOverlay({
-      title: "ROL DE TRIPULACIÓN & ZARPE OFICIAL",
-      subtitle: `${vessel?.name || "SV Albatros"} • POB: ${crewList.length}`,
+      title: "DOCUMENTO DE APOYO PARA ZARPE",
+      subtitle: `${vessel?.name || "SV Albatros"} • POB: ${crewList.length} • Para presentar ante Autoridad Marítima`,
       sha256Hash: digest,
-      tokenBadge: "DIRECTEMAR PDF",
+      tokenBadge: "BORRADOR APOYO",
     });
   };
 
@@ -509,7 +509,7 @@ export function VoyagesZarpeView({
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 uppercase">
                 <RadioTower className="w-3.5 h-3.5" />
-                <span>SITPORT • DIRECTEMAR e-ZARPE</span>
+                <span>DESPACHO &amp; BITÁCORA DE VIAJE</span>
               </span>
               <span className="text-xs font-mono opacity-60">
                 {(voyages || []).length} viajes registrados
@@ -520,7 +520,7 @@ export function VoyagesZarpeView({
             </h1>
             <p className="text-xs sm:text-sm opacity-70 max-w-2xl">
               Crea travesías, gestiona la dotación a bordo, completa el checklist de seguridad y
-              tramita el E-Zarpe con firma criptográfica oficial ante la Autoridad Marítima.
+              genera el documento de apoyo para zarpe ante la Autoridad Marítima.
             </p>
           </div>
 
@@ -1295,9 +1295,9 @@ export function VoyagesZarpeView({
           <div className="border-b border-white/5 pb-4 flex items-center justify-between">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold">
-                PASO 4 DE 4 • DESPACHO ELECTRÓNICO OFICIAL
+                PASO 4 DE 4 • DOCUMENTO DE ZARPE &amp; DESPACHO
               </div>
-              <h2 className="text-lg font-bold mt-0.5">E-Zarpe DIRECTEMAR (SITPORT)</h2>
+              <h2 className="text-lg font-bold mt-0.5">Preparación de Zarpe &amp; Rol de Tripulación</h2>
             </div>
 
             <RadioTower className="w-6 h-6 text-[#00E5FF]" />
@@ -1353,7 +1353,7 @@ export function VoyagesZarpeView({
               <div>
                 <span className="text-[9px] opacity-55 block">ESTADO</span>
                 <span className="font-bold text-[#00E676]">
-                  {currentVoyage?.status === "active" ? "Zarpe Autorizado" : "Listo para Despacho"}
+                  {currentVoyage?.status === "active" ? "Documento Generado" : "Listo para Despacho"}
                 </span>
               </div>
             </div>
@@ -1362,41 +1362,42 @@ export function VoyagesZarpeView({
           {/* Transmit Action */}
           {canTransmitZarpe ? (
             <div className="p-5 rounded-2xl bg-gradient-to-r from-[var(--accent-primary)]/15 to-[#00E676]/15 border border-[var(--accent-primary)]/30 space-y-3 text-center">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase">
+                <span>Modo demo — aprobación simulada, no válida ante la Autoridad Marítima</span>
+              </div>
+
               <h3 className="text-base font-bold text-white">
                 {currentVoyage?.status === "active"
-                  ? "✓ Esta travesía ya cuenta con Zarpe Oficial Aprobado"
-                  : "Todo listo para transmitir a la Capitanía de Puerto"}
+                  ? "✓ Documentación de Travesía Lista"
+                  : "Todo listo para generar la documentación de apoyo"}
               </h3>
               <p className="text-xs font-mono opacity-80 max-w-lg mx-auto">
-                Al transmitir, se emitirá una firma criptográfica SHA-256 legalmente vinculante ante
-                la Armada de Chile y el rol quedará congelado para navegación.
+                El zarpe formal debe tramitarse por los canales oficiales de DIRECTEMAR (portal web oficial SITPORT o presencialmente en Capitanía de Puerto). Este documento es un borrador de apoyo para la tripulación.
               </p>
 
               <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
                 <button
                   type="button"
                   data-testid="transmit-ezarpe-directemar-btn"
-                  onClick={handleTransmitZarpe}
-                  disabled={transmittingZarpe}
+                  onClick={handleDownloadPDF}
                   className="marine-btn marine-btn-primary min-h-12 px-7 text-sm font-bold shadow-none flex items-center gap-2"
                 >
-                  <RadioTower className="w-4 h-4" />
-                  <span>
-                    {transmittingZarpe
-                      ? "Transmitiendo a SITPORT..."
-                      : currentVoyage?.status === "active"
-                      ? "Re-validar Despacho Oficial"
-                      : "Transmitir E-Zarpe a DIRECTEMAR"}
-                  </span>
+                  <Download className="w-4 h-4" />
+                  <span>Generar documento de zarpe (PDF) para presentar ante la Autoridad Marítima</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={handleDownloadPDF}
+                  onClick={handleTransmitZarpe}
+                  disabled={transmittingZarpe}
                   className="marine-btn marine-btn-secondary min-h-12 px-5 text-xs flex items-center gap-2"
                 >
-                  <Download className="w-4 h-4" />
-                  <span>Imprimir Copia a Bordo (PDF)</span>
+                  <RadioTower className="w-4 h-4" />
+                  <span>
+                    {transmittingZarpe
+                      ? "Simulando despacho..."
+                      : "Simular validación local (Demo)"}
+                  </span>
                 </button>
               </div>
 
@@ -1410,13 +1411,13 @@ export function VoyagesZarpeView({
                 <div className="mt-3 p-3 rounded-xl bg-black/40 border border-[#00E676]/40 text-left font-mono text-[11px] space-y-1">
                   <div className="text-[#00E676] font-bold flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Despacho Aprobado: {authorityApproval.approval_token}</span>
+                    <span>Registro Simulado: {authorityApproval.approval_token}</span>
                   </div>
                   <div className="text-white/80">
-                    Autoridad: {authorityApproval.authority}
+                    Módulo: {authorityApproval.authority}
                   </div>
                   <div className="text-white/60 text-[10px]">
-                    Sello SHA-256: {authorityApproval.sha256_manifest_seal.slice(0, 24)}... • POB: {authorityApproval.pob_count}
+                    Resumen SHA-256: {authorityApproval.sha256_manifest_seal.slice(0, 24)}... • POB: {authorityApproval.pob_count}
                   </div>
                 </div>
               )}

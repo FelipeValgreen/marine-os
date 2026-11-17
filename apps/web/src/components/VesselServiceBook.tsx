@@ -221,11 +221,11 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 uppercase">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>YachtPass Ecosystem • Inmutable Service Vault</span>
+                <span>Registro de Mantenimiento de A Bordo</span>
               </span>
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30">
                 <Sparkles className="w-3 h-3" />
-                <span>+18% Plusvalía Reventa Certificada</span>
+                <span>Trazabilidad Técnica Verificable</span>
               </span>
             </div>
 
@@ -233,9 +233,8 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
               Libro de Mantenimiento &amp; Pasaporte del Barco
             </h1>
             <p className="text-xs sm:text-sm opacity-70 max-w-2xl">
-              Cada intervención técnica, cambio de rodete y reglaje de válvulas queda sellado con
-              firma criptográfica SHA-256. Un historial inmutable que prueba el estándar de cuidado ante
-              compradores, astilleros y aseguradoras.
+              Cada intervención técnica, cambio de rodete y reglaje de válvulas queda registrado con
+              resumen SHA-256 local. Un historial técnico que respalda el estándar de cuidado de la embarcación.
             </p>
           </div>
 

@@ -23,6 +23,9 @@ export interface VesselRecord {
   fuel_capacity_l: number;
   water_capacity_l: number;
   engine_hours_current: number;
+  chain_length_meters?: number;
+  mmsi?: string;
+  call_sign?: string;
   polar_data: Record<string, unknown>;
   created_at: string;
 }
@@ -381,55 +384,58 @@ export interface UserProfileAccount {
 
 export const PRECONFIGURED_ACCOUNTS: UserProfileAccount[] = [
   {
-    id: "acc-felipe-valverde",
-    name: "Cap. Felipe Valverde",
-    shortLabel: "Cap. Felipe Valverde",
+    id: "acc-capitan-demo",
+    name: "Capitán Demo",
+    shortLabel: "Capitán Demo",
+    email: "demo@marinos.app",
     role: "fleet_admin",
     roleBadge: "Fleet Admin / Armador & Capitán",
     documentType: "RUT",
-    documentNumber: "13.452.890-1",
+    documentNumber: "11.111.111-1",
     nationality: "CL",
     licenseType: "Capitán Deportivo de Alta Mar (DIRECTEMAR)",
-    licenseNumber: "CDAM-2021-9042",
+    licenseNumber: "CDAM-DEMO-001",
     licenseExpiry: "2031-06-30",
     maxLoaMeters: 30.0,
-    vhfOperatorCert: "Restringido GMDSS #CL-4410",
+    vhfOperatorCert: "Restringido GMDSS #CL-DEMO",
     loggedMilesNm: 8420,
-    avatarInitials: "FV",
+    avatarInitials: "CD",
   },
   {
-    id: "acc-rodrigo-soto",
-    name: "Skipper Rodrigo Soto",
-    shortLabel: "Skipper Rodrigo Soto",
+    id: "acc-skipper-demo",
+    name: "Skipper Demo Austral",
+    shortLabel: "Skipper Demo Austral",
+    email: "demo-skipper@marinos.app",
     role: "skipper",
     roleBadge: "Skipper / Patrón Titular",
     documentType: "RUT",
-    documentNumber: "16.781.234-K",
+    documentNumber: "22.222.222-2",
     nationality: "CL",
     licenseType: "Capitán Deportivo Costero (DIRECTEMAR)",
-    licenseNumber: "CDC-2024-8841",
+    licenseNumber: "CDC-DEMO-8841",
     licenseExpiry: "2029-11-15",
     maxLoaMeters: 24.0,
-    vhfOperatorCert: "Operador Radiotelefonista #CL-7812",
+    vhfOperatorCert: "Operador Radiotelefonista #CL-DEMO",
     loggedMilesNm: 3910,
-    avatarInitials: "RS",
+    avatarInitials: "SD",
   },
   {
-    id: "acc-cami-vargas",
-    name: "Cami Vargas",
-    shortLabel: "Cami Vargas",
+    id: "acc-crew-demo",
+    name: "Tripulante Demo",
+    shortLabel: "Tripulante Demo",
+    email: "demo-crew@marinos.app",
     role: "crew",
     roleBadge: "Crew / Tripulante de Guardia",
     documentType: "RUT",
-    documentNumber: "19.832.104-5",
+    documentNumber: "33.333.333-3",
     nationality: "CL",
     licenseType: "Patrón Deportivo de Bahía (DIRECTEMAR)",
-    licenseNumber: "PDB-2025-3319",
+    licenseNumber: "PDB-DEMO-3319",
     licenseExpiry: "2027-02-10",
     maxLoaMeters: 14.0,
     vhfOperatorCert: "Curso Básico Seguridad SOLAS",
     loggedMilesNm: 960,
-    avatarInitials: "CV",
+    avatarInitials: "TD",
   },
 ];
 
@@ -766,6 +772,9 @@ export async function ensureDemoSeedData(): Promise<void> {
             fuel_capacity_l: 200,
             water_capacity_l: 330,
             engine_hours_current: 1420.5,
+            chain_length_meters: 60,
+            mmsi: "725001234",
+            call_sign: "CB-4582",
             polar_data: {
               tws_8: { beat_angle: 44, beat_vmg: 4.6, run_vmg: 5.1 },
               tws_12: { beat_angle: 41, beat_vmg: 5.8, run_vmg: 6.7 },

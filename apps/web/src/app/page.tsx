@@ -252,7 +252,7 @@ export default function MarineOSHomePage() {
       window.open(url, "_blank");
     }
     if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(msg).catch(() => {});
+      navigator.clipboard.writeText(msg).catch(() => { });
     }
     pushToast({
       title: "Recordatorio de Gastos Generado",
@@ -262,9 +262,9 @@ export default function MarineOSHomePage() {
   };
 
   const handleCopyTrophyText = () => {
-    const text = `🏆 *Pasaporte Náutico Digital • MarinOS*\nCapitán: ${activeAccount.name}\nLicencia: ${activeAccount.licenseType}\nMillas Registradas: ${totalSeaTimeMilesNm} MN\nEmbarcación: ${vessel?.name || "SV Albatros"}\nInsignias: Cruce Golfo de Ancud • Veterano de Chiloé (1500+ MN) • Fondeo Seguro (10+ Noches) • DIRECTEMAR Verified.\nVerificado con hash SHA-256 en MarinOS Local-First.`;
+    const text = `🏆 *Pasaporte Náutico Digital • MarinOS*\nCapitán: ${activeAccount.name}\nLicencia: ${activeAccount.licenseType}\nMillas Registradas: ${totalSeaTimeMilesNm} MN\nEmbarcación: ${vessel?.name || "SV Albatros"}\nInsignias: Cruce Golfo de Ancud • Navegante Austral (1500+ MN) • Fondeo Seguro (10+ Noches) • Credencial Registrada en App.\nRegistrado en MarinOS Local-First.`;
     if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {});
+      navigator.clipboard.writeText(text).catch(() => { });
       setCopiedShareLink(true);
       setTimeout(() => setCopiedShareLink(false), 2500);
     }
@@ -331,13 +331,12 @@ export default function MarineOSHomePage() {
     });
     pushToast({
       title: "Estado de Repuesto Actualizado",
-      subtitle: `${existing.part_name} marcado como ${
-        nextStatus === "dispatched"
-          ? "En Tránsito"
-          : nextStatus === "delivered"
+      subtitle: `${existing.part_name} marcado como ${nextStatus === "dispatched"
+        ? "En Tránsito"
+        : nextStatus === "delivered"
           ? "Entregado a Bordo"
           : "Cotizado"
-      }`,
+        }`,
       tone: "emerald",
     });
   };
@@ -878,40 +877,40 @@ export default function MarineOSHomePage() {
     const SpeechRecognitionCtor =
       typeof window !== "undefined"
         ? (
-            window as unknown as {
-              SpeechRecognition?: new () => {
-                lang: string;
-                interimResults: boolean;
-                maxAlternatives: number;
-                onresult: ((ev: { results: { 0: { 0: { transcript: string } } } }) => void) | null;
-                onerror: (() => void) | null;
-                onend: (() => void) | null;
-                start: () => void;
-              };
-              webkitSpeechRecognition?: new () => {
-                lang: string;
-                interimResults: boolean;
-                maxAlternatives: number;
-                onresult: ((ev: { results: { 0: { 0: { transcript: string } } } }) => void) | null;
-                onerror: (() => void) | null;
-                onend: (() => void) | null;
-                start: () => void;
-              };
-            }
-          ).SpeechRecognition ||
-          (
-            window as unknown as {
-              webkitSpeechRecognition?: new () => {
-                lang: string;
-                interimResults: boolean;
-                maxAlternatives: number;
-                onresult: ((ev: { results: { 0: { 0: { transcript: string } } } }) => void) | null;
-                onerror: (() => void) | null;
-                onend: (() => void) | null;
-                start: () => void;
-              };
-            }
-          ).webkitSpeechRecognition
+          window as unknown as {
+            SpeechRecognition?: new () => {
+              lang: string;
+              interimResults: boolean;
+              maxAlternatives: number;
+              onresult: ((ev: { results: { 0: { 0: { transcript: string } } } }) => void) | null;
+              onerror: (() => void) | null;
+              onend: (() => void) | null;
+              start: () => void;
+            };
+            webkitSpeechRecognition?: new () => {
+              lang: string;
+              interimResults: boolean;
+              maxAlternatives: number;
+              onresult: ((ev: { results: { 0: { 0: { transcript: string } } } }) => void) | null;
+              onerror: (() => void) | null;
+              onend: (() => void) | null;
+              start: () => void;
+            };
+          }
+        ).SpeechRecognition ||
+        (
+          window as unknown as {
+            webkitSpeechRecognition?: new () => {
+              lang: string;
+              interimResults: boolean;
+              maxAlternatives: number;
+              onresult: ((ev: { results: { 0: { 0: { transcript: string } } } }) => void) | null;
+              onerror: (() => void) | null;
+              onend: (() => void) | null;
+              start: () => void;
+            };
+          }
+        ).webkitSpeechRecognition
         : undefined;
 
     if (SpeechRecognitionCtor) {
@@ -1322,18 +1321,18 @@ export default function MarineOSHomePage() {
             data-testid="signalk-engine-pill"
             className="hidden xl:flex marine-pill px-3.5 py-2 items-center gap-3 font-mono text-xs"
           >
-              <Activity className="w-3.5 h-3.5 text-[#00E676]" />
-              <span>YANMAR {telemetry.rpm} RPM</span>
-              <span className="opacity-25">•</span>
-              <span>{telemetry.coolant_temp_c.toFixed(1)}°C</span>
-              <span className="opacity-25">•</span>
-              <span>{telemetry.oil_pressure_kpa} kPa</span>
-              <span className="opacity-25">•</span>
-              <span className="text-[#00E5FF]">
-                {telemetry.alternator_voltage_v.toFixed(1)}V
-              </span>
-            </div>
+            <Activity className="w-3.5 h-3.5 text-[#00E676]" />
+            <span>YANMAR {telemetry.rpm} RPM</span>
+            <span className="opacity-25">•</span>
+            <span>{telemetry.coolant_temp_c.toFixed(1)}°C</span>
+            <span className="opacity-25">•</span>
+            <span>{telemetry.oil_pressure_kpa} kPa</span>
+            <span className="opacity-25">•</span>
+            <span className="text-[#00E5FF]">
+              {telemetry.alternator_voltage_v.toFixed(1)}V
+            </span>
           </div>
+        </div>
 
         {/* 2. TOP-RIGHT FLOATING BUTTONS ("⌘K", "Planificador 48h", "Copiloto IA" + "Fondeo & Clima") */}
         <div className="fixed top-4 right-3 sm:right-4 z-30 flex items-center gap-2">
@@ -1355,11 +1354,10 @@ export default function MarineOSHomePage() {
               setDrawerTab("routing");
               setDrawerOpen(true);
             }}
-            className={`marine-pill min-h-14 px-3.5 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${
-              drawerOpen && drawerTab === "routing"
-                ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
-                : ""
-            }`}
+            className={`marine-pill min-h-14 px-3.5 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${drawerOpen && drawerTab === "routing"
+              ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
+              : ""
+              }`}
           >
             <Compass className="w-4 h-4 text-[#00E676] shrink-0" />
             <span className="hidden md:inline">Planificador 48h</span>
@@ -1381,571 +1379,563 @@ export default function MarineOSHomePage() {
             <span className="hidden sm:inline">Copiloto IA</span>
           </button>
 
-            <button
-              type="button"
-              data-testid="toggle-anchorage-drawer-btn"
-              onClick={() => {
-                if (drawerOpen && drawerTab === "anchorage") {
-                  setDrawerOpen(false);
-                } else {
-                  setDrawerTab("anchorage");
-                  setDrawerOpen(true);
-                }
-              }}
-              className={`marine-pill min-h-14 px-4 sm:px-5 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${anchorWatch.isDragging
-                ? "bg-[#FF2D55] text-white border-[#FF2D55] animate-pulse"
-                : drawerOpen && drawerTab === "anchorage"
-                  ? "border-[var(--accent-primary)]/50 text-[var(--accent-primary)]"
-                  : ""
-                }`}
-            >
-              <CloudSun className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
-              <span>Fondeo & Clima</span>
-              <span className="hidden sm:inline font-mono text-xs px-2 py-0.5 rounded-full bg-white/10">
-                {liveWeather.windSpeedKn.toFixed(1)} kn • {liveWeather.score}%
-              </span>
-            </button>
-          </div>
+          <button
+            type="button"
+            data-testid="toggle-anchorage-drawer-btn"
+            onClick={() => {
+              if (drawerOpen && drawerTab === "anchorage") {
+                setDrawerOpen(false);
+              } else {
+                setDrawerTab("anchorage");
+                setDrawerOpen(true);
+              }
+            }}
+            className={`marine-pill min-h-14 px-4 sm:px-5 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${anchorWatch.isDragging
+              ? "bg-[#FF2D55] text-white border-[#FF2D55] animate-pulse"
+              : drawerOpen && drawerTab === "anchorage"
+                ? "border-[var(--accent-primary)]/50 text-[var(--accent-primary)]"
+                : ""
+              }`}
+          >
+            <CloudSun className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
+            <span>Fondeo & Clima</span>
+            <span className="hidden sm:inline font-mono text-xs px-2 py-0.5 rounded-full bg-white/10">
+              {liveWeather.windSpeedKn.toFixed(1)} kn • {liveWeather.score}%
+            </span>
+          </button>
+        </div>
 
-          {/* 3. BOTTOM-LEFT MINIMALIST TELEMETRY HUD (4 Clean Numbers: SOG, COG, PROF, VIENTO) */}
-          <div className="fixed bottom-20 lg:bottom-6 left-3 right-3 sm:right-auto lg:left-20 z-30">
-            <div className="marine-card px-4 sm:px-5 py-3.5 rounded-2xl grid grid-cols-4 sm:flex sm:items-center gap-3 sm:gap-8">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest opacity-55">
-                  SOG
-                </div>
-                <div className="font-mono text-xl sm:text-3xl font-semibold tracking-tight leading-none mt-1">
-                  {telemetry.sog_kn.toFixed(1)}
-                  <span className="text-[10px] font-normal opacity-50 ml-0.5">
-                    KN
-                  </span>
-                </div>
+        {/* 3. BOTTOM-LEFT MINIMALIST TELEMETRY HUD (4 Clean Numbers: SOG, COG, PROF, VIENTO) */}
+        <div className="fixed bottom-20 lg:bottom-6 left-3 right-3 sm:right-auto lg:left-20 z-30">
+          <div className="marine-card px-4 sm:px-5 py-3.5 rounded-2xl grid grid-cols-4 sm:flex sm:items-center gap-3 sm:gap-8">
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-widest opacity-55">
+                SOG
               </div>
-
-              <div className="hidden sm:block h-8 w-px bg-white/10" />
-
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest opacity-55">
-                  COG
-                </div>
-                <div className="font-mono text-xl sm:text-3xl font-semibold tracking-tight leading-none mt-1">
-                  {String(Math.round(telemetry.cog_deg)).padStart(3, "0")}
-                  <span className="text-[10px] font-normal opacity-50 ml-0.5">
-                    °M
-                  </span>
-                </div>
+              <div className="font-mono text-xl sm:text-3xl font-semibold tracking-tight leading-none mt-1">
+                {telemetry.sog_kn.toFixed(1)}
+                <span className="text-[10px] font-normal opacity-50 ml-0.5">
+                  KN
+                </span>
               </div>
+            </div>
 
-              <div className="hidden sm:block h-8 w-px bg-white/10" />
+            <div className="hidden sm:block h-8 w-px bg-white/10" />
 
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest opacity-55">
-                  PROF
-                </div>
-                <div className="font-mono text-xl sm:text-3xl font-semibold tracking-tight leading-none mt-1 text-[#00E5FF]">
-                  {telemetry.depth_m.toFixed(1)}
-                  <span className="text-[10px] font-normal opacity-50 ml-0.5">
-                    M
-                  </span>
-                </div>
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-widest opacity-55">
+                COG
               </div>
+              <div className="font-mono text-xl sm:text-3xl font-semibold tracking-tight leading-none mt-1">
+                {String(Math.round(telemetry.cog_deg)).padStart(3, "0")}
+                <span className="text-[10px] font-normal opacity-50 ml-0.5">
+                  °M
+                </span>
+              </div>
+            </div>
 
-              <div className="hidden sm:block h-8 w-px bg-white/10" />
+            <div className="hidden sm:block h-8 w-px bg-white/10" />
 
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest opacity-55">
-                  VIENTO
-                </div>
-                <div className="font-mono text-xl sm:text-3xl font-semibold tracking-tight leading-none mt-1 text-[#00E676]">
-                  {liveWeather.windSpeedKn.toFixed(1)}
-                  <span className="text-[10px] font-normal opacity-50 ml-0.5">
-                    KN
-                  </span>
-                </div>
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-widest opacity-55">
+                PROF
+              </div>
+              <div className="font-mono text-xl sm:text-3xl font-semibold tracking-tight leading-none mt-1 text-[#00E5FF]">
+                {telemetry.depth_m.toFixed(1)}
+                <span className="text-[10px] font-normal opacity-50 ml-0.5">
+                  M
+                </span>
+              </div>
+            </div>
+
+            <div className="hidden sm:block h-8 w-px bg-white/10" />
+
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-widest opacity-55">
+                VIENTO
+              </div>
+              <div className="font-mono text-xl sm:text-3xl font-semibold tracking-tight leading-none mt-1 text-[#00E676]">
+                {liveWeather.windSpeedKn.toFixed(1)}
+                <span className="text-[10px] font-normal opacity-50 ml-0.5">
+                  KN
+                </span>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* 4. COLLAPSIBLE RIGHT DRAWER (w-96, Anchorage Matcher + Marine Copilot AI) */}
-          <AnimatePresence>
-            {drawerOpen && (
-              <motion.div
-                key="anchorage-weather-drawer"
-                data-testid="anchorage-weather-drawer"
-                initial={{ x: 420, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 420, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="fixed top-20 bottom-20 lg:bottom-6 right-3 sm:right-4 w-[calc(100vw-1.5rem)] sm:w-96 z-40"
-              >
-                <div className="marine-card h-full p-5 flex flex-col justify-between overflow-y-auto space-y-4 border border-white/5 shadow-2xl shadow-black/80">
-              <div className="space-y-4">
-                {/* Drawer Mode Switcher + Close Button */}
-                <div className="flex items-center justify-between gap-2 border-b border-white/5 pb-3">
-                  <div className="grid grid-cols-3 gap-1.5 flex-1">
-                    <button
-                      type="button"
-                      onClick={() => setDrawerTab("anchorage")}
-                      className={`min-h-14 px-2 rounded-xl font-mono text-[11px] font-semibold flex items-center justify-center gap-1 transition ${
-                        drawerTab === "anchorage"
+        {/* 4. COLLAPSIBLE RIGHT DRAWER (w-96, Anchorage Matcher + Marine Copilot AI) */}
+        <AnimatePresence>
+          {drawerOpen && (
+            <motion.div
+              key="anchorage-weather-drawer"
+              data-testid="anchorage-weather-drawer"
+              initial={{ x: 420, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 420, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed top-20 bottom-20 lg:bottom-6 right-3 sm:right-4 w-[calc(100vw-1.5rem)] sm:w-96 z-40"
+            >
+              <div className="marine-card h-full p-5 flex flex-col justify-between overflow-y-auto space-y-4 border border-white/5 shadow-2xl shadow-black/80">
+                <div className="space-y-4">
+                  {/* Drawer Mode Switcher + Close Button */}
+                  <div className="flex items-center justify-between gap-2 border-b border-white/5 pb-3">
+                    <div className="grid grid-cols-3 gap-1.5 flex-1">
+                      <button
+                        type="button"
+                        onClick={() => setDrawerTab("anchorage")}
+                        className={`min-h-14 px-2 rounded-xl font-mono text-[11px] font-semibold flex items-center justify-center gap-1 transition ${drawerTab === "anchorage"
                           ? "marine-btn-primary"
                           : "marine-btn-secondary"
-                      }`}
-                    >
-                      <CloudSun className="w-3.5 h-3.5 shrink-0" />
-                      <span>Fondeo</span>
-                    </button>
-                    <button
-                      type="button"
-                      data-testid="drawer-tab-routing-btn"
-                      onClick={() => setDrawerTab("routing")}
-                      className={`min-h-14 px-2 rounded-xl font-mono text-[11px] font-semibold flex items-center justify-center gap-1 transition ${
-                        drawerTab === "routing"
+                          }`}
+                      >
+                        <CloudSun className="w-3.5 h-3.5 shrink-0" />
+                        <span>Fondeo</span>
+                      </button>
+                      <button
+                        type="button"
+                        data-testid="drawer-tab-routing-btn"
+                        onClick={() => setDrawerTab("routing")}
+                        className={`min-h-14 px-2 rounded-xl font-mono text-[11px] font-semibold flex items-center justify-center gap-1 transition ${drawerTab === "routing"
                           ? "marine-btn-primary"
                           : "marine-btn-secondary"
-                      }`}
-                    >
-                      <Compass className="w-3.5 h-3.5 shrink-0" />
-                      <span>Ruteo 48h</span>
-                    </button>
-                    <button
-                      type="button"
-                      data-testid="drawer-tab-copilot-btn"
-                      onClick={() => setDrawerTab("copilot")}
-                      className={`min-h-14 px-2 rounded-xl font-mono text-[11px] font-semibold flex items-center justify-center gap-1 transition ${
-                        drawerTab === "copilot"
+                          }`}
+                      >
+                        <Compass className="w-3.5 h-3.5 shrink-0" />
+                        <span>Ruteo 48h</span>
+                      </button>
+                      <button
+                        type="button"
+                        data-testid="drawer-tab-copilot-btn"
+                        onClick={() => setDrawerTab("copilot")}
+                        className={`min-h-14 px-2 rounded-xl font-mono text-[11px] font-semibold flex items-center justify-center gap-1 transition ${drawerTab === "copilot"
                           ? "marine-btn-primary"
                           : "marine-btn-secondary"
-                      }`}
+                          }`}
+                      >
+                        <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                        <span>Copiloto</span>
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setDrawerOpen(false)}
+                      className="min-h-14 w-12 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center shrink-0"
+                      aria-label="Cerrar panel"
                     >
-                      <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                      <span>Copiloto</span>
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setDrawerOpen(false)}
-                    className="min-h-14 w-12 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center shrink-0"
-                    aria-label="Cerrar panel"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {drawerTab === "copilot" ? (
-                  <MarineCopilot vesselContext={copilotContext} compact={true} />
-                ) : drawerTab === "routing" ? (
-                  <div
-                    data-testid="passage-planner-panel"
-                    className="space-y-4 font-mono text-xs"
-                  >
-                    <div>
-                      <div className="text-[10px] uppercase tracking-widest text-[var(--accent-primary)]">
-                        WEATHER ROUTING • EVOLUCIÓN 48 HORAS
+                  {drawerTab === "copilot" ? (
+                    <MarineCopilot vesselContext={copilotContext} compact={true} />
+                  ) : drawerTab === "routing" ? (
+                    <div
+                      data-testid="passage-planner-panel"
+                      className="space-y-4 font-mono text-xs"
+                    >
+                      <div>
+                        <div className="text-[10px] uppercase tracking-widest text-[var(--accent-primary)]">
+                          WEATHER ROUTING • EVOLUCIÓN 48 HORAS
+                        </div>
+                        <h3 className="text-base font-sans font-bold mt-0.5">
+                          Planificador de Zarpe (Modelo Meteorológico)
+                        </h3>
                       </div>
-                      <h3 className="text-base font-sans font-bold mt-0.5">
-                        Planificador de Zarpe (PredictWind Engine)
-                      </h3>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { id: "now", label: "Zarpar Ahora" },
-                        { id: "in_2h", label: "Zarpar en 2 hrs ⭐" },
-                        { id: "in_6h", label: "Zarpar en 6 hrs" },
-                        { id: "tomorrow_0800", label: "Zarpar Mañana" },
-                      ].map((w) => (
-                        <button
-                          key={w.id}
-                          type="button"
-                          data-testid={`routing-window-${w.id}`}
-                          onClick={() =>
-                            setDepartureWindowId(
-                              w.id as "now" | "in_2h" | "in_6h" | "tomorrow_0800"
-                            )
-                          }
-                          className={`min-h-14 px-3 rounded-xl text-xs font-bold transition ${
-                            departureWindowId === w.id
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { id: "now", label: "Zarpar Ahora" },
+                          { id: "in_2h", label: "Zarpar en 2 hrs ⭐" },
+                          { id: "in_6h", label: "Zarpar en 6 hrs" },
+                          { id: "tomorrow_0800", label: "Zarpar Mañana" },
+                        ].map((w) => (
+                          <button
+                            key={w.id}
+                            type="button"
+                            data-testid={`routing-window-${w.id}`}
+                            onClick={() =>
+                              setDepartureWindowId(
+                                w.id as "now" | "in_2h" | "in_6h" | "tomorrow_0800"
+                              )
+                            }
+                            className={`min-h-14 px-3 rounded-xl text-xs font-bold transition ${departureWindowId === w.id
                               ? "marine-btn-primary"
                               : "marine-btn-secondary"
-                          }`}
-                        >
-                          {w.label}
-                        </button>
-                      ))}
-                    </div>
+                              }`}
+                          >
+                            {w.label}
+                          </button>
+                        ))}
+                      </div>
 
-                    <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-[var(--accent-primary)]">
-                          {passagePlan.label}
-                        </span>
-                        <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                            passagePlan.status === "OPTIMAL"
+                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-[var(--accent-primary)]">
+                            {passagePlan.label}
+                          </span>
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${passagePlan.status === "OPTIMAL"
                               ? "bg-[#00E676]/20 text-[#00E676]"
                               : passagePlan.status === "GOOD"
-                              ? "bg-[var(--accent-primary)]/20 text-[var(--accent-primary)]"
-                              : "bg-[#FF9F0A]/20 text-[#FF9F0A]"
-                          }`}
-                        >
-                          {passagePlan.status} ({passagePlan.comfort_score}%)
-                        </span>
-                      </div>
-
-                      <p className="font-sans text-xs opacity-90 leading-relaxed">
-                        {passagePlan.tactical_summary}
-                      </p>
-
-                      <div className="grid grid-cols-3 gap-2 pt-1 text-center">
-                        <div className="p-2 rounded-lg bg-white/5">
-                          <div className="text-[9px] opacity-60">VIENTO MED</div>
-                          <div className="text-sm font-bold mt-0.5">
-                            {passagePlan.avg_wind_kn} kn
-                          </div>
-                        </div>
-                        <div className="p-2 rounded-lg bg-white/5">
-                          <div className="text-[9px] opacity-60">SOG EST.</div>
-                          <div className="text-sm font-bold mt-0.5 text-[var(--accent-primary)]">
-                            {passagePlan.predicted_sog_kn} kn
-                          </div>
-                        </div>
-                        <div className="p-2 rounded-lg bg-white/5">
-                          <div className="text-[9px] opacity-60">ETA CRUCE</div>
-                          <div className="text-sm font-bold mt-0.5 text-[#00E676]">
-                            {passagePlan.eta_hours} hrs
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="pt-2 border-t border-white/5 text-[11px] text-[#00E676]">
-                        Plan Vélico: <strong>{passagePlan.sail_plan}</strong>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {/* Anchorage Selector */}
-                    <div className="space-y-1.5">
-                      <label className="block text-[11px] font-mono uppercase opacity-70">
-                        Caleta / Fondeadero (Seno de Reloncaví & Chiloé)
-                      </label>
-                      <div className="flex gap-2">
-                        <select
-                          value={selectedAnchorageSlug}
-                          onChange={(e) =>
-                            setSelectedAnchorageSlug(e.target.value)
-                          }
-                          className="flex-1 min-w-0 min-h-14 px-3 text-xs sm:text-sm font-medium"
-                        >
-                          {anchorages.map((a) => (
-                            <option key={a.id} value={a.slug}>
-                              {a.name} ({a.min_depth_m}m • {a.seabed_type})
-                            </option>
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            fetchLiveOpenMeteoAndScore(selectedAnchorage)
-                          }
-                          title="Actualizar Open-Meteo en vivo"
-                          className="marine-btn marine-btn-secondary px-3.5 shrink-0"
-                        >
-                          <RefreshCw
-                            className={`w-4 h-4 ${liveWeather.loading
-                              ? "animate-spin text-[var(--accent-primary)]"
-                              : ""
+                                ? "bg-[var(--accent-primary)]/20 text-[var(--accent-primary)]"
+                                : "bg-[#FF9F0A]/20 text-[#FF9F0A]"
                               }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Real-Time Open-Meteo Weather & Marine Readouts with Zero-CLS Skeletons */}
-                    <div className="grid grid-cols-2 gap-2.5 font-mono">
-                      <div className="min-h-[96px] p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col justify-between">
-                        <div className="flex items-center justify-between text-[10px] opacity-60 uppercase">
-                          <span>VIENTO REAL</span>
-                          <Wind className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
-                        </div>
-                        {liveWeather.loading ? (
-                          <div className="space-y-1.5 pt-1">
-                            <div className="h-6 w-20 marine-skeleton" />
-                            <div className="h-3.5 w-28 marine-skeleton" />
-                          </div>
-                        ) : (
-                          <>
-                            <div
-                              data-testid="live-wind-readout"
-                              className="text-xl font-semibold mt-1"
-                            >
-                              {liveWeather.windSpeedKn.toFixed(1)} kn
-                            </div>
-                            <div className="text-[11px] opacity-70 mt-0.5 truncate">
-                              Ráf. {liveWeather.windGustKn.toFixed(1)} kn •{" "}
-                              {Math.round(liveWeather.windDirDeg)}° (
-                              {degreesToCardinal(liveWeather.windDirDeg)})
-                            </div>
-                          </>
-                        )}
-                      </div>
-
-                      <div className="min-h-[96px] p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col justify-between">
-                        <div className="flex items-center justify-between text-[10px] opacity-60 uppercase">
-                          <span>OLEAJE MARINO</span>
-                          <Waves className="w-3.5 h-3.5 text-[#00E676]" />
-                        </div>
-                        {liveWeather.loading ? (
-                          <div className="space-y-1.5 pt-1">
-                            <div className="h-6 w-20 marine-skeleton" />
-                            <div className="h-3.5 w-24 marine-skeleton" />
-                          </div>
-                        ) : (
-                          <>
-                            <div
-                              data-testid="live-wave-readout"
-                              className="text-xl font-semibold mt-1"
-                            >
-                              {liveWeather.waveHeightM.toFixed(2)} m
-                            </div>
-                            <div className="text-[11px] opacity-70 mt-0.5 truncate">
-                              Período {liveWeather.wavePeriodS.toFixed(1)}s •{" "}
-                              {Math.round(liveWeather.waveDirDeg)}°
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Calculated Chain Scope & Safety Score */}
-                    <div className="min-h-[148px] p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2 font-mono text-xs flex flex-col justify-between">
-                      {liveWeather.loading ? (
-                        <div className="space-y-2.5 py-1">
-                          <div className="h-4 w-full marine-skeleton" />
-                          <div className="h-4 w-4/5 marine-skeleton" />
-                          <div className="h-4 w-3/4 marine-skeleton" />
-                          <div className="h-6 w-full marine-skeleton mt-2" />
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex items-center justify-between">
-                            <span className="opacity-70">SCORE SEGURIDAD</span>
-                            <span className="px-2.5 py-0.5 rounded-full bg-[#00E676]/15 text-[#00E676] font-bold">
-                              {liveWeather.score}/100 ({liveWeather.status})
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="opacity-70">
-                              SONDA / UKC BAJAMAR
-                            </span>
-                            <span>
-                              {scopeCalc.lowTideDepthMeters}m (UKC{" "}
-                              {(
-                                scopeCalc.lowTideDepthMeters -
-                                (vessel?.draft_meters || 2.18)
-                              ).toFixed(2)}
-                              m)
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="opacity-70">AMPLITUD DE MAREA</span>
-                            <span>+{scopeCalc.tideAmplitudeMeters}m</span>
-                          </div>
-                          <div className="pt-2 border-t border-white/5 flex items-center justify-between text-sm font-bold text-[var(--accent-primary)]">
-                            <span>CADENA RECOMENDADA</span>
-                            <span>
-                              {scopeCalc.recommendedChainMeters}m (Ratio{" "}
-                              {scopeCalc.recommendedRatio}:1)
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Circular Anchor Watch Radar & Siren Controls */}
-                    <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 font-semibold text-xs">
-                          <BellRing className="w-4 h-4 text-[var(--accent-primary)]" />
-                          <span>Anchor Watch Pro</span>
-                        </div>
-                        <span
-                          data-testid="anchor-watch-status"
-                          className={`font-mono text-[11px] px-2.5 py-0.5 rounded-full font-bold ${anchorWatch.isDragging
-                            ? "bg-[#FF2D55]/20 text-[#FF2D55]"
-                            : "bg-[#00E676]/20 text-[#00E676]"
-                            }`}
-                        >
-                          {anchorWatch.alertLevel}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`w-20 h-20 rounded-full border-2 border-dashed flex flex-col items-center justify-center font-mono shrink-0 ${anchorWatch.isDragging
-                            ? "border-[#FF2D55] bg-[#FF2D55]/10 text-[#FF2D55] animate-pulse"
-                            : "border-[#00E676]/60 bg-[#00E676]/5 text-[#00E676]"
-                            }`}
-                        >
-                          <span className="text-sm font-bold">
-                            {anchorWatch.distanceFromAnchorMeters}m
-                          </span>
-                          <span className="text-[9px] opacity-70">
-                            MAX {anchorWatch.maxSwingRadiusMeters}m
+                          >
+                            {passagePlan.status} ({passagePlan.comfort_score}%)
                           </span>
                         </div>
 
-                        <div className="space-y-1 text-xs font-mono flex-1 min-w-0">
-                          <div>
-                            Margen: <strong>{anchorWatch.marginMeters}m</strong>
+                        <p className="font-sans text-xs opacity-90 leading-relaxed">
+                          {passagePlan.tactical_summary}
+                        </p>
+
+                        <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                          <div className="p-2 rounded-lg bg-white/5">
+                            <div className="text-[9px] opacity-60">VIENTO MED</div>
+                            <div className="text-sm font-bold mt-0.5">
+                              {passagePlan.avg_wind_kn} kn
+                            </div>
                           </div>
-                          <div>
-                            Demora:{" "}
-                            <strong>{anchorWatch.bearingFromAnchorDeg}°</strong>
+                          <div className="p-2 rounded-lg bg-white/5">
+                            <div className="text-[9px] opacity-60">SOG EST.</div>
+                            <div className="text-sm font-bold mt-0.5 text-[var(--accent-primary)]">
+                              {passagePlan.predicted_sog_kn} kn
+                            </div>
                           </div>
+                          <div className="p-2 rounded-lg bg-white/5">
+                            <div className="text-[9px] opacity-60">ETA CRUCE</div>
+                            <div className="text-sm font-bold mt-0.5 text-[#00E676]">
+                              {passagePlan.eta_hours} hrs
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-white/5 text-[11px] text-[#00E676]">
+                          Plan Vélico: <strong>{passagePlan.sail_plan}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Anchorage Selector */}
+                      <div className="space-y-1.5">
+                        <label className="block text-[11px] font-mono uppercase opacity-70">
+                          Caleta / Fondeadero (Seno de Reloncaví & Chiloé)
+                        </label>
+                        <div className="flex gap-2">
+                          <select
+                            value={selectedAnchorageSlug}
+                            onChange={(e) =>
+                              setSelectedAnchorageSlug(e.target.value)
+                            }
+                            className="flex-1 min-w-0 min-h-14 px-3 text-xs sm:text-sm font-medium"
+                          >
+                            {anchorages.map((a) => (
+                              <option key={a.id} value={a.slug}>
+                                {a.name} ({a.min_depth_m}m • {a.seabed_type})
+                              </option>
+                            ))}
+                          </select>
                           <button
                             type="button"
                             onClick={() =>
-                              setSoundAlarmEnabled(!soundAlarmEnabled)
+                              fetchLiveOpenMeteoAndScore(selectedAnchorage)
                             }
-                            className="min-h-14 w-full px-3 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] text-[var(--accent-primary)] flex items-center justify-center gap-1.5 mt-1"
+                            title="Actualizar Open-Meteo en vivo"
+                            className="marine-btn marine-btn-secondary px-3.5 shrink-0"
                           >
-                            <Volume2 className="w-4 h-4 shrink-0" />
-                            <span>
-                              Sirena: {soundAlarmEnabled ? "ACTIVA" : "MUTE"}
-                            </span>
+                            <RefreshCw
+                              className={`w-4 h-4 ${liveWeather.loading
+                                ? "animate-spin text-[var(--accent-primary)]"
+                                : ""
+                                }`}
+                            />
                           </button>
                         </div>
                       </div>
 
-                      {anchorWatch.isDragging && (
-                        <div
-                          data-testid="drag-alarm-banner"
-                          className="p-3 rounded-xl bg-[#FF2D55]/20 border border-[#FF2D55] font-mono text-xs text-[#FF2D55] font-semibold"
-                        >
-                          ¡ALARMA DE GARREO! Barco fuera del radio de borneo (
-                          {anchorWatch.distanceFromAnchorMeters}m &gt;{" "}
-                          {anchorWatch.maxSwingRadiusMeters}m).
+                      {/* Real-Time Open-Meteo Weather & Marine Readouts with Zero-CLS Skeletons */}
+                      <div className="grid grid-cols-2 gap-2.5 font-mono">
+                        <div className="min-h-[96px] p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col justify-between">
+                          <div className="flex items-center justify-between text-[10px] opacity-60 uppercase">
+                            <span>VIENTO REAL</span>
+                            <Wind className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                          </div>
+                          {liveWeather.loading ? (
+                            <div className="space-y-1.5 pt-1">
+                              <div className="h-6 w-20 marine-skeleton" />
+                              <div className="h-3.5 w-28 marine-skeleton" />
+                            </div>
+                          ) : (
+                            <>
+                              <div
+                                data-testid="live-wind-readout"
+                                className="text-xl font-semibold mt-1"
+                              >
+                                {liveWeather.windSpeedKn.toFixed(1)} kn
+                              </div>
+                              <div className="text-[11px] opacity-70 mt-0.5 truncate">
+                                Ráf. {liveWeather.windGustKn.toFixed(1)} kn •{" "}
+                                {Math.round(liveWeather.windDirDeg)}° (
+                                {degreesToCardinal(liveWeather.windDirDeg)})
+                              </div>
+                            </>
+                          )}
                         </div>
-                      )}
 
-                      <div className="grid grid-cols-2 gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => setVesselOffsetMeters(24)}
-                          className="marine-btn marine-btn-secondary text-xs px-2"
-                        >
-                          <span>Fondeo Seguro</span>
-                        </button>
-                        <button
-                          type="button"
-                          data-testid="simulate-drag-btn"
-                          onClick={handleSimulateDragWithAudio}
-                          className="marine-btn marine-btn-primary text-xs px-2"
-                        >
-                          <span>Simular Garreo</span>
-                        </button>
+                        <div className="min-h-[96px] p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col justify-between">
+                          <div className="flex items-center justify-between text-[10px] opacity-60 uppercase">
+                            <span>OLEAJE MARINO</span>
+                            <Waves className="w-3.5 h-3.5 text-[#00E676]" />
+                          </div>
+                          {liveWeather.loading ? (
+                            <div className="space-y-1.5 pt-1">
+                              <div className="h-6 w-20 marine-skeleton" />
+                              <div className="h-3.5 w-24 marine-skeleton" />
+                            </div>
+                          ) : (
+                            <>
+                              <div
+                                data-testid="live-wave-readout"
+                                className="text-xl font-semibold mt-1"
+                              >
+                                {liveWeather.waveHeightM.toFixed(2)} m
+                              </div>
+                              <div className="text-[11px] opacity-70 mt-0.5 truncate">
+                                Período {liveWeather.wavePeriodS.toFixed(1)}s •{" "}
+                                {Math.round(liveWeather.waveDirDeg)}°
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </>
-                )}
-              </div>
 
-              {/* Bottom GPX Import in Drawer */}
-              <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs font-mono">
-                <span className="opacity-60 truncate pr-2">
-                  GPX: {parsedRoute.totalDistanceNm} MN
-                </span>
-                <label className="marine-btn marine-btn-secondary text-xs px-3 cursor-pointer shrink-0">
-                  <Upload className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
-                  <span>Cargar .GPX</span>
-                  <input
-                    type="file"
-                    accept=".gpx,application/xml,text/xml"
-                    onChange={handleGPXFileUpload}
-                    className="hidden"
-                  />
-                </label>
+                      {/* Calculated Chain Scope & Safety Score */}
+                      <div className="min-h-[148px] p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2 font-mono text-xs flex flex-col justify-between">
+                        {liveWeather.loading ? (
+                          <div className="space-y-2.5 py-1">
+                            <div className="h-4 w-full marine-skeleton" />
+                            <div className="h-4 w-4/5 marine-skeleton" />
+                            <div className="h-4 w-3/4 marine-skeleton" />
+                            <div className="h-6 w-full marine-skeleton mt-2" />
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center justify-between">
+                              <span className="opacity-70">SCORE SEGURIDAD</span>
+                              <span className="px-2.5 py-0.5 rounded-full bg-[#00E676]/15 text-[#00E676] font-bold">
+                                {liveWeather.score}/100 ({liveWeather.status})
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="opacity-70">
+                                SONDA / UKC BAJAMAR
+                              </span>
+                              <span>
+                                {scopeCalc.lowTideDepthMeters}m (UKC{" "}
+                                {(
+                                  scopeCalc.lowTideDepthMeters -
+                                  (vessel?.draft_meters || 2.18)
+                                ).toFixed(2)}
+                                m)
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="opacity-70">AMPLITUD DE MAREA</span>
+                              <span>+{scopeCalc.tideAmplitudeMeters}m</span>
+                            </div>
+                            <div className="pt-2 border-t border-white/5 flex items-center justify-between text-sm font-bold text-[var(--accent-primary)]">
+                              <span>CADENA RECOMENDADA</span>
+                              <span>
+                                {scopeCalc.recommendedChainMeters}m (Ratio{" "}
+                                {scopeCalc.recommendedRatio}:1)
+                              </span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Circular Anchor Watch Radar & Siren Controls */}
+                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 font-semibold text-xs">
+                            <BellRing className="w-4 h-4 text-[var(--accent-primary)]" />
+                            <span>Anchor Watch Pro</span>
+                          </div>
+                          <span
+                            data-testid="anchor-watch-status"
+                            className={`font-mono text-[11px] px-2.5 py-0.5 rounded-full font-bold ${anchorWatch.isDragging
+                              ? "bg-[#FF2D55]/20 text-[#FF2D55]"
+                              : "bg-[#00E676]/20 text-[#00E676]"
+                              }`}
+                          >
+                            {anchorWatch.alertLevel}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <div
+                            className={`w-20 h-20 rounded-full border-2 border-dashed flex flex-col items-center justify-center font-mono shrink-0 ${anchorWatch.isDragging
+                              ? "border-[#FF2D55] bg-[#FF2D55]/10 text-[#FF2D55] animate-pulse"
+                              : "border-[#00E676]/60 bg-[#00E676]/5 text-[#00E676]"
+                              }`}
+                          >
+                            <span className="text-sm font-bold">
+                              {anchorWatch.distanceFromAnchorMeters}m
+                            </span>
+                            <span className="text-[9px] opacity-70">
+                              MAX {anchorWatch.maxSwingRadiusMeters}m
+                            </span>
+                          </div>
+
+                          <div className="space-y-1 text-xs font-mono flex-1 min-w-0">
+                            <div>
+                              Margen: <strong>{anchorWatch.marginMeters}m</strong>
+                            </div>
+                            <div>
+                              Demora:{" "}
+                              <strong>{anchorWatch.bearingFromAnchorDeg}°</strong>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSoundAlarmEnabled(!soundAlarmEnabled)
+                              }
+                              className="min-h-14 w-full px-3 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] text-[var(--accent-primary)] flex items-center justify-center gap-1.5 mt-1"
+                            >
+                              <Volume2 className="w-4 h-4 shrink-0" />
+                              <span>
+                                Sirena: {soundAlarmEnabled ? "ACTIVA" : "MUTE"}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {anchorWatch.isDragging && (
+                          <div
+                            data-testid="drag-alarm-banner"
+                            className="p-3 rounded-xl bg-[#FF2D55]/20 border border-[#FF2D55] font-mono text-xs text-[#FF2D55] font-semibold"
+                          >
+                            ¡ALARMA DE GARREO! Barco fuera del radio de borneo (
+                            {anchorWatch.distanceFromAnchorMeters}m &gt;{" "}
+                            {anchorWatch.maxSwingRadiusMeters}m).
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setVesselOffsetMeters(24)}
+                            className="marine-btn marine-btn-secondary text-xs px-2"
+                          >
+                            <span>Fondeo Seguro</span>
+                          </button>
+                          <button
+                            type="button"
+                            data-testid="simulate-drag-btn"
+                            onClick={handleSimulateDragWithAudio}
+                            className="marine-btn marine-btn-primary text-xs px-2"
+                          >
+                            <span>Simular Garreo</span>
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Bottom GPX Import in Drawer */}
+                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs font-mono">
+                  <span className="opacity-60 truncate pr-2">
+                    GPX: {parsedRoute.totalDistanceNm} MN
+                  </span>
+                  <label className="marine-btn marine-btn-secondary text-xs px-3 cursor-pointer shrink-0">
+                    <Upload className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                    <span>Cargar .GPX</span>
+                    <input
+                      type="file"
+                      accept=".gpx,application/xml,text/xml"
+                      onChange={handleGPXFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     );
   }
 
-        // ===========================================================================
-        // VIEW 2: VESSEL (MI BARCO / GEMELO DIGITAL, SIGNAL K, QRs & DAMAGE CONTROL)
-        // ===========================================================================
-        if (activeSection === "vessel") {
+  // ===========================================================================
+  // VIEW 2: VESSEL (MI BARCO / GEMELO DIGITAL, SIGNAL K, QRs & DAMAGE CONTROL)
+  // ===========================================================================
+  if (activeSection === "vessel") {
     return (
-        <div className="space-y-6">
-          <div className="marine-card p-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)]">
-                INGENIERÍA NAVAL &amp; SOURCING DE REPUESTOS
-              </div>
-              <div className="text-lg font-bold">
-                {vessel?.name || "SV Albatros (Oceanis 41.1)"} —{" "}
-                {vesselSubView === "digital_twin"
-                  ? "Gemelo Digital & Telemetría Signal K"
-                  : vesselSubView === "damage_control"
+      <div className="space-y-6">
+        <div className="marine-card p-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)]">
+              INGENIERÍA NAVAL &amp; SOURCING DE REPUESTOS
+            </div>
+            <div className="text-lg font-bold">
+              {vessel?.name || "SV Albatros (Oceanis 41.1)"} —{" "}
+              {vesselSubView === "digital_twin"
+                ? "Gemelo Digital & Telemetría Signal K"
+                : vesselSubView === "damage_control"
                   ? "Damage Control & Marketplace de Repuestos"
                   : "Libro de Mantenimiento Inmutable & Garantías"}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                data-testid="vessel-subview-twin-btn"
-                onClick={() => setVesselSubView("digital_twin")}
-                className={`marine-btn text-xs ${
-                  vesselSubView === "digital_twin"
-                    ? "marine-btn-primary"
-                    : "marine-btn-secondary"
-                }`}
-              >
-                <Gauge className="w-4 h-4" />
-                <span>Gemelo Digital &amp; Inventario</span>
-              </button>
-              <button
-                type="button"
-                data-testid="vessel-subview-damage-btn"
-                onClick={() => setVesselSubView("damage_control")}
-                className={`marine-btn text-xs ${
-                  vesselSubView === "damage_control"
-                    ? "bg-[#FF2D55] text-white border-[#FF2D55]"
-                    : "marine-btn-secondary"
-                }`}
-              >
-                <Activity className="w-4 h-4 text-[#FF2D55]" />
-                <span>Damage Control (Falla Motor / Marketplace)</span>
-              </button>
-              <button
-                type="button"
-                data-testid="vessel-subview-service-book-btn"
-                onClick={() => setVesselSubView("service_book")}
-                className={`marine-btn text-xs ${
-                  vesselSubView === "service_book"
-                    ? "marine-btn-primary"
-                    : "marine-btn-secondary"
-                }`}
-              >
-                <ShieldCheck className="w-4 h-4" />
-                <span>Libro de Mantenimiento</span>
-              </button>
             </div>
           </div>
 
-          {vesselSubView === "service_book" ? (
-            <VesselServiceBook vessel={vessel} />
-          ) : vesselSubView === "damage_control" ? (
-            <DamageControl />
-          ) : (
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              data-testid="vessel-subview-twin-btn"
+              onClick={() => setVesselSubView("digital_twin")}
+              className={`marine-btn text-xs ${vesselSubView === "digital_twin"
+                ? "marine-btn-primary"
+                : "marine-btn-secondary"
+                }`}
+            >
+              <Gauge className="w-4 h-4" />
+              <span>Gemelo Digital &amp; Inventario</span>
+            </button>
+            <button
+              type="button"
+              data-testid="vessel-subview-damage-btn"
+              onClick={() => setVesselSubView("damage_control")}
+              className={`marine-btn text-xs ${vesselSubView === "damage_control"
+                ? "bg-[#FF2D55] text-white border-[#FF2D55]"
+                : "marine-btn-secondary"
+                }`}
+            >
+              <Activity className="w-4 h-4 text-[#FF2D55]" />
+              <span>Damage Control (Falla Motor / Marketplace)</span>
+            </button>
+            <button
+              type="button"
+              data-testid="vessel-subview-service-book-btn"
+              onClick={() => setVesselSubView("service_book")}
+              className={`marine-btn text-xs ${vesselSubView === "service_book"
+                ? "marine-btn-primary"
+                : "marine-btn-secondary"
+                }`}
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Libro de Mantenimiento</span>
+            </button>
+          </div>
+        </div>
+
+        {vesselSubView === "service_book" ? (
+          <VesselServiceBook vessel={vessel} />
+        ) : vesselSubView === "damage_control" ? (
+          <DamageControl />
+        ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-5 space-y-6">
               <div className="marine-card p-6 space-y-4">
@@ -2193,50 +2183,50 @@ export default function MarineOSHomePage() {
               <MarineCopilot vesselContext={copilotContext} />
             </div>
           </div>
-          )}
-        </div>
-        );
+        )}
+      </div>
+    );
   }
 
-        // ===========================================================================
-        // VIEW 3: VOYAGES & ZARPE
-        // ===========================================================================
-        if (activeSection === "voyages") {
-          return <VoyagesZarpeView magicToken={DEMO_IDS.MAGIC_TOKEN} />;
-        }
+  // ===========================================================================
+  // VIEW 3: VOYAGES & ZARPE
+  // ===========================================================================
+  if (activeSection === "voyages") {
+    return <VoyagesZarpeView magicToken={DEMO_IDS.MAGIC_TOKEN} />;
+  }
 
-        // ===========================================================================
-        // VIEW 4: FLEET & VESSEL MANAGER
-        // ===========================================================================
-        if (activeSection === "fleet") {
-          return <FleetManager />;
-        }
+  // ===========================================================================
+  // VIEW 4: FLEET & VESSEL MANAGER
+  // ===========================================================================
+  if (activeSection === "fleet") {
+    return <FleetManager />;
+  }
 
-        // ===========================================================================
-        // VIEW 5: CREW DIRECTORY & ADDRESS BOOK
-        // ===========================================================================
-        if (activeSection === "crew") {
-          return <CrewDirectory />;
-        }
+  // ===========================================================================
+  // VIEW 5: CREW DIRECTORY & ADDRESS BOOK
+  // ===========================================================================
+  if (activeSection === "crew") {
+    return <CrewDirectory />;
+  }
 
-        // ===========================================================================
-        // VIEW 6: INTEGRATION HUB & SETTINGS
-        // ===========================================================================
-        if (activeSection === "integrations") {
-          return <IntegrationHub />;
-        }
+  // ===========================================================================
+  // VIEW 6: INTEGRATION HUB & SETTINGS
+  // ===========================================================================
+  if (activeSection === "integrations") {
+    return <IntegrationHub />;
+  }
 
-        // ===========================================================================
-        // VIEW 7: HANDOVER WIZARD
-        // ===========================================================================
-        if (activeSection === "handover") {
-          return <HandoverWizard vesselId={activeVesselId} />;
-        }
+  // ===========================================================================
+  // VIEW 7: HANDOVER WIZARD
+  // ===========================================================================
+  if (activeSection === "handover") {
+    return <HandoverWizard vesselId={activeVesselId} />;
+  }
 
-        // ===========================================================================
-        // VIEW 8: MARINE ACADEMY & SUPPORT HUB (SALVAVIDAS 🛟)
-        // ===========================================================================
-        if (activeSection === "academy") {
+  // ===========================================================================
+  // VIEW 8: MARINE ACADEMY & SUPPORT HUB (SALVAVIDAS 🛟)
+  // ===========================================================================
+  if (activeSection === "academy") {
     return <MarineAcademy onRelaunchSeaTrials={relaunchSeaTrials} />;
   }
 
@@ -2269,7 +2259,7 @@ export default function MarineOSHomePage() {
                         </div>
                         <div>
                           <div className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)] opacity-90">
-                            REPÚBLICA DE CHILE • DIRECTEMAR — APPLE WALLET NÁUTICO
+                            MarinOS • PERFIL NÁUTICO DIGITAL
                           </div>
                           <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white mt-0.5">
                             {activeAccount.licenseType}
@@ -2277,27 +2267,64 @@ export default function MarineOSHomePage() {
                         </div>
                       </div>
 
-                      {/* Traffic Light Expiration Semaphore */}
-                      <div
-                        data-testid="license-expiry-semaphore"
-                        className={`px-3.5 py-1.5 rounded-full font-mono text-xs font-bold flex items-center gap-2 border ${semaphore.tone === "green"
-                          ? "bg-[#00E676]/15 border-[#00E676]/50 text-[#00E676]"
-                          : semaphore.tone === "amber"
-                            ? "bg-[#FF9F0A]/15 border-[#FF9F0A]/50 text-[#FF9F0A]"
-                            : "bg-[#FF2D55]/20 border-[#FF2D55] text-[#FF2D55] animate-pulse"
-                          }`}
-                      >
-                        <span
-                          className={`w-2 h-2 rounded-full ${semaphore.tone === "green"
-                            ? "bg-[#00E676]"
-                            : semaphore.tone === "amber"
-                              ? "bg-[#FF9F0A]"
-                              : "bg-[#FF2D55]"
-                            }`}
-                        />
-                        <span className="tracking-wide uppercase text-[11px]">{semaphore.badgeLabel}</span>
-                      </div>
+              {/* Traffic Light Expiration Semaphore */}
+              <div
+                data-testid="license-expiry-semaphore"
+                className={`px-3.5 py-1.5 rounded-full font-mono text-xs font-bold flex items-center gap-2 border ${semaphore.tone === "green"
+                  ? "bg-[#00E676]/15 border-[#00E676]/50 text-[#00E676]"
+                  : semaphore.tone === "amber"
+                    ? "bg-[#FF9F0A]/15 border-[#FF9F0A]/50 text-[#FF9F0A]"
+                    : "bg-[#FF2D55]/20 border-[#FF2D55] text-[#FF2D55] animate-pulse"
+                  }`}
+              >
+                <span
+                  className={`w-2 h-2 rounded-full ${semaphore.tone === "green"
+                    ? "bg-[#00E676]"
+                    : semaphore.tone === "amber"
+                      ? "bg-[#FF9F0A]"
+                      : "bg-[#FF2D55]"
+                    }`}
+                />
+                <span className="tracking-wide uppercase text-[11px]">{semaphore.badgeLabel}</span>
+              </div>
+            </div>
+
+            {/* Middle Body: Captain Metadata + Simulated Official QR Code */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="space-y-3 flex-1">
+                <div>
+                  <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">
+                    TITULAR DEL PASAPORTE NÁUTICO
+                  </div>
+                  <div className="text-2xl font-bold tracking-tight text-white mt-0.5">
+                    {activeAccount.name}
+                  </div>
+                  <div className="text-xs opacity-75 font-medium text-slate-300">
+                    {activeAccount.email || "demo@marinos.app"} •{" "}
+                    <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs pt-1">
+                  <div className="p-3 rounded-2xl bg-white/[0.025] border border-white/5">
+                    <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">DOCUMENTO</div>
+                    <div className="font-mono font-semibold mt-1 text-white">
+                      {activeAccount.documentType} {activeAccount.documentNumber}
                     </div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/[0.025] border border-white/5">
+                    <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">Nº REGISTRO</div>
+                    <div className="font-mono font-semibold mt-1 text-[var(--accent-primary)]">
+                      {activeAccount.licenseNumber}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/[0.025] border border-white/5 col-span-2 sm:col-span-1">
+                    <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">VENCIMIENTO</div>
+                    <div className="font-mono font-semibold mt-1 text-white">
+                      {activeAccount.licenseExpiry}
+                    </div>
+                  </div>
+                </div>
 
                     {/* Middle Body: Captain Metadata + Simulated Official QR Code */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -2310,40 +2337,152 @@ export default function MarineOSHomePage() {
                             {activeAccount.name}
                           </div>
                           <div className="text-xs opacity-75 font-medium text-slate-300">
-                            {activeAccount.email || "filipo.valverde@gmail.com"} •{" "}
+                            {activeAccount.email || "demo@marinos.app"} •{" "}
                             <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs pt-1">
-                          <div className="p-3 rounded-2xl bg-white/[0.025] border border-white/5">
-                            <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">DOCUMENTO</div>
-                            <div className="font-mono font-semibold mt-1 text-white">
-                              {activeAccount.documentType} {activeAccount.documentNumber}
-                            </div>
-                          </div>
-                          <div className="p-3 rounded-2xl bg-white/[0.025] border border-white/5">
-                            <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">Nº REGISTRO</div>
-                            <div className="font-mono font-semibold mt-1 text-[var(--accent-primary)]">
-                              {activeAccount.licenseNumber}
-                            </div>
-                          </div>
-                          <div className="p-3 rounded-2xl bg-white/[0.025] border border-white/5 col-span-2 sm:col-span-1">
-                            <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">VENCIMIENTO</div>
-                            <div className="font-mono font-semibold mt-1 text-white">
-                              {activeAccount.licenseExpiry}
-                            </div>
-                          </div>
-                        </div>
+                {/* Insignias de Logros (Gamificación y Prestigio Náutico) */}
+                <div className="space-y-1.5 pt-2">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5" />
+                    <span>INSIGNIAS DE LOGROS • PRESTIGIO NÁUTICO</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 font-semibold shadow-sm">
+                      <span>🌊</span> Cruce Golfo de Ancud
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/30 font-semibold shadow-sm">
+                      <span>⚓</span> Veterano de Chiloé: 1500+ MN
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30 font-semibold shadow-sm">
+                      <span>🛡️</span> Fondeo Seguro: 10 Noches
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 text-white border border-white/20 font-semibold shadow-sm">
+                      <span>🇨🇱</span> DIRECTEMAR Verificado
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-                        <div className="flex flex-wrap items-center gap-2 text-xs">
-                          <span className="px-2.5 py-1 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-[11px] text-slate-300">
-                            Atribución Máx: {activeAccount.maxLoaMeters}m LOA
-                          </span>
-                          <span className="px-2.5 py-1 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-[11px] text-slate-300">
-                            {activeAccount.vhfOperatorCert}
-                          </span>
-                        </div>
+              {/* Simulated Vector QR Code for Port Authority Verification */}
+              <div className="p-3.5 rounded-2xl bg-black/60 border border-white/15 flex flex-col items-center justify-center shrink-0 self-start sm:self-center">
+                <svg
+                  viewBox="0 0 100 100"
+                  className="w-28 h-28"
+                  aria-label="Código QR de Verificación DIRECTEMAR"
+                >
+                  <rect width="100" height="100" rx="8" fill="#040B16" />
+                  <rect
+                    x="10"
+                    y="10"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    stroke={isNight ? "#FF1E1E" : "#00E5FF"}
+                    strokeWidth="4"
+                  />
+                  <rect
+                    x="16"
+                    y="16"
+                    width="12"
+                    height="12"
+                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
+                  />
+                  <rect
+                    x="66"
+                    y="10"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    stroke={isNight ? "#FF1E1E" : "#00E5FF"}
+                    strokeWidth="4"
+                  />
+                  <rect
+                    x="72"
+                    y="16"
+                    width="12"
+                    height="12"
+                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
+                  />
+                  <rect
+                    x="10"
+                    y="66"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    stroke={isNight ? "#FF1E1E" : "#00E5FF"}
+                    strokeWidth="4"
+                  />
+                  <rect
+                    x="16"
+                    y="72"
+                    width="12"
+                    height="12"
+                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
+                  />
+                  <rect
+                    x="42"
+                    y="14"
+                    width="6"
+                    height="6"
+                    fill={isNight ? "#FF1E1E" : "#00E676"}
+                  />
+                  <rect
+                    x="52"
+                    y="22"
+                    width="6"
+                    height="14"
+                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
+                  />
+                  <rect
+                    x="42"
+                    y="42"
+                    width="16"
+                    height="16"
+                    fill={isNight ? "#FF1E1E" : "#00E676"}
+                  />
+                  <rect
+                    x="14"
+                    y="44"
+                    width="18"
+                    height="6"
+                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
+                  />
+                  <rect
+                    x="66"
+                    y="44"
+                    width="22"
+                    height="6"
+                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
+                  />
+                  <rect
+                    x="44"
+                    y="68"
+                    width="8"
+                    height="20"
+                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
+                  />
+                  <rect
+                    x="62"
+                    y="62"
+                    width="12"
+                    height="12"
+                    fill={isNight ? "#FF1E1E" : "#00E676"}
+                  />
+                  <rect
+                    x="78"
+                    y="76"
+                    width="12"
+                    height="12"
+                    fill={isNight ? "#FF1E1E" : "#00E5FF"}
+                  />
+                </svg>
+                <span className="font-mono text-[9px] uppercase tracking-widest opacity-70 mt-1.5">
+                  QR VERIFICACIÓN ARMADA
+                </span>
+              </div>
+            </div>
 
                         {/* Insignias de Logros (Gamificación y Prestigio Náutico) */}
                         <div className="space-y-1.5 pt-2">
@@ -2356,13 +2495,13 @@ export default function MarineOSHomePage() {
                               <span>🌊</span> Cruce Golfo de Ancud
                             </span>
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/30 font-semibold shadow-sm">
-                              <span>⚓</span> Veterano de Chiloé: 1500+ MN
+                              <span>⚓</span> Navegante Austral: 1500+ MN
                             </span>
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30 font-semibold shadow-sm">
                               <span>🛡️</span> Fondeo Seguro: 10 Noches
                             </span>
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 text-white border border-white/20 font-semibold shadow-sm">
-                              <span>🇨🇱</span> DIRECTEMAR Verificado
+                              <span>🇨🇱</span> Credencial Registrada
                             </span>
                           </div>
                         </div>
@@ -2373,7 +2512,7 @@ export default function MarineOSHomePage() {
                         <svg
                           viewBox="0 0 100 100"
                           className="w-28 h-28"
-                          aria-label="Código QR de Verificación DIRECTEMAR"
+                          aria-label="Código QR de Identificación de Tripulante"
                         >
                           <rect width="100" height="100" rx="8" fill="#040B16" />
                           <rect
@@ -2482,710 +2621,710 @@ export default function MarineOSHomePage() {
                           />
                         </svg>
                         <span className="font-mono text-[9px] uppercase tracking-widest opacity-70 mt-1.5">
-                          QR VERIFICACIÓN ARMADA
+                          QR IDENTIFICACIÓN TRIPULANTE
                         </span>
                       </div>
                     </div>
 
-                    {/* Wallet Interactive Controls (Test Semaphore & License Tier Offline in IndexedDB) */}
-                    <div className="pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <button
-                          type="button"
-                          data-testid="share-passport-trophy-btn"
-                          onClick={() => setIsSharingPassport(true)}
-                          className="marine-btn text-xs px-3.5 bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-semibold shadow-none hover:bg-[#202c3f]"
-                        >
-                          <Share2 className="w-4 h-4" />
-                          <span>Compartir mi Perfil / Logbook</span>
-                        </button>
-                        <button
-                          type="button"
-                          data-testid="edit-passport-profile-btn"
-                          onClick={handleOpenEditProfile}
-                          className="marine-btn marine-btn-primary text-xs px-3.5"
-                        >
-                          <UserCog className="w-4 h-4" />
-                          <span>Editar Perfil</span>
-                        </button>
-                        <button
-                          type="button"
-                          data-testid="passport-tier-altamar-btn"
-                          onClick={() =>
-                            updatePassportProfile({
-                              licenseType: "Capitán Deportivo de Alta Mar (DIRECTEMAR)",
-                              licenseExpiry: "2031-06-30",
-                              maxLoaMeters: 30.0,
-                            })
-                          }
-                          className="marine-btn marine-btn-secondary text-xs px-3"
-                        >
-                          <span>Capitán Alta Mar (Verde &gt;6m)</span>
-                        </button>
-                        <button
-                          type="button"
-                          data-testid="passport-tier-bahia-expiring-btn"
-                          onClick={() =>
-                            updatePassportProfile({
-                              licenseType: "Patrón Deportivo de Bahía (DIRECTEMAR)",
-                              licenseExpiry: "2026-12-01",
-                              maxLoaMeters: 14.0,
-                            })
-                          }
-                          className="marine-btn marine-btn-secondary text-xs px-3"
-                        >
-                          <span>Simular Vencimiento &lt;30d (Rojo)</span>
-                        </button>
-                      </div>
+          {/* Right 5 cols: Total Nautical Miles (Sea Time Log) & Certification Summary — Bento Card */}
+          <div className="lg:col-span-5 marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/60">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)]">
+                  SEA TIME LOG • BITÁCORA CERTIFICADA
+                </span>
+                <Compass className="w-5 h-5 text-[var(--accent-primary)]" />
+              </div>
+              <h2 className="text-lg font-bold tracking-tight text-white">
+                Millas Náuticas Totales Acumuladas
+              </h2>
+              <p className="text-xs text-slate-300 opacity-80 leading-relaxed font-normal">
+                Suma automática de tu historial base certificado más todas las
+                travesías GPS grabadas en IndexedDB.
+              </p>
+            </div>
 
-                      <Link
-                        href="/login"
-                        onClick={() => logoutSession()}
-                        className="marine-btn marine-btn-secondary text-xs px-3.5"
-                      >
-                        <LogOut className="w-4 h-4 text-[#FF2D55]" />
-                        <span>Cambiar Cuenta OAuth</span>
-                      </Link>
-                    </div>
-                  </div>
+            <div className="p-5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2">
+              <div className="text-[10px] font-bold tracking-[0.15em] uppercase opacity-65 text-slate-300">
+                TOTAL SEA TIME (INDEXEDDB + TRACKS)
+              </div>
+              <div
+                data-testid="sea-time-total-miles"
+                className="text-4xl sm:text-5xl font-mono font-bold tracking-tight text-[#00E5FF]"
+              >
+                {totalSeaTimeMilesNm.toLocaleString("es-CL")}{" "}
+                <span className="text-base font-normal font-sans text-slate-400">MN</span>
+              </div>
+              <div className="text-xs text-[#00E676] pt-1 font-mono">
+                • Base histórica: {activeAccount.loggedMilesNm} MN + Travesías
+                grabadas: +{loggedTrackMilesNm} MN ({savedTracks.length} piernas)
+              </div>
+            </div>
 
-                  {/* Right 5 cols: Total Nautical Miles (Sea Time Log) & Certification Summary — Bento Card */}
-                  <div className="lg:col-span-5 marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/60">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)]">
-                          SEA TIME LOG • BITÁCORA CERTIFICADA
-                        </span>
-                        <Compass className="w-5 h-5 text-[var(--accent-primary)]" />
-                      </div>
-                      <h2 className="text-lg font-bold tracking-tight text-white">
-                        Millas Náuticas Totales Acumuladas
-                      </h2>
-                      <p className="text-xs text-slate-300 opacity-80 leading-relaxed font-normal">
-                        Suma automática de tu historial base certificado más todas las
-                        travesías GPS grabadas en IndexedDB.
-                      </p>
-                    </div>
-
-                    <div className="p-5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2">
-                      <div className="text-[10px] font-bold tracking-[0.15em] uppercase opacity-65 text-slate-300">
-                        TOTAL SEA TIME (INDEXEDDB + TRACKS)
-                      </div>
-                      <div
-                        data-testid="sea-time-total-miles"
-                        className="text-4xl sm:text-5xl font-mono font-bold tracking-tight text-[#00E5FF]"
-                      >
-                        {totalSeaTimeMilesNm.toLocaleString("es-CL")}{" "}
-                        <span className="text-base font-normal font-sans text-slate-400">MN</span>
-                      </div>
-                      <div className="text-xs text-[#00E676] pt-1 font-mono">
-                        • Base histórica: {activeAccount.loggedMilesNm} MN + Travesías
-                        grabadas: +{loggedTrackMilesNm} MN ({savedTracks.length} piernas)
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 text-xs">
-                      <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
-                        <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">TRAVESÍAS GRABADAS</div>
-                        <div className="text-lg font-mono font-bold mt-1 text-white">
-                          {savedTracks.length} <span className="text-xs font-sans font-normal opacity-60">Piernas</span>
-                        </div>
-                      </div>
-                      <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
-                        <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">PROVEEDOR AUTH</div>
-                        <div className="text-xs font-mono font-semibold mt-1 uppercase text-[#00E676] truncate">
-                          {activeAccount.authProvider || "GOOGLE OAUTH"}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
+                <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">TRAVESÍAS GRABADAS</div>
+                <div className="text-lg font-mono font-bold mt-1 text-white">
+                  {savedTracks.length} <span className="text-xs font-sans font-normal opacity-60">Piernas</span>
                 </div>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
+                <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">PROVEEDOR AUTH</div>
+                <div className="text-xs font-mono font-semibold mt-1 uppercase text-[#00E676] truncate">
+                  {activeAccount.authProvider || "GOOGLE OAUTH"}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                {/* Sub-Tab Navigation: Bitácora & Replay vs. Órdenes de Repuestos */}
-                <div className="flex flex-wrap items-center gap-2 border-b border-white/5 pb-3 pt-2">
-                  <button
-                    type="button"
-                    data-testid="logbook-tab-entries-btn"
-                    onClick={() => setLogbookTab("entries")}
-                    className={`marine-btn text-xs px-4 py-2.5 flex items-center gap-2 ${
-                      logbookTab === "entries"
-                        ? "marine-btn-primary"
-                        : "marine-btn-secondary"
-                    }`}
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    <span>Bitácora de Navegación &amp; Grabadora GPS</span>
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="logbook-tab-marketplace-btn"
-                    onClick={() => setLogbookTab("marketplace")}
-                    className={`marine-btn text-xs px-4 py-2.5 flex items-center gap-2 ${
-                      logbookTab === "marketplace"
-                        ? "marine-btn-primary"
-                        : "marine-btn-secondary"
-                    }`}
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    <span>Órdenes de Repuestos • Damage Control</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/20">
-                      {marketplaceOrders.length}
+        {/* Sub-Tab Navigation: Bitácora & Replay vs. Órdenes de Repuestos */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-white/5 pb-3 pt-2">
+          <button
+            type="button"
+            data-testid="logbook-tab-entries-btn"
+            onClick={() => setLogbookTab("entries")}
+            className={`marine-btn text-xs px-4 py-2.5 flex items-center gap-2 ${logbookTab === "entries"
+              ? "marine-btn-primary"
+              : "marine-btn-secondary"
+              }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>Bitácora de Navegación &amp; Grabadora GPS</span>
+          </button>
+          <button
+            type="button"
+            data-testid="logbook-tab-marketplace-btn"
+            onClick={() => setLogbookTab("marketplace")}
+            className={`marine-btn text-xs px-4 py-2.5 flex items-center gap-2 ${logbookTab === "marketplace"
+              ? "marine-btn-primary"
+              : "marine-btn-secondary"
+              }`}
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span>Órdenes de Repuestos • Damage Control</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/20">
+              {marketplaceOrders.length}
+            </span>
+          </button>
+        </div>
+
+        {logbookTab === "entries" ? (
+          /* Bottom Row: Track Recorder & Replay + Watch Logbook & Expenses */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-7 marine-card p-6 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
+                <div>
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <Award className="w-5 h-5 text-[var(--accent-primary)]" />
+                    <span>
+                      Historial de Navegaciones, Grabadora en Vivo &amp; Replay
                     </span>
-                  </button>
+                  </h2>
+                  <p className="text-xs font-mono opacity-70">
+                    Cada track grabado incrementa automáticamente tu Sea Time Log
+                  </p>
                 </div>
 
-                {logbookTab === "entries" ? (
-                  /* Bottom Row: Track Recorder & Replay + Watch Logbook & Expenses */
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div className="lg:col-span-7 marine-card p-6 space-y-4">
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
-                        <div>
-                          <h2 className="text-lg font-semibold flex items-center gap-2">
-                            <Award className="w-5 h-5 text-[var(--accent-primary)]" />
-                            <span>
-                              Historial de Navegaciones, Grabadora en Vivo &amp; Replay
-                            </span>
-                          </h2>
-                          <p className="text-xs font-mono opacity-70">
-                            Cada track grabado incrementa automáticamente tu Sea Time Log
-                          </p>
-                        </div>
-
-                        <button
-                          type="button"
-                          data-testid="toggle-track-record-btn"
-                          onClick={handleToggleTrackRecording}
-                          className={`marine-btn text-xs ${
-                            isRecordingTrack
-                              ? "marine-btn-primary animate-pulse"
-                              : "marine-btn-secondary"
-                          }`}
-                        >
-                          <CircleDot className="w-4 h-4" />
-                          <span>
-                            {isRecordingTrack
-                              ? `Guardar Track (${recordedPoints.length} pts)`
-                              : "Grabar Ruta GPS en Vivo"}
-                          </span>
-                        </button>
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {savedTracks.map((trk) => (
-                            <button
-                              key={trk.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedReplayTrackId(trk.id);
-                                setReplayIndex(0);
-                              }}
-                              className={`min-h-14 p-3.5 rounded-xl border text-left font-mono text-xs transition ${
-                                selectedReplayTrackId === trk.id
-                                  ? "bg-[var(--accent-primary)]/15 border-[var(--accent-primary)]/50"
-                                  : "bg-white/[0.03] border-white/5 hover:bg-white/[0.06]"
-                              }`}
-                            >
-                              <div className="font-semibold truncate">{trk.title}</div>
-                              <div className="opacity-70 mt-0.5 truncate">
-                                {trk.skipper_name} • +{trk.distance_nm} MN • Máx{" "}
-                                {trk.max_sog_kn} kn
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-
-                        {activeReplayTrack && (
-                          <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
-                            <button
-                              type="button"
-                              data-testid="replay-track-btn"
-                              onClick={() => setIsReplaying(!isReplaying)}
-                              className="marine-btn marine-btn-primary text-xs px-4"
-                            >
-                              {isReplaying ? (
-                                <>
-                                  <Pause className="w-4 h-4" />
-                                  <span>Pausar</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Play className="w-4 h-4" />
-                                  <span>Reproducir Replay</span>
-                                </>
-                              )}
-                            </button>
-
-                            <div className="flex-1 min-w-[180px]">
-                              <div className="flex justify-between mb-1 opacity-80">
-                                <span>
-                                  Punto {replayIndex + 1} /{" "}
-                                  {activeReplayTrack.points.length} (
-                                  {replayPoint?.timestamp})
-                                </span>
-                                <span className="text-[var(--accent-primary)]">
-                                  {replayPoint?.sog_kn} kn • {replayPoint?.cog_deg}°
-                                </span>
-                              </div>
-                              <input
-                                type="range"
-                                min={0}
-                                max={Math.max(0, activeReplayTrack.points.length - 1)}
-                                value={replayIndex}
-                                onChange={(e) => setReplayIndex(Number(e.target.value))}
-                                className="w-full"
-                              />
-                            </div>
-                          </div>
-                        )}
-
-                        <NauticalMap
-                          fullScreen={false}
-                          waypoints={parsedRoute.waypoints}
-                          anchorages={anchorages}
-                          selectedAnchorage={selectedAnchorage}
-                          vesselPosition={{
-                            lat: replayPoint?.lat ?? effectiveVesselLat,
-                            lon: replayPoint?.lon ?? effectiveVesselLon,
-                          }}
-                          anchorPosition={{ lat: anchorLat, lon: anchorLon }}
-                          swingRadiusMeters={scopeCalc.swingRadiusMeters}
-                          isNight={isNight}
-                          trackPoints={
-                            isRecordingTrack
-                              ? recordedPoints
-                              : activeReplayTrack?.points || []
-                          }
-                          onSelectAnchorage={(a) => setSelectedAnchorageSlug(a.slug)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="lg:col-span-5 space-y-6">
-                      <div className="marine-card p-6 space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
-                          <h3 className="text-lg font-semibold flex items-center gap-2">
-                            <BookOpen className="w-5 h-5 text-[var(--accent-primary)]" />
-                            <span>
-                              Bitácora de Voz &amp; Guardia ({logbookEntries.length})
-                            </span>
-                          </h3>
-                          <span className="font-mono text-[10px] uppercase px-2.5 py-1 rounded-full bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-bold">
-                            ZERO DATA ENTRY
-                          </span>
-                        </div>
-
-                        {/* Primary Floating/Featured Voice Microphone Button (1-Tap Zero Data Entry) */}
-                        <button
-                          type="button"
-                          data-testid="voice-logbook-mic-btn"
-                          onClick={handleTriggerVoiceLogbook}
-                          className={`w-full min-h-[68px] marine-btn text-sm sm:text-base font-bold flex items-center justify-center gap-3 shadow-2xl ${
-                            isListeningVoice
-                              ? "bg-[#FF2D55] text-white border-[#FF2D55] animate-pulse"
-                              : "marine-btn-primary"
-                          }`}
-                        >
-                          <Mic className="w-6 h-6 shrink-0" />
-                          <span>
-                            {isListeningVoice
-                              ? "ESCUCHANDO VOZ... (CAPTURANDO GPS + HORÓMETRO)"
-                              : "Dictar Bitácora por Voz (1-Toque: Audio + GPS + Horómetro)"}
-                          </span>
-                        </button>
-
-                        <form
-                          onSubmit={handleAddLogbookEntryOffline}
-                          className="flex flex-wrap sm:flex-nowrap gap-2"
-                        >
-                          <input
-                            type="text"
-                            value={logNote}
-                            onChange={(e) => setLogNote(e.target.value)}
-                            placeholder={`Anotar novedad como ${activeAccount.name}...`}
-                            className="flex-1 min-w-0 min-h-14 px-3.5 text-sm"
-                          />
-                          <button
-                            type="submit"
-                            className="marine-btn marine-btn-primary text-xs w-full sm:w-auto shrink-0"
-                          >
-                            <span>Firmar</span>
-                          </button>
-                        </form>
-
-                        <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                          {logbookEntries.map((entry) => (
-                            <div
-                              key={entry.id}
-                              className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs font-mono"
-                            >
-                              <div className="flex justify-between font-semibold text-[var(--accent-primary)]">
-                                <span>{entry.author}</span>
-                                <span className="opacity-70">
-                                  {entry.timestamp.slice(0, 19).replace("T", " ")} UTC
-                                </span>
-                              </div>
-                              <div className="mt-1.5 opacity-90">{entry.notes}</div>
-                              <div className="mt-1.5 text-[11px] opacity-60">
-                                {entry.lat.toFixed(4)}°S, {entry.lon.toFixed(4)}°W • SOG{" "}
-                                {entry.sog_kn}kn • Motor {entry.engine_hours}h
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="marine-card p-6 space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
-                          <h3 className="text-base font-semibold flex items-center gap-2">
-                            <Receipt className="w-5 h-5 text-[#00E676]" />
-                            <span>Gastos de Travesía &amp; OCR Boletas</span>
-                          </h3>
-                          <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-[#00E676]/15 text-[#00E676]">
-                            USD ${totalExpensesUsd} (${perPersonUsd}/pers)
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleScanReceiptOCR("diesel")}
-                            className="marine-btn marine-btn-secondary text-xs"
-                          >
-                            <Receipt className="w-4 h-4 text-[var(--accent-primary)]" />
-                            <span>OCR Boleta Diésel</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleScanReceiptOCR("provisions")}
-                            className="marine-btn marine-btn-secondary text-xs"
-                          >
-                            <Receipt className="w-4 h-4 text-[var(--accent-primary)]" />
-                            <span>OCR Víveres</span>
-                          </button>
-                        </div>
-
-                        <div className="space-y-2">
-                          {expenses.map((exp) => (
-                            <div
-                              key={exp.id}
-                              className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between text-xs font-mono"
-                            >
-                              <div className="min-w-0 pr-2">
-                                <div className="font-medium truncate">{exp.title}</div>
-                                <div className="opacity-65 text-[11px] truncate">
-                                  Pagó: {exp.paid_by} • #{exp.receipt_number}
-                                </div>
-                              </div>
-                              <div className="text-right font-semibold shrink-0">
-                                <div className="text-[#00E676]">USD ${exp.amount_usd}</div>
-                                <div className="opacity-60 text-[11px]">
-                                  CLP ${exp.amount_clp.toLocaleString("es-CL")}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* División Automática de Gastos (Split-Bill FinOps) */}
-                        <div className="pt-4 border-t border-white/5 space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div className="text-xs font-mono uppercase tracking-wider text-[var(--accent-primary)] font-semibold flex items-center gap-1.5">
-                              <MessageCircle className="w-3.5 h-3.5" />
-                              <span>División de Gastos (Split-Bill FinOps)</span>
-                            </div>
-                            <span className="text-[10px] font-mono opacity-65">
-                              {crewList.length} tripulantes a bordo
-                            </span>
-                          </div>
-
-                          <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-3">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono pb-2 border-b border-white/5">
-                              <div>
-                                <div className="text-[10px] uppercase opacity-60">CUOTA EXACTA POR PERSONA</div>
-                                <div className="text-lg font-bold text-[#00E676] mt-0.5">
-                                  ${perPersonUsd} USD{" "}
-                                  <span className="text-xs opacity-75 font-normal">
-                                    (~${(perPersonUsd * 950).toLocaleString("es-CL")} CLP)
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="text-left sm:text-right text-[11px] opacity-80 sm:border-l sm:border-white/5 sm:pl-3">
-                                <div>Cada tripulante debe transferir a:</div>
-                                <div className="font-bold text-white text-xs mt-0.5">
-                                  {expenses[0]?.paid_by || activeAccount.name}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Crew breakdown table/list */}
-                            <div className="space-y-1.5">
-                              {crewList.map((c) => {
-                                const isPayer = c.full_name === (expenses[0]?.paid_by || activeAccount.name);
-                                const isSettled = Boolean(settledCrewIds[c.id]);
-                                return (
-                                  <div
-                                    key={c.id}
-                                    className="flex items-center justify-between text-xs font-mono py-1.5 px-2.5 rounded-lg bg-white/[0.02] border border-white/5"
-                                  >
-                                    <div className="flex items-center gap-2 min-w-0">
-                                      <span
-                                        className={`w-2 h-2 rounded-full shrink-0 ${
-                                          isPayer
-                                            ? "bg-[#00E676]"
-                                            : isSettled
-                                            ? "bg-[#00E676]"
-                                            : "bg-[var(--accent-primary)]"
-                                        }`}
-                                      />
-                                      <span className="truncate font-medium">{c.full_name}</span>
-                                      <span className="text-[10px] opacity-50 uppercase">
-                                        ({c.role})
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 shrink-0">
-                                      {isPayer ? (
-                                        <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E676]/15 text-[#00E676] font-semibold border border-[#00E676]/30">
-                                          Pagó el Total
-                                        </span>
-                                      ) : (
-                                        <button
-                                          type="button"
-                                          onClick={() => handleToggleCrewSettlement(c.id)}
-                                          className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors flex items-center gap-1 ${
-                                            isSettled
-                                              ? "bg-[#00E676]/20 text-[#00E676] border border-[#00E676]/40"
-                                              : "bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/30"
-                                          }`}
-                                        >
-                                          {isSettled ? (
-                                            <>
-                                              <CheckCircle2 className="w-3 h-3 text-[#00E676]" />
-                                              <span>Transferido</span>
-                                            </>
-                                          ) : (
-                                            <span>Cobrar: ${perPersonUsd} USD</span>
-                                          )}
-                                        </button>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-
-                            <button
-                              type="button"
-                              data-testid="whatsapp-split-bill-btn"
-                              onClick={() => handleSendWhatsAppSplitReminder(expenses[0]?.paid_by || activeAccount.name, perPersonUsd)}
-                              className="w-full mt-2 marine-btn text-xs py-2.5 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-black font-bold rounded-xl shadow-lg transition-transform active:scale-[0.99]"
-                            >
-                              <MessageCircle className="w-4 h-4 fill-black" />
-                              <span>Enviar recordatorio por WhatsApp</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* Marketplace Orders Tracker Tab */
-                  <div className="space-y-6">
-                    {/* Metrics Top Row */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
-                        <div className="text-[10px] opacity-60">TOTAL ÓRDENES</div>
-                        <div className="text-2xl font-bold mt-1 text-[var(--accent-primary)]">
-                          {marketplaceOrders.length}
-                        </div>
-                        <div className="text-[10px] opacity-50 mt-0.5">Repuestos Solicitados</div>
-                      </div>
-
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
-                        <div className="text-[10px] opacity-60">EN TRÁNSITO</div>
-                        <div className="text-2xl font-bold mt-1 text-[#00E5FF]">
-                          {marketplaceOrders.filter((o) => o.status === "dispatched" || o.status === "in_transit").length}
-                        </div>
-                        <div className="text-[10px] opacity-50 mt-0.5">Rumbo al Puerto</div>
-                      </div>
-
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
-                        <div className="text-[10px] opacity-60">A BORDO / ENTREGADOS</div>
-                        <div className="text-2xl font-bold mt-1 text-[#00E676]">
-                          {marketplaceOrders.filter((o) => o.status === "delivered").length}
-                        </div>
-                        <div className="text-[10px] opacity-50 mt-0.5">Recibidos por Tripulación</div>
-                      </div>
-
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
-                        <div className="text-[10px] opacity-60">PRESUPUESTO TOTAL</div>
-                        <div className="text-2xl font-bold mt-1 text-white">
-                          USD ${marketplaceOrders.reduce((acc, o) => acc + (o.estimated_price_usd || 0), 0).toLocaleString("es-CL")}
-                        </div>
-                        <div className="text-[10px] opacity-50 mt-0.5">
-                          ~CLP ${(marketplaceOrders.reduce((acc, o) => acc + (o.estimated_price_usd || 0), 0) * 950).toLocaleString("es-CL")}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Orders List / Empty State */}
-                    {marketplaceOrders.length === 0 ? (
-                      <div className="marine-card p-12 text-center space-y-4">
-                        <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mx-auto text-[var(--accent-primary)]">
-                          <ShoppingBag className="w-8 h-8" />
-                        </div>
-                        <div className="max-w-md mx-auto space-y-2">
-                          <h3 className="text-lg font-bold">No hay órdenes de repuestos activas</h3>
-                          <p className="text-xs font-mono opacity-70">
-                            Cuando registres una rotura en el módulo de Control de Daños (Damage Control), el sistema cotizará los repuestos con proveedores locales y podrás monitorear su entrega aquí.
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setActiveSection("vessel")}
-                          className="marine-btn marine-btn-primary text-xs px-6 py-3 min-h-12 inline-flex items-center gap-2"
-                        >
-                          <Package className="w-4 h-4" />
-                          <span>Ir a Control de Daños de la Embarcación</span>
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-base font-semibold flex items-center gap-2">
-                            <Truck className="w-5 h-5 text-[var(--accent-primary)]" />
-                            <span>Seguimiento de Despachos &amp; Logística Portuaria</span>
-                          </h3>
-                          <span className="text-xs font-mono opacity-60">
-                            Persistencia local en Dexie.js (Offline-Ready)
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {marketplaceOrders.map((order) => {
-                            const isDelivered = order.status === "delivered";
-                            const isInTransit = order.status === "dispatched" || order.status === "in_transit";
-                            return (
-                              <div
-                                key={order.id}
-                                className={`marine-card p-5 space-y-4 border transition ${
-                                  isDelivered
-                                    ? "border-[#00E676]/40 bg-[#00E676]/[0.02]"
-                                    : isInTransit
-                                    ? "border-[#00E5FF]/40 bg-[#00E5FF]/[0.02]"
-                                    : "border-white/5"
-                                }`}
-                              >
-                                <div className="flex items-start justify-between gap-3">
-                                  <div>
-                                    <div className="font-semibold text-base flex items-center gap-2">
-                                      <Package className="w-4 h-4 text-[var(--accent-primary)]" />
-                                      <span>{order.part_name}</span>
-                                    </div>
-                                    <div className="text-xs font-mono opacity-65 mt-0.5">
-                                      SKU: {order.part_sku}
-                                    </div>
-                                  </div>
-
-                                  <div
-                                    className={`px-3 py-1 rounded-full font-mono text-[11px] font-bold shrink-0 ${
-                                      isDelivered
-                                        ? "bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/50"
-                                        : isInTransit
-                                        ? "bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/50 animate-pulse"
-                                        : "bg-[#FF9F0A]/15 text-[#FF9F0A] border border-[#FF9F0A]/50"
-                                    }`}
-                                  >
-                                    {isDelivered
-                                      ? "ENTREGADO A BORDO"
-                                      : isInTransit
-                                      ? "EN TRÁNSITO"
-                                      : "COTIZADO"}
-                                  </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-2 font-mono text-xs pt-1 border-t border-white/5">
-                                  <div>
-                                    <div className="text-[10px] opacity-50 uppercase">Puerto de Destino</div>
-                                    <div className="font-semibold text-[var(--accent-primary)] truncate mt-0.5">
-                                      {order.arrival_port}
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <div className="text-[10px] opacity-50 uppercase">Proveedor Asignado</div>
-                                    <div className="font-semibold truncate mt-0.5">
-                                      {order.supplier_name}
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <div className="text-[10px] opacity-50 uppercase">Precio Estimado</div>
-                                    <div className="font-semibold text-white mt-0.5">
-                                      USD ${order.estimated_price_usd}
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <div className="text-[10px] opacity-50 uppercase">Tracking / Orden</div>
-                                    <div className="font-semibold opacity-80 truncate mt-0.5">
-                                      {order.tracking_code || `#${order.id.slice(0, 8)}`}
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
-                                  <div className="text-[10px] font-mono opacity-50">
-                                    {order.created_at ? new Date(order.created_at).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" }) : "Fecha no disp."}
-                                  </div>
-
-                                  <div className="flex items-center gap-2">
-                                    {!isDelivered && (
-                                      <>
-                                        {!isInTransit && (
-                                          <button
-                                            type="button"
-                                            onClick={() => handleUpdateOrderStatus(order.id, "dispatched")}
-                                            className="marine-btn marine-btn-secondary text-xs px-3 py-1.5"
-                                          >
-                                            <Truck className="w-3.5 h-3.5" />
-                                            <span>Marcar en Tránsito</span>
-                                          </button>
-                                        )}
-                                        <button
-                                          type="button"
-                                          onClick={() => handleUpdateOrderStatus(order.id, "delivered")}
-                                          className="marine-btn marine-btn-primary text-xs px-3 py-1.5"
-                                        >
-                                          <PackageCheck className="w-3.5 h-3.5" />
-                                          <span>Confirmar Entrega</span>
-                                        </button>
-                                      </>
-                                    )}
-                                    {isDelivered && (
-                                      <span className="text-xs font-mono text-[#00E676] flex items-center gap-1">
-                                        <PackageCheck className="w-4 h-4" />
-                                        <span>Instalado &amp; Operativo</span>
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <button
+                  type="button"
+                  data-testid="toggle-track-record-btn"
+                  onClick={handleToggleTrackRecording}
+                  className={`marine-btn text-xs ${isRecordingTrack
+                    ? "marine-btn-primary animate-pulse"
+                    : "marine-btn-secondary"
+                    }`}
+                >
+                  <CircleDot className="w-4 h-4" />
+                  <span>
+                    {isRecordingTrack
+                      ? `Guardar Track (${recordedPoints.length} pts)`
+                      : "Grabar Ruta GPS en Vivo"}
+                  </span>
+                </button>
               </div>
 
-              {/* Profile Edit Modal */}
-              {isEditingProfile && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-                  <div
-                    className={`max-w-2xl w-full rounded-3xl p-6 sm:p-8 space-y-6 border shadow-2xl my-8 ${
-                      isNight
-                        ? "bg-black border-[#FF1E1E] text-white"
-                        : "bg-[#0A192F] border-white/15 text-white"
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {savedTracks.map((trk) => (
+                    <button
+                      key={trk.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedReplayTrackId(trk.id);
+                        setReplayIndex(0);
+                      }}
+                      className={`min-h-14 p-3.5 rounded-xl border text-left font-mono text-xs transition ${selectedReplayTrackId === trk.id
+                        ? "bg-[var(--accent-primary)]/15 border-[var(--accent-primary)]/50"
+                        : "bg-white/[0.03] border-white/5 hover:bg-white/[0.06]"
+                        }`}
+                    >
+                      <div className="font-semibold truncate">{trk.title}</div>
+                      <div className="opacity-70 mt-0.5 truncate">
+                        {trk.skipper_name} • +{trk.distance_nm} MN • Máx{" "}
+                        {trk.max_sog_kn} kn
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {activeReplayTrack && (
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
+                    <button
+                      type="button"
+                      data-testid="replay-track-btn"
+                      onClick={() => setIsReplaying(!isReplaying)}
+                      className="marine-btn marine-btn-primary text-xs px-4"
+                    >
+                      {isReplaying ? (
+                        <>
+                          <Pause className="w-4 h-4" />
+                          <span>Pausar</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4" />
+                          <span>Reproducir Replay</span>
+                        </>
+                      )}
+                    </button>
+
+                    <div className="flex-1 min-w-[180px]">
+                      <div className="flex justify-between mb-1 opacity-80">
+                        <span>
+                          Punto {replayIndex + 1} /{" "}
+                          {activeReplayTrack.points.length} (
+                          {replayPoint?.timestamp})
+                        </span>
+                        <span className="text-[var(--accent-primary)]">
+                          {replayPoint?.sog_kn} kn • {replayPoint?.cog_deg}°
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={Math.max(0, activeReplayTrack.points.length - 1)}
+                        value={replayIndex}
+                        onChange={(e) => setReplayIndex(Number(e.target.value))}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <NauticalMap
+                  fullScreen={false}
+                  waypoints={parsedRoute.waypoints}
+                  anchorages={anchorages}
+                  selectedAnchorage={selectedAnchorage}
+                  vesselPosition={{
+                    lat: replayPoint?.lat ?? effectiveVesselLat,
+                    lon: replayPoint?.lon ?? effectiveVesselLon,
+                  }}
+                  anchorPosition={{ lat: anchorLat, lon: anchorLon }}
+                  swingRadiusMeters={scopeCalc.swingRadiusMeters}
+                  isNight={isNight}
+                  trackPoints={
+                    isRecordingTrack
+                      ? recordedPoints
+                      : activeReplayTrack?.points || []
+                  }
+                  onSelectAnchorage={(a) => setSelectedAnchorageSlug(a.slug)}
+                />
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 space-y-6">
+              <div className="marine-card p-6 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-[var(--accent-primary)]" />
+                    <span>
+                      Bitácora de Voz &amp; Guardia ({logbookEntries.length})
+                    </span>
+                  </h3>
+                  <span className="font-mono text-[10px] uppercase px-2.5 py-1 rounded-full bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-bold">
+                    ZERO DATA ENTRY
+                  </span>
+                </div>
+
+                {/* Primary Floating/Featured Voice Microphone Button (1-Tap Zero Data Entry) */}
+                <button
+                  type="button"
+                  data-testid="voice-logbook-mic-btn"
+                  onClick={handleTriggerVoiceLogbook}
+                  className={`w-full min-h-[68px] marine-btn text-sm sm:text-base font-bold flex items-center justify-center gap-3 shadow-2xl ${isListeningVoice
+                    ? "bg-[#FF2D55] text-white border-[#FF2D55] animate-pulse"
+                    : "marine-btn-primary"
                     }`}
+                >
+                  <Mic className="w-6 h-6 shrink-0" />
+                  <span>
+                    {isListeningVoice
+                      ? "ESCUCHANDO VOZ... (CAPTURANDO GPS + HORÓMETRO)"
+                      : "Dictar Bitácora por Voz (1-Toque: Audio + GPS + Horómetro)"}
+                  </span>
+                </button>
+
+                <form
+                  onSubmit={handleAddLogbookEntryOffline}
+                  className="flex flex-wrap sm:flex-nowrap gap-2"
+                >
+                  <input
+                    type="text"
+                    value={logNote}
+                    onChange={(e) => setLogNote(e.target.value)}
+                    placeholder={`Anotar novedad como ${activeAccount.name}...`}
+                    className="flex-1 min-w-0 min-h-14 px-3.5 text-sm"
+                  />
+                  <button
+                    type="submit"
+                    className="marine-btn marine-btn-primary text-xs w-full sm:w-auto shrink-0"
+                  >
+                    <span>Firmar</span>
+                  </button>
+                </form>
+
+                <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                  {logbookEntries.map((entry) => (
+                    <div
+                      key={entry.id}
+                      className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs font-mono"
+                    >
+                      <div className="flex justify-between font-semibold text-[var(--accent-primary)]">
+                        <span>{entry.author}</span>
+                        <span className="opacity-70">
+                          {entry.timestamp.slice(0, 19).replace("T", " ")} UTC
+                        </span>
+                      </div>
+                      <div className="mt-1.5 opacity-90">{entry.notes}</div>
+                      <div className="mt-1.5 text-[11px] opacity-60">
+                        {entry.lat.toFixed(4)}°S, {entry.lon.toFixed(4)}°W • SOG{" "}
+                        {entry.sog_kn}kn • Motor {entry.engine_hours}h
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="marine-card p-6 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
+                  <h3 className="text-base font-semibold flex items-center gap-2">
+                    <Receipt className="w-5 h-5 text-[#00E676]" />
+                    <span>Gastos de Travesía &amp; OCR Boletas</span>
+                  </h3>
+                  <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-[#00E676]/15 text-[#00E676]">
+                    USD ${totalExpensesUsd} (${perPersonUsd}/pers)
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleScanReceiptOCR("diesel")}
+                    className="marine-btn marine-btn-secondary text-xs"
+                  >
+                    <Receipt className="w-4 h-4 text-[var(--accent-primary)]" />
+                    <span>OCR Boleta Diésel</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleScanReceiptOCR("provisions")}
+                    className="marine-btn marine-btn-secondary text-xs"
+                  >
+                    <Receipt className="w-4 h-4 text-[var(--accent-primary)]" />
+                    <span>OCR Víveres</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {expenses.map((exp) => (
+                    <div
+                      key={exp.id}
+                      className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between text-xs font-mono"
+                    >
+                      <div className="min-w-0 pr-2">
+                        <div className="font-medium truncate">{exp.title}</div>
+                        <div className="opacity-65 text-[11px] truncate">
+                          Pagó: {exp.paid_by} • #{exp.receipt_number}
+                        </div>
+                      </div>
+                      <div className="text-right font-semibold shrink-0">
+                        <div className="text-[#00E676]">USD ${exp.amount_usd}</div>
+                        <div className="opacity-60 text-[11px]">
+                          CLP ${exp.amount_clp.toLocaleString("es-CL")}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* División Automática de Gastos (Split-Bill FinOps) */}
+                <div className="pt-4 border-t border-white/5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-mono uppercase tracking-wider text-[var(--accent-primary)] font-semibold flex items-center gap-1.5">
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>División de Gastos (Split-Bill FinOps)</span>
+                    </div>
+                    <span className="text-[10px] font-mono opacity-65">
+                      {crewList.length} tripulantes a bordo
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono pb-2 border-b border-white/5">
+                      <div>
+                        <div className="text-[10px] uppercase opacity-60">CUOTA EXACTA POR PERSONA</div>
+                        <div className="text-lg font-bold text-[#00E676] mt-0.5">
+                          ${perPersonUsd} USD{" "}
+                          <span className="text-xs opacity-75 font-normal">
+                            (~${(perPersonUsd * 950).toLocaleString("es-CL")} CLP)
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-left sm:text-right text-[11px] opacity-80 sm:border-l sm:border-white/5 sm:pl-3">
+                        <div>Cada tripulante debe transferir a:</div>
+                        <div className="font-bold text-white text-xs mt-0.5">
+                          {expenses[0]?.paid_by || activeAccount.name}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Crew breakdown table/list */}
+                    <div className="space-y-1.5">
+                      {crewList.map((c) => {
+                        const isPayer = c.full_name === (expenses[0]?.paid_by || activeAccount.name);
+                        const isSettled = Boolean(settledCrewIds[c.id]);
+                        return (
+                          <div
+                            key={c.id}
+                            className="flex items-center justify-between text-xs font-mono py-1.5 px-2.5 rounded-lg bg-white/[0.02] border border-white/5"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span
+                                className={`w-2 h-2 rounded-full shrink-0 ${isPayer
+                                  ? "bg-[#00E676]"
+                                  : isSettled
+                                    ? "bg-[#00E676]"
+                                    : "bg-[var(--accent-primary)]"
+                                  }`}
+                              />
+                              <span className="truncate font-medium">{c.full_name}</span>
+                              <span className="text-[10px] opacity-50 uppercase">
+                                ({c.role})
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {isPayer ? (
+                                <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E676]/15 text-[#00E676] font-semibold border border-[#00E676]/30">
+                                  Pagó el Total
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleCrewSettlement(c.id)}
+                                  className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors flex items-center gap-1 ${isSettled
+                                    ? "bg-[#00E676]/20 text-[#00E676] border border-[#00E676]/40"
+                                    : "bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/30"
+                                    }`}
+                                >
+                                  {isSettled ? (
+                                    <>
+                                      <CheckCircle2 className="w-3 h-3 text-[#00E676]" />
+                                      <span>Transferido</span>
+                                    </>
+                                  ) : (
+                                    <span>Cobrar: ${perPersonUsd} USD</span>
+                                  )}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      type="button"
+                      data-testid="whatsapp-split-bill-btn"
+                      onClick={() => handleSendWhatsAppSplitReminder(expenses[0]?.paid_by || activeAccount.name, perPersonUsd)}
+                      className="w-full mt-2 marine-btn text-xs py-2.5 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-black font-bold rounded-xl shadow-lg transition-transform active:scale-[0.99]"
+                    >
+                      <MessageCircle className="w-4 h-4 fill-black" />
+                      <span>Enviar recordatorio por WhatsApp</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Marketplace Orders Tracker Tab */
+          <div className="space-y-6">
+            {/* Metrics Top Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+                <div className="text-[10px] opacity-60">TOTAL ÓRDENES</div>
+                <div className="text-2xl font-bold mt-1 text-[var(--accent-primary)]">
+                  {marketplaceOrders.length}
+                </div>
+                <div className="text-[10px] opacity-50 mt-0.5">Repuestos Solicitados</div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+                <div className="text-[10px] opacity-60">EN TRÁNSITO</div>
+                <div className="text-2xl font-bold mt-1 text-[#00E5FF]">
+                  {marketplaceOrders.filter((o) => o.status === "dispatched" || o.status === "in_transit").length}
+                </div>
+                <div className="text-[10px] opacity-50 mt-0.5">Rumbo al Puerto</div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+                <div className="text-[10px] opacity-60">A BORDO / ENTREGADOS</div>
+                <div className="text-2xl font-bold mt-1 text-[#00E676]">
+                  {marketplaceOrders.filter((o) => o.status === "delivered").length}
+                </div>
+                <div className="text-[10px] opacity-50 mt-0.5">Recibidos por Tripulación</div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+                <div className="text-[10px] opacity-60">PRESUPUESTO TOTAL</div>
+                <div className="text-2xl font-bold mt-1 text-white">
+                  USD ${marketplaceOrders.reduce((acc, o) => acc + (o.estimated_price_usd || 0), 0).toLocaleString("es-CL")}
+                </div>
+                <div className="text-[10px] opacity-50 mt-0.5">
+                  ~CLP ${(marketplaceOrders.reduce((acc, o) => acc + (o.estimated_price_usd || 0), 0) * 950).toLocaleString("es-CL")}
+                </div>
+              </div>
+            </div>
+
+            {/* Orders List / Empty State */}
+            {marketplaceOrders.length === 0 ? (
+              <div className="marine-card p-12 text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mx-auto text-[var(--accent-primary)]">
+                  <ShoppingBag className="w-8 h-8" />
+                </div>
+                <div className="max-w-md mx-auto space-y-2">
+                  <h3 className="text-lg font-bold">No hay órdenes de repuestos activas</h3>
+                  <p className="text-xs font-mono opacity-70">
+                    Cuando registres una rotura en el módulo de Control de Daños (Damage Control), el sistema cotizará los repuestos con proveedores locales y podrás monitorear su entrega aquí.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveSection("vessel")}
+                  className="marine-btn marine-btn-primary text-xs px-6 py-3 min-h-12 inline-flex items-center gap-2"
+                >
+                  <Package className="w-4 h-4" />
+                  <span>Ir a Control de Daños de la Embarcación</span>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-semibold flex items-center gap-2">
+                    <Truck className="w-5 h-5 text-[var(--accent-primary)]" />
+                    <span>Seguimiento de Despachos &amp; Logística Portuaria</span>
+                  </h3>
+                  <span className="text-xs font-mono opacity-60">
+                    Persistencia local en Dexie.js (Offline-Ready)
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {marketplaceOrders.map((order) => {
+                    const isDelivered = order.status === "delivered";
+                    const isInTransit = order.status === "dispatched" || order.status === "in_transit";
+                    return (
+                      <div
+                        key={order.id}
+                        className={`marine-card p-5 space-y-4 border transition ${isDelivered
+                          ? "border-[#00E676]/40 bg-[#00E676]/[0.02]"
+                          : isInTransit
+                            ? "border-[#00E5FF]/40 bg-[#00E5FF]/[0.02]"
+                            : "border-white/5"
+                          }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="font-semibold text-base flex items-center gap-2">
+                              <Package className="w-4 h-4 text-[var(--accent-primary)]" />
+                              <span>{order.part_name}</span>
+                            </div>
+                            <div className="text-xs font-mono opacity-65 mt-0.5">
+                              SKU: {order.part_sku}
+                            </div>
+                          </div>
+
+                          <div
+                            className={`px-3 py-1 rounded-full font-mono text-[11px] font-bold shrink-0 ${isDelivered
+                              ? "bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/50"
+                              : isInTransit
+                                ? "bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/50 animate-pulse"
+                                : "bg-[#FF9F0A]/15 text-[#FF9F0A] border border-[#FF9F0A]/50"
+                              }`}
+                          >
+                            {isDelivered
+                              ? "ENTREGADO A BORDO"
+                              : isInTransit
+                                ? "EN TRÁNSITO"
+                                : "COTIZADO"}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 font-mono text-xs pt-1 border-t border-white/5">
+                          <div>
+                            <div className="text-[10px] opacity-50 uppercase">Puerto de Destino</div>
+                            <div className="font-semibold text-[var(--accent-primary)] truncate mt-0.5">
+                              {order.arrival_port}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] opacity-50 uppercase">Proveedor Asignado</div>
+                            <div className="font-semibold truncate mt-0.5">
+                              {order.supplier_name}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] opacity-50 uppercase">Precio Estimado</div>
+                            <div className="font-semibold text-white mt-0.5">
+                              USD ${order.estimated_price_usd}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] opacity-50 uppercase">Tracking / Orden</div>
+                            <div className="font-semibold opacity-80 truncate mt-0.5">
+                              {order.tracking_code || `#${order.id.slice(0, 8)}`}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+                          <div className="text-[10px] font-mono opacity-50">
+                            {order.created_at ? new Date(order.created_at).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" }) : "Fecha no disp."}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {!isDelivered && (
+                              <>
+                                {!isInTransit && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateOrderStatus(order.id, "dispatched")}
+                                    className="marine-btn marine-btn-secondary text-xs px-3 py-1.5"
+                                  >
+                                    <Truck className="w-3.5 h-3.5" />
+                                    <span>Marcar en Tránsito</span>
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateOrderStatus(order.id, "delivered")}
+                                  className="marine-btn marine-btn-primary text-xs px-3 py-1.5"
+                                >
+                                  <PackageCheck className="w-3.5 h-3.5" />
+                                  <span>Confirmar Entrega</span>
+                                </button>
+                              </>
+                            )}
+                            {isDelivered && (
+                              <span className="text-xs font-mono text-[#00E676] flex items-center gap-1">
+                                <PackageCheck className="w-4 h-4" />
+                                <span>Instalado &amp; Operativo</span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Profile Edit Modal */}
+      {isEditingProfile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div
+            className={`max-w-2xl w-full rounded-3xl p-6 sm:p-8 space-y-6 border shadow-2xl my-8 ${isNight
+              ? "bg-black border-[#FF1E1E] text-white"
+              : "bg-[#0A192F] border-white/15 text-white"
+              }`}
+          >
+            <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-4">
+              <div>
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <UserCog className="w-5 h-5 text-[var(--accent-primary)]" />
+                  <span>Editar Perfil Náutico &amp; Credencial</span>
+                </h3>
+                <p className="text-xs font-mono opacity-70 mt-1">
+                  Modifica tus datos de oficial de navegación y credencial DIRECTEMAR en el Pasaporte Digital
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditingProfile(false)}
+                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase opacity-70">
+                    Nombre Completo
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={profileFormData.name || ""}
+                    onChange={(e) =>
+                      setProfileFormData({ ...profileFormData, name: e.target.value })
+                    }
+                    className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
+                    placeholder="Ej. Felipe Valverde"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase opacity-70">
+                    Iniciales de Avatar (Badge)
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={3}
+                    value={profileFormData.avatarInitials || ""}
+                    onChange={(e) =>
+                      setProfileFormData({
+                        ...profileFormData,
+                        avatarInitials: e.target.value.toUpperCase(),
+                      })
+                    }
+                    className="w-full min-h-12 px-3.5 text-sm font-mono uppercase rounded-xl bg-white/5 border border-white/5"
+                    placeholder="FV"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase opacity-70">
+                    Tipo Documento
+                  </label>
+                  <select
+                    value={profileFormData.documentType || "RUT"}
+                    onChange={(e) =>
+                      setProfileFormData({
+                        ...profileFormData,
+                        documentType: e.target.value,
+                      })
+                    }
+                    className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/5"
                   >
                     <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-4">
                       <div>
@@ -3194,7 +3333,7 @@ export default function MarineOSHomePage() {
                           <span>Editar Perfil Náutico &amp; Credencial</span>
                         </h3>
                         <p className="text-xs font-mono opacity-70 mt-1">
-                          Modifica tus datos de oficial de navegación y credencial DIRECTEMAR en el Pasaporte Digital
+                          Modifica tus datos de oficial de navegación y credencial náutica en el Pasaporte Digital
                         </p>
                       </div>
                       <button
@@ -3206,259 +3345,240 @@ export default function MarineOSHomePage() {
                       </button>
                     </div>
 
-                    <form onSubmit={handleSaveProfile} className="space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-xs font-mono uppercase opacity-70">
-                            Nombre Completo
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={profileFormData.name || ""}
-                            onChange={(e) =>
-                              setProfileFormData({ ...profileFormData, name: e.target.value })
-                            }
-                            className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
-                            placeholder="Ej. Felipe Valverde"
-                          />
-                        </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase opacity-70">
+                    Nº Documento / RUT
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={profileFormData.documentNumber || ""}
+                    onChange={(e) =>
+                      setProfileFormData({
+                        ...profileFormData,
+                        documentNumber: e.target.value,
+                      })
+                    }
+                    className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
+                    placeholder="12.345.678-9"
+                  />
+                </div>
 
-                        <div className="space-y-1">
-                          <label className="text-xs font-mono uppercase opacity-70">
-                            Iniciales de Avatar (Badge)
-                          </label>
-                          <input
-                            type="text"
-                            maxLength={3}
-                            value={profileFormData.avatarInitials || ""}
-                            onChange={(e) =>
-                              setProfileFormData({
-                                ...profileFormData,
-                                avatarInitials: e.target.value.toUpperCase(),
-                              })
-                            }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono uppercase rounded-xl bg-white/5 border border-white/5"
-                            placeholder="FV"
-                          />
-                        </div>
-                      </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase opacity-70">
+                    Nacionalidad
+                  </label>
+                  <input
+                    type="text"
+                    value={profileFormData.nationality || "Chilena"}
+                    onChange={(e) =>
+                      setProfileFormData({
+                        ...profileFormData,
+                        nationality: e.target.value,
+                      })
+                    }
+                    className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
+                    placeholder="Chilena"
+                  />
+                </div>
+              </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-xs font-mono uppercase opacity-70">
-                            Tipo Documento
-                          </label>
-                          <select
-                            value={profileFormData.documentType || "RUT"}
-                            onChange={(e) =>
-                              setProfileFormData({
-                                ...profileFormData,
-                                documentType: e.target.value,
-                              })
-                            }
-                            className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/5"
-                          >
-                            <option value="RUT" className="bg-[#0A192F]">RUT</option>
-                            <option value="Pasaporte" className="bg-[#0A192F]">Pasaporte</option>
-                            <option value="DNI" className="bg-[#0A192F]">DNI</option>
-                          </select>
-                        </div>
+              <div className="space-y-1">
+                <label className="text-xs font-mono uppercase opacity-70">
+                  Tipo de Licencia (DIRECTEMAR)
+                </label>
+                <select
+                  value={
+                    profileFormData.licenseType ||
+                    "Capitán Deportivo de Alta Mar (DIRECTEMAR)"
+                  }
+                  onChange={(e) =>
+                    setProfileFormData({
+                      ...profileFormData,
+                      licenseType: e.target.value,
+                    })
+                  }
+                  className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/5"
+                >
+                  <option value="Capitán Deportivo de Alta Mar (DIRECTEMAR)" className="bg-[#0A192F]">
+                    Capitán Deportivo de Alta Mar (DIRECTEMAR)
+                  </option>
+                  <option value="Capitán Deportivo Costero (DIRECTEMAR)" className="bg-[#0A192F]">
+                    Capitán Deportivo Costero (DIRECTEMAR)
+                  </option>
+                  <option value="Patrón Deportivo de Bahía (DIRECTEMAR)" className="bg-[#0A192F]">
+                    Patrón Deportivo de Bahía (DIRECTEMAR)
+                  </option>
+                  <option value="Patrón de Nave Menor (DIRECTEMAR)" className="bg-[#0A192F]">
+                    Patrón de Nave Menor (DIRECTEMAR)
+                  </option>
+                  <option value="Oficial de Cubierta Mercante" className="bg-[#0A192F]">
+                    Oficial de Cubierta Mercante
+                  </option>
+                </select>
+              </div>
 
-                        <div className="space-y-1">
-                          <label className="text-xs font-mono uppercase opacity-70">
-                            Nº Documento / RUT
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={profileFormData.documentNumber || ""}
-                            onChange={(e) =>
-                              setProfileFormData({
-                                ...profileFormData,
-                                documentNumber: e.target.value,
-                              })
-                            }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
-                            placeholder="12.345.678-9"
-                          />
-                        </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase opacity-70">
+                    Nº de Registro
+                  </label>
+                  <input
+                    type="text"
+                    value={profileFormData.licenseNumber || ""}
+                    onChange={(e) =>
+                      setProfileFormData({
+                        ...profileFormData,
+                        licenseNumber: e.target.value,
+                      })
+                    }
+                    className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
+                    placeholder="ARM-CL-94821"
+                  />
+                </div>
 
-                        <div className="space-y-1">
-                          <label className="text-xs font-mono uppercase opacity-70">
-                            Nacionalidad
-                          </label>
-                          <input
-                            type="text"
-                            value={profileFormData.nationality || "Chilena"}
-                            onChange={(e) =>
-                              setProfileFormData({
-                                ...profileFormData,
-                                nationality: e.target.value,
-                              })
-                            }
-                            className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
-                            placeholder="Chilena"
-                          />
-                        </div>
-                      </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase opacity-70">
+                    Fecha Vencimiento
+                  </label>
+                  <input
+                    type="date"
+                    value={profileFormData.licenseExpiry || ""}
+                    onChange={(e) =>
+                      setProfileFormData({
+                        ...profileFormData,
+                        licenseExpiry: e.target.value,
+                      })
+                    }
+                    className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
+                  />
+                </div>
 
-                      <div className="space-y-1">
-                        <label className="text-xs font-mono uppercase opacity-70">
-                          Tipo de Licencia (DIRECTEMAR)
-                        </label>
-                        <select
-                          value={
-                            profileFormData.licenseType ||
-                            "Capitán Deportivo de Alta Mar (DIRECTEMAR)"
-                          }
-                          onChange={(e) =>
-                            setProfileFormData({
-                              ...profileFormData,
-                              licenseType: e.target.value,
-                            })
-                          }
-                          className="w-full min-h-12 px-3 text-sm rounded-xl bg-white/5 border border-white/5"
-                        >
-                          <option value="Capitán Deportivo de Alta Mar (DIRECTEMAR)" className="bg-[#0A192F]">
-                            Capitán Deportivo de Alta Mar (DIRECTEMAR)
-                          </option>
-                          <option value="Capitán Deportivo Costero (DIRECTEMAR)" className="bg-[#0A192F]">
-                            Capitán Deportivo Costero (DIRECTEMAR)
-                          </option>
-                          <option value="Patrón Deportivo de Bahía (DIRECTEMAR)" className="bg-[#0A192F]">
-                            Patrón Deportivo de Bahía (DIRECTEMAR)
-                          </option>
-                          <option value="Patrón de Nave Menor (DIRECTEMAR)" className="bg-[#0A192F]">
-                            Patrón de Nave Menor (DIRECTEMAR)
-                          </option>
-                          <option value="Oficial de Cubierta Mercante" className="bg-[#0A192F]">
-                            Oficial de Cubierta Mercante
-                          </option>
-                        </select>
-                      </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase opacity-70">
+                    Eslora Máx Atribución (m)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={profileFormData.maxLoaMeters ?? 24}
+                    onChange={(e) =>
+                      setProfileFormData({
+                        ...profileFormData,
+                        maxLoaMeters: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
+                  />
+                </div>
+              </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-xs font-mono uppercase opacity-70">
-                            Nº de Registro
-                          </label>
-                          <input
-                            type="text"
-                            value={profileFormData.licenseNumber || ""}
-                            onChange={(e) =>
-                              setProfileFormData({
-                                ...profileFormData,
-                                licenseNumber: e.target.value,
-                              })
-                            }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
-                            placeholder="ARM-CL-94821"
-                          />
-                        </div>
+              <div className="space-y-1">
+                <label className="text-xs font-mono uppercase opacity-70">
+                  Certificación Radioperador VHF
+                </label>
+                <input
+                  type="text"
+                  value={profileFormData.vhfOperatorCert || ""}
+                  onChange={(e) =>
+                    setProfileFormData({
+                      ...profileFormData,
+                      vhfOperatorCert: e.target.value,
+                    })
+                  }
+                  className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
+                  placeholder="Certificado Radioperador Restringido VHF"
+                />
+              </div>
 
-                        <div className="space-y-1">
-                          <label className="text-xs font-mono uppercase opacity-70">
-                            Fecha Vencimiento
-                          </label>
-                          <input
-                            type="date"
-                            value={profileFormData.licenseExpiry || ""}
-                            onChange={(e) =>
-                              setProfileFormData({
-                                ...profileFormData,
-                                licenseExpiry: e.target.value,
-                              })
-                            }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
-                          />
-                        </div>
+              <div className="pt-4 border-t border-white/5 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingProfile(false)}
+                  className="marine-btn marine-btn-secondary min-h-12 px-5 text-sm"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="marine-btn marine-btn-primary min-h-12 px-6 text-sm font-bold"
+                >
+                  Guardar en Pasaporte
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Modal Trofeo Digital & Pasaporte Náutico Compartible (Instagram Stories / Red Social) */}
+      {isSharingPassport && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in"
+          onClick={() => setIsSharingPassport(false)}
+        >
+          <div
+            className="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl bg-[#040B16] border border-white/5 p-6 sm:p-7 shadow-2xl shadow-black/80 relative space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+              <div className="flex items-center gap-2">
+                <Award className="w-5 h-5 text-[var(--accent-primary)]" />
+                <span className="font-mono text-xs uppercase tracking-widest text-[var(--accent-primary)] font-bold">
+                  TROFEO DIGITAL NÁUTICO • MARINOS
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsSharingPassport(false)}
+                className="p-1 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-                        <div className="space-y-1">
-                          <label className="text-xs font-mono uppercase opacity-70">
-                            Eslora Máx Atribución (m)
-                          </label>
-                          <input
-                            type="number"
-                            step="0.5"
-                            value={profileFormData.maxLoaMeters ?? 24}
-                            onChange={(e) =>
-                              setProfileFormData({
-                                ...profileFormData,
-                                maxLoaMeters: parseFloat(e.target.value) || 0,
-                              })
-                            }
-                            className="w-full min-h-12 px-3.5 text-sm font-mono rounded-xl bg-white/5 border border-white/5"
-                          />
-                        </div>
-                      </div>
+            {/* Instagram Story Format Card (Digital Trophy) */}
+            <div className="relative rounded-2xl p-5 bg-[#0a1424] border border-white/5 overflow-hidden space-y-4 text-center">
 
-                      <div className="space-y-1">
-                        <label className="text-xs font-mono uppercase opacity-70">
-                          Certificación Radioperador VHF
-                        </label>
-                        <input
-                          type="text"
-                          value={profileFormData.vhfOperatorCert || ""}
-                          onChange={(e) =>
-                            setProfileFormData({
-                              ...profileFormData,
-                              vhfOperatorCert: e.target.value,
-                            })
-                          }
-                          className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
-                          placeholder="Certificado Radioperador Restringido VHF"
-                        />
-                      </div>
+              {/* Top Badge */}
+              <div className="flex justify-center">
+                <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 uppercase">
+                  BITÁCORA OFICIAL CERTIFICADA
+                </span>
+              </div>
 
-                      <div className="pt-4 border-t border-white/5 flex items-center justify-end gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingProfile(false)}
-                          className="marine-btn marine-btn-secondary min-h-12 px-5 text-sm"
-                        >
-                          Cancelar
-                        </button>
-                        <button
-                          type="submit"
-                          className="marine-btn marine-btn-primary min-h-12 px-6 text-sm font-bold"
-                        >
-                          Guardar en Pasaporte
-                        </button>
-                      </div>
-                    </form>
+              {/* Captain Avatar & Name */}
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-20 h-20 rounded-full border-2 border-[var(--accent-primary)]/60 p-1">
+                  <div className="w-full h-full rounded-full bg-[#040B16] flex items-center justify-center font-bold text-2xl text-white font-mono">
+                    {activeAccount.name.slice(0, 2).toUpperCase()}
                   </div>
                 </div>
-              )}
-              {/* Modal Trofeo Digital & Pasaporte Náutico Compartible (Instagram Stories / Red Social) */}
-              {isSharingPassport && (
-                <div
-                  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in"
-                  onClick={() => setIsSharingPassport(false)}
-                >
-                  <div
-                    className="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl bg-[#040B16] border border-white/5 p-6 sm:p-7 shadow-2xl shadow-black/80 relative space-y-5"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {/* Header */}
-                    <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                      <div className="flex items-center gap-2">
-                        <Award className="w-5 h-5 text-[var(--accent-primary)]" />
-                        <span className="font-mono text-xs uppercase tracking-widest text-[var(--accent-primary)] font-bold">
-                          TROFEO DIGITAL NÁUTICO • MARINOS
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setIsSharingPassport(false)}
-                        className="p-1 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
+                <div>
+                  <h4 className="text-xl font-bold tracking-tight text-white">
+                    {activeAccount.name}
+                  </h4>
+                  <div className="text-xs font-mono text-[var(--accent-primary)] mt-0.5">
+                    {activeAccount.licenseType}
+                  </div>
+                  <div className="text-[11px] font-mono opacity-60">
+                    Reg. {activeAccount.licenseNumber} • {activeAccount.documentType} {activeAccount.documentNumber}
+                  </div>
+                </div>
+              </div>
 
-                    {/* Instagram Story Format Card (Digital Trophy) */}
-                    <div className="relative rounded-2xl p-5 bg-[#0a1424] border border-white/5 overflow-hidden space-y-4 text-center">
+              {/* Big Sea Time Counter */}
+              <div className="py-3 px-4 rounded-xl bg-white/[0.04] border border-white/5 space-y-1">
+                <div className="text-[10px] font-mono uppercase tracking-widest opacity-60">
+                  TOTAL SEA TIME ACUMULADO
+                </div>
+                <div className="text-3xl font-extrabold font-mono text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[var(--accent-primary)]">
+                  {totalSeaTimeMilesNm.toFixed(1)} MN
+                </div>
+                <div className="text-[11px] font-mono opacity-70">
+                  Embarcación habitual: SV Albatros (14.2m LOA)
+                </div>
+              </div>
 
                       {/* Top Badge */}
                       <div className="flex justify-center">
@@ -3530,51 +3650,82 @@ export default function MarineOSHomePage() {
                           <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
                             <span className="text-base">🇨🇱</span>
                             <div>
-                              <div className="font-bold text-white text-[10px]">DIRECTEMAR</div>
-                              <div className="text-[9px] opacity-60">Firma Criptográfica</div>
+                              <div className="font-bold text-white text-[10px]">Credencial Náutica</div>
+                              <div className="text-[9px] opacity-60">Registrada en App</div>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Cryptographic Seal */}
+                      {/* Local Storage Info */}
                       <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[9px] font-mono opacity-60">
-                        <span>MARINOS DECENTRALIZED LEDGER</span>
+                        <span>MARINOS LOCAL STORAGE</span>
                         <span>HASH: SHA256-e8f491c2</span>
                       </div>
                     </div>
-
-                    {/* Action Buttons */}
-                    <div className="space-y-2 pt-2">
-                      <button
-                        type="button"
-                        data-testid="copy-trophy-text-btn"
-                        onClick={handleCopyTrophyText}
-                        className="w-full marine-btn marine-btn-primary min-h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-none"
-                      >
-                        {copiedShareLink ? (
-                          <>
-                            <Check className="w-4 h-4 text-black" />
-                            <span>¡Copiado para Instagram / WhatsApp!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-4 h-4" />
-                            <span>Copiar Trofeo para Compartir</span>
-                          </>
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setIsSharingPassport(false)}
-                        className="w-full marine-btn marine-btn-secondary min-h-11 text-xs"
-                      >
-                        Cerrar
-                      </button>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
+                    <span className="text-base">⚓</span>
+                    <div>
+                      <div className="font-bold text-white text-[10px]">Veterano Chiloé</div>
+                      <div className="text-[9px] opacity-60">1500+ MN Navegadas</div>
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
+                    <span className="text-base">🛡️</span>
+                    <div>
+                      <div className="font-bold text-white text-[10px]">Fondeo Seguro</div>
+                      <div className="text-[9px] opacity-60">10 Noches Sin Garreo</div>
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-2">
+                    <span className="text-base">🇨🇱</span>
+                    <div>
+                      <div className="font-bold text-white text-[10px]">DIRECTEMAR</div>
+                      <div className="text-[9px] opacity-60">Firma Criptográfica</div>
                     </div>
                   </div>
                 </div>
-              )}
-            </>
-          );
+              </div>
+
+              {/* Cryptographic Seal */}
+              <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[9px] font-mono opacity-60">
+                <span>MARINOS DECENTRALIZED LEDGER</span>
+                <span>HASH: SHA256-e8f491c2</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-2 pt-2">
+              <button
+                type="button"
+                data-testid="copy-trophy-text-btn"
+                onClick={handleCopyTrophyText}
+                className="w-full marine-btn marine-btn-primary min-h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-none"
+              >
+                {copiedShareLink ? (
+                  <>
+                    <Check className="w-4 h-4 text-black" />
+                    <span>¡Copiado para Instagram / WhatsApp!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    <span>Copiar Trofeo para Compartir</span>
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSharingPassport(false)}
+                className="w-full marine-btn marine-btn-secondary min-h-11 text-xs"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

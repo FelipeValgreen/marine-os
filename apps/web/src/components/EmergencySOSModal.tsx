@@ -9,85 +9,152 @@ import {
   Satellite,
   X,
   Volume2,
-  CheckCircle2,
-  Send,
-  ShieldAlert,
+  LifeBuoy,
+  Flame,
+  Droplets,
+  Anchor,
+  HelpCircle,
+  Eye,
+  Navigation,
 } from "lucide-react";
-import { db, DEMO_IDS, enqueueOfflineMutation } from "@/lib/offline/db";
+import {
+  db,
+  DEMO_IDS,
+  getIntegrationSettings,
+  type IntegrationSettingsRecord,
+} from "@/lib/offline/db";
 import {
   formatNauticalCoordsDMS,
   triggerAcousticMarineAlarm,
 } from "@/lib/nautical";
 import { useMarineContext } from "@/components/ThemeProvider";
 
+export type EmergencyCategory =
+  | "via_de_agua"
+  | "fuego"
+  | "hombre_al_agua"
+  | "gobierno_varada"
+  | "otra";
+
+interface EmergencyDefinition {
+  id: EmergencyCategory;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+  assistance: string;
+  extraInfo: string;
+}
+
+const EMERGENCY_TYPES: EmergencyDefinition[] = [
+  {
+    id: "via_de_agua",
+    label: "Vía de Agua",
+    icon: Droplets,
+    description: "VÍA DE AGUA INCONTROLADA EN CASCO / SALA DE MÁQUINAS",
+    assistance: "SOLICITO ASISTENCIA INMEDIATA Y BOMBAS DE ACHIQUE",
+    extraInfo: "Embarcación con riesgo de pérdida de flotabilidad",
+  },
+  {
+    id: "fuego",
+    label: "Fuego a Bordo",
+    icon: Flame,
+    description: "INCENDIO A BORDO FUERA DE CONTROL",
+    assistance: "SOLICITO EVACUACIÓN Y APOYO DE EXTINCIÓN INMEDIATO",
+    extraInfo: "Fuego activo, tripulación preparando abandono de ser necesario",
+  },
+  {
+    id: "hombre_al_agua",
+    label: "Hombre al Agua (MOB)",
+    icon: LifeBuoy,
+    description: "HOMBRE AL AGUA (MOB) EN EL AGUA",
+    assistance: "SOLICITO APOYO URGENTE DE BÚSQUEDA Y RESCATE (SAR)",
+    extraInfo: "Iniciando maniobra de recuperación en la última posición marcada",
+  },
+  {
+    id: "gobierno_varada",
+    label: "Pérdida de Gobierno / Varada",
+    icon: Anchor,
+    description: "PÉRDIDA TOTAL DE GOBIERNO / EMBARCACIÓN VARADA EN BAJÍO",
+    assistance: "SOLICITO ASISTENCIA DE REMOLQUE Y RESCATE",
+    extraInfo: "Sin timón o propulsión, derivando hacia costa / peligros",
+  },
+  {
+    id: "otra",
+    label: "Otra Emergencia Grave",
+    icon: HelpCircle,
+    description: "EMERGENCIA GRAVE CON PELIGRO INMINENTE PARA LA VIDA",
+    assistance: "SOLICITO ASISTENCIA INMEDIATA",
+    extraInfo: "Situación crítica a bordo",
+  },
+];
+
 export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
-  const { theme, pushToast } = useMarineContext();
+  const { theme } = useMarineContext();
   const isNight = theme === "night-red-shift";
 
   const vessel = useLiveQuery(() => db.vessels.get(DEMO_IDS.VESSEL_ID), []);
   const crewList = useLiveQuery(() => db.voyage_crew.toArray(), [], []);
 
-  const [emergencyType, setEmergencyType] = useState<string>(
-    "VÍA DE AGUA EN SALA DE MÁQUINAS"
-  );
+  // R-4.5.1: Sin emergencia preseleccionada; el usuario elige la categoría
+  const [selectedEmergency, setSelectedEmergency] =
+    useState<EmergencyCategory | null>(null);
+
+  // R-4.5.8: Coordenadas 100% offline desde GPS nativo del dispositivo si está disponible
   const [liveCoords, setLiveCoords] = useState<{ lat: number; lon: number }>({
     lat: -41.4717,
     lon: -72.9369,
   });
-  const [satTransmitted, setSatTransmitted] = useState<boolean>(false);
-  const [satTimestamp, setSatTimestamp] = useState<string>("");
 
-  // Live GPS micro-tick to show real-time coordinate tracking during MAYDAY broadcast
+  const [integrationSettings, setIntegrationSettings] =
+    useState<IntegrationSettingsRecord | null>(null);
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      setLiveCoords((prev) => ({
-        lat: prev.lat - 0.00004,
-        lon: prev.lon + 0.00003,
-      }));
-    }, 2000);
-    return () => clearInterval(timer);
+    getIntegrationSettings().then(setIntegrationSettings).catch(() => {});
+
+    if (typeof navigator !== "undefined" && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setLiveCoords({
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+          });
+        },
+        () => {},
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 }
+      );
+
+      const watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          setLiveCoords({
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+          });
+        },
+        () => {},
+        { enableHighAccuracy: true, maximumAge: 5000 }
+      );
+
+      return () => navigator.geolocation.clearWatch(watchId);
+    }
   }, []);
 
   const dms = formatNauticalCoordsDMS(liveCoords.lat, liveCoords.lon);
-  const pobCount = Math.max(1, crewList.length || 3);
-  const vesselName = vessel?.name || "SV Albatros (Oceanis 41.1)";
+  const pobCount = Math.max(1, (crewList || []).length || 3);
+  const vesselName = vessel?.name || "SV Albatros";
   const regNumber = vessel?.registration_number || "CB-4582";
+  const mmsi = vessel?.mmsi || "NO REGISTRADO";
+  const callSign = vessel?.call_sign || regNumber;
 
-  const compressedSatellitePayload = `SOS|${regNumber}|${liveCoords.lat.toFixed(
-    5
-  )},${liveCoords.lon.toFixed(5)}|POB:${pobCount}|EMERG:${emergencyType.slice(
-    0,
-    18
-  )}|LOA:${vessel?.loa_meters || 12.43}M|UTC:${new Date()
-    .toISOString()
-    .slice(11, 19)}`;
+  const currentEmergencyDef = EMERGENCY_TYPES.find(
+    (e) => e.id === selectedEmergency
+  );
 
-  const handleSendSatelliteBurst = async () => {
-    const ts = new Date().toISOString();
-    setSatTimestamp(ts);
-    setSatTransmitted(true);
-    triggerAcousticMarineAlarm();
-
-    await enqueueOfflineMutation({
-      table_name: "logbook_entries",
-      operation: "INSERT",
-      record_id: `sos-sat-${Date.now()}`,
-      payload: {
-        type: "IRIDIUM_GARMIN_SBD_SOS",
-        burst_payload: compressedSatellitePayload,
-        lat: liveCoords.lat,
-        lon: liveCoords.lon,
-        pob: pobCount,
-        transmitted_at: ts,
-      },
-    });
-
-    pushToast({
-      title: "Burst Satelital Iridium / Garmin Encolado",
-      subtitle: `${compressedSatellitePayload.length} bytes transmitidos al gateway local`,
-      tone: "coral",
-    });
-  };
+  // R-4.5.5: Verificar si existe dispositivo satelital configurado y activo
+  const hasActiveSatelliteHardware = Boolean(
+    integrationSettings?.satellite?.enabled &&
+      integrationSettings.satellite.provider !== "none" &&
+      integrationSettings.satellite.device_imei
+  );
 
   return (
     <motion.div
@@ -96,37 +163,37 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.18 }}
-      className={`fixed inset-0 z-[80] w-screen h-screen overflow-y-auto p-4 sm:p-8 flex items-center justify-center select-none ${
+      transition={{ duration: 0.15 }}
+      className={`fixed inset-0 z-[80] w-screen h-screen overflow-y-auto p-3 sm:p-6 flex items-center justify-center select-none ${
         isNight
           ? "bg-black text-[#FF1E1E]"
-          : "bg-black/85 backdrop-blur-2xl text-slate-100"
+          : "bg-black/90 backdrop-blur-2xl text-slate-100"
       }`}
     >
       <motion.div
         key="emergency-sos-panel"
-        initial={{ opacity: 0, scale: 0.95, y: 14 }}
+        initial={{ opacity: 0, scale: 0.96, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 14 }}
+        exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className={`w-full max-w-6xl rounded-3xl p-6 sm:p-8 border shadow-2xl shadow-black/90 space-y-6 ${
+        className={`w-full max-w-5xl rounded-3xl p-5 sm:p-7 border shadow-2xl shadow-black/90 space-y-5 my-6 ${
           isNight
             ? "bg-black border-[#FF1E1E]"
-            : "bg-[#040B16] border-red-900/60"
+            : "bg-[#060b14] border-red-900/60"
         }`}
       >
-        {/* Top Emergency Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-[#FF2D55] text-white flex items-center justify-center animate-pulse shrink-0">
-              <AlertOctagon className="w-8 h-8" />
+        {/* Top Emergency Header + Close Button (R-4.5.7: Área táctil >= 48px con 1 toque) */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-3.5">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-red-600 text-white flex items-center justify-center shrink-0">
+              <AlertOctagon className="w-7 h-7" />
             </div>
             <div>
-              <div className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#FF2D55]">
-                 CONSOLA DE EMERGENCIA MARÍTIMA • MRCC CHILE / DIRECTEMAR
+              <div className="text-[10px] font-bold tracking-[0.15em] uppercase text-red-500">
+                PROTOCOLO DE SOCORRO Y SEGURIDAD • CANAL 16 VHF (156.800 MHz)
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                SOS — Protocolo MAYDAY VHF Canal 16 &amp; Gateway Satelital
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+                Consola de Emergencia y MAYDAY
               </h1>
             </div>
           </div>
@@ -135,217 +202,272 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
             <button
               type="button"
               onClick={() => triggerAcousticMarineAlarm()}
-              className="marine-btn marine-btn-secondary text-xs px-4"
+              className="marine-btn marine-btn-secondary text-xs px-3.5 min-h-[48px]"
             >
-              <Volume2 className="w-4 h-4 text-[#FF2D55]" />
+              <Volume2 className="w-4 h-4 text-red-500" />
               <span>Sirena Acústica</span>
             </button>
             <button
               type="button"
               data-testid="close-sos-modal-btn"
               onClick={onClose}
-              className="min-h-14 px-5 rounded-xl bg-white/10 hover:bg-white/20 font-mono text-xs font-bold flex items-center gap-2"
+              className="min-h-[48px] min-w-[48px] px-4 rounded-xl bg-white/10 hover:bg-white/20 font-mono text-xs font-bold flex items-center justify-center gap-2 transition"
+              aria-label="Cerrar SOS"
             >
               <X className="w-5 h-5" />
-              <span>CERRAR SOS</span>
+              <span>CERRAR</span>
             </button>
           </div>
         </div>
 
-        {/* GIANT 32PT LIVE GPS COORDINATES BANNER FOR WHEELHOUSE / VHF READOUT */}
+        {/* R-4.5.2: PASO 1 SIEMPRE VISIBLE — VHF DSC DISTRESS */}
+        <div
+          data-testid="sos-step1-dsc-banner"
+          className="p-4 rounded-2xl bg-red-950/40 border border-red-800 text-red-100 flex items-start gap-3.5"
+        >
+          <div className="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 mt-0.5 font-bold font-mono text-sm">
+            1
+          </div>
+          <div className="space-y-1">
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-red-400">
+              PASO 1 INMEDIATO: ALERTA DIGITAL DSC (SI TU RADIO CUENTA CON DSC)
+            </div>
+            <p className="text-sm font-semibold leading-relaxed">
+              Si tu radio VHF tiene DSC, levanta la tapa roja y{" "}
+              <span className="text-white underline decoration-red-400 font-bold">
+                mantén apretado el botón DISTRESS
+              </span>{" "}
+              durante varios segundos (según el equipo) hasta que confirme la emisión.
+            </p>
+          </div>
+        </div>
+
+        {/* GIANT LIVE GPS COORDINATES BANNER FOR WHEELHOUSE / VHF READOUT */}
         <div
           data-testid="sos-giant-32pt-coords"
-          className="p-5 sm:p-6 rounded-2xl bg-black border border-red-900 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-none"
+          className="p-4 sm:p-5 rounded-2xl bg-black border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         >
           <div>
-            <div className="font-mono text-xs uppercase tracking-[0.2em] text-[#FF2D55] font-bold">
-              POSICIÓN GPS EN VIVO • LECTURA RÁPIDA DE TIMONERA (32PT)
+            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-red-400 font-bold">
+              POSICIÓN GPS ACTUAL • LECTURA INMEDIATA PARA TRANSMISIÓN
             </div>
-            <div className="font-mono text-2xl sm:text-[32pt] leading-none font-black tracking-tight text-[#00E5FF] mt-2">
-              {dms.latDms} • {dms.lonDms}
+            <div className="font-mono text-2xl sm:text-3xl font-bold tracking-tight text-white mt-1">
+              {dms.combined}
             </div>
           </div>
-          <div className="font-mono text-xs sm:text-sm text-right opacity-90 shrink-0 space-y-1">
-            <div className="px-3 py-1 rounded-lg bg-[#FF2D55]/20 border border-[#FF2D55] text-[#FF2D55] font-bold inline-block">
-              DECIMAL: {liveCoords.lat.toFixed(5)}°S, {liveCoords.lon.toFixed(5)}°W
+          <div className="font-mono text-xs text-left sm:text-right opacity-80 shrink-0 space-y-0.5">
+            <div>
+              MMSI: <strong className="text-white">{mmsi}</strong>
             </div>
-            <div className="opacity-75">
-              DATUM WGS84 • CANAL 16 VHF (156.800 MHz)
+            <div>
+              SEÑAL DISTINTIVA: <strong className="text-white">{callSign}</strong>
             </div>
           </div>
         </div>
 
-        {/* Emergency Nature Quick Selector */}
+        {/* R-4.5.1: SELECTOR DE NATURALEZA DE EMERGENCIA (OBLIGATORIO) */}
         <div className="space-y-2">
-          <div className="font-mono text-xs uppercase opacity-75">
-            SELECCIONA LA NATURALEZA DE LA EMERGENCIA PARA ACTUALIZAR EL SCRIPT:
+          <div className="font-mono text-xs uppercase tracking-wider text-slate-300">
+            {selectedEmergency
+              ? "NATURALEZA DE LA EMERGENCIA SELECCIONADA (HAZ CLIC PARA CAMBIAR):"
+              : "PASO 2: SELECCIONA LA NATURALEZA DE TU EMERGENCIA:"}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-            {[
-              "VÍA DE AGUA EN SALA DE MÁQUINAS",
-              "FUEGO A BORDO SIN CONTROL",
-              "HOMBRE AL AGUA (MOB)",
-              "PÉRDIDA DE GOBIERNO / VARADA",
-            ].map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setEmergencyType(type)}
-                className={`min-h-14 px-3.5 py-2 rounded-xl font-mono text-xs font-bold text-left border transition ${
-                  emergencyType === type
-                    ? "bg-[#FF2D55] text-white border-[#FF2D55]"
-                    : "bg-white/5 border-white/15 hover:bg-white/10"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+            {EMERGENCY_TYPES.map((em) => {
+              const Icon = em.icon;
+              const isSelected = selectedEmergency === em.id;
+              return (
+                <button
+                  key={em.id}
+                  type="button"
+                  data-testid={`sos-select-${em.id}`}
+                  onClick={() => setSelectedEmergency(em.id)}
+                  className={`min-h-[52px] p-2.5 rounded-xl border text-left transition flex items-center gap-2.5 ${
+                    isSelected
+                      ? "bg-red-950/60 text-white border-red-600 font-bold"
+                      : "bg-[#0d1524] border-white/5 text-slate-300 hover:bg-[#142033]"
+                  }`}
+                >
+                  <Icon
+                    className={`w-5 h-5 shrink-0 ${
+                      isSelected ? "text-red-400" : "text-slate-400"
+                    }`}
+                  />
+                  <span className="text-xs leading-tight">{em.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Responsive Industrial Grid: Side-by-side on PC/iPad Pro, Stacked on Mobile */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* PANEL A: VHF CHANNEL 16 MAYDAY SCRIPT (7 cols) */}
-          <div className="lg:col-span-7 rounded-2xl p-6 bg-white/[0.03] border border-white/15 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
-              <div className="flex items-center gap-2.5">
-                <Radio className="w-6 h-6 text-[#FF2D55]" />
-                <div>
-                  <h2 className="text-lg font-bold">
-                    A. Llamada VHF Canal 16 (156.800 MHz — Alta Potencia 25W)
-                  </h2>
-                  <p className="text-xs font-mono opacity-75">
-                    Presiona PTT y lee este script en voz clara y pausada:
-                  </p>
-                </div>
-              </div>
-              <span className="px-3 py-1 rounded-full bg-[#FF2D55]/20 text-[#FF2D55] font-mono text-xs font-bold">
-                POB: {pobCount} PERSONAS
-              </span>
+        {/* R-4.5.4: ACCIONES INMEDIATAS PARA HOMBRE AL AGUA (MOB) */}
+        {selectedEmergency === "hombre_al_agua" && (
+          <div
+            data-testid="sos-mob-immediate-actions"
+            className="p-4 sm:p-5 rounded-2xl bg-amber-950/40 border border-amber-600/60 text-amber-100 space-y-2.5"
+          >
+            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-amber-400">
+              <LifeBuoy className="w-4 h-4 text-amber-400" />
+              <span>ACCIONES CRÍTICAS INMEDIATAS ANTES DE TRANSMITIR:</span>
             </div>
 
-            {/* High-Legibility Giant Phonetic Script */}
-            <div
-              data-testid="vhf-mayday-script"
-              className="p-5 rounded-2xl bg-black/80 border-2 border-[#FF2D55]/60 font-mono text-sm sm:text-base leading-relaxed space-y-2.5"
-            >
-              <div className="text-[#FF2D55] font-black text-lg sm:text-xl">
-                &ldquo;MAYDAY, MAYDAY, MAYDAY&rdquo;
-              </div>
-              <div>
-                AQUÍ{" "}
-                <strong className="text-[#00E5FF]">
-                  {vesselName.toUpperCase()}
-                </strong>
-                ,{" "}
-                <strong className="text-[#00E5FF]">
-                  {vesselName.toUpperCase()}
-                </strong>
-                ,{" "}
-                <strong className="text-[#00E5FF]">
-                  {vesselName.toUpperCase()}
-                </strong>
-              </div>
-              <div>
-                MATRÍCULA:{" "}
-                <strong>{regNumber} (CHARLIE BRAVO 4-5-8-2)</strong>
-              </div>
-              <div className="p-3 rounded-xl bg-[#00E5FF]/10 border border-[#00E5FF]/40 text-[#00E5FF] font-bold">
-                POSICIÓN GPS EN VIVO: {dms.latDms} / {dms.lonDms}
-                <div className="text-xs opacity-85 mt-0.5">
-                  (DECIMAL: {liveCoords.lat.toFixed(5)}°S,{" "}
-                  {liveCoords.lon.toFixed(5)}°W — SENO DE RELONCAVÍ / CHILOÉ)
-                </div>
-              </div>
-              <div>
-                EMERGENCIA:{" "}
-                <strong className="text-[#FF9F0A]">{emergencyType}</strong>
-              </div>
-              <div>
-                PERSONAS A BORDO (POB):{" "}
-                <strong className="text-[#00E676]">
-                  {pobCount} TRIPULANTES
-                </strong>{" "}
-                • VELERO BLANCO {vessel?.loa_meters || 12.43}M ESLORA
-              </div>
-              <div className="text-[#FF2D55] font-bold">
-                &ldquo;SOLICITO ASISTENCIA INMEDIATA — CAMBIO.&rdquo;
-              </div>
-            </div>
+            <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 text-xs">
+              <li className="p-2.5 rounded-xl bg-black/40 border border-amber-600/30 flex items-start gap-2">
+                <span className="font-mono font-bold text-amber-400">1.</span>
+                <span>¡Gritar fuerte <strong>&quot;¡HOMBRE AL AGUA!&quot;</strong></span>
+              </li>
+              <li className="p-2.5 rounded-xl bg-black/40 border border-amber-600/30 flex items-start gap-2">
+                <span className="font-mono font-bold text-amber-400">2.</span>
+                <span>Lanzar aro o boya salvavidas de inmediato</span>
+              </li>
+              <li className="p-2.5 rounded-xl bg-black/40 border border-amber-600/30 flex items-start gap-2">
+                <span className="font-mono font-bold text-amber-400">3.</span>
+                <span className="flex items-center gap-1">
+                  <Eye className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Designar vigía permanente señalando con el brazo</span>
+                </span>
+              </li>
+              <li className="p-2.5 rounded-xl bg-black/40 border border-amber-600/30 flex items-start gap-2">
+                <span className="font-mono font-bold text-amber-400">4.</span>
+                <span className="flex items-center gap-1">
+                  <Navigation className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Pulsar botón MOB en el plotter / GPS</span>
+                </span>
+              </li>
+              <li className="p-2.5 rounded-xl bg-black/40 border border-amber-600/30 flex items-start gap-2">
+                <span className="font-mono font-bold text-amber-400">5.</span>
+                <span>Iniciar maniobra de recuperación (Williamson/Anderson)</span>
+              </li>
+            </ol>
           </div>
+        )}
 
-          {/* PANEL B: SATELLITE GATEWAY IRIDIUM GO! / GARMIN INREACH (5 cols) */}
-          <div className="lg:col-span-5 rounded-2xl p-6 bg-white/[0.03] border border-white/15 flex flex-col justify-between space-y-5">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2.5 border-b border-white/5 pb-3">
-                <Satellite className="w-6 h-6 text-[#00E5FF]" />
+        {/* R-4.5.3: GUION DE VOZ ESTÁNDAR DE SOCORRO (MAYDAY) */}
+        {selectedEmergency ? (
+          <div className="space-y-4">
+            <div className="rounded-2xl p-5 bg-[#0d1524] border border-white/5 space-y-3">
+              <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Radio className="w-5 h-5 text-red-500" />
+                  <span className="font-mono text-xs font-bold uppercase text-red-400">
+                    PASO 3: GUION DE TRANSMISIÓN EN CANAL 16 VHF (PRESIÓN PTT Y LEE):
+                  </span>
+                </div>
+                <span className="text-[11px] font-mono opacity-70">
+                  POB: {pobCount} a bordo
+                </span>
+              </div>
+
+              {/* Estructura oficial OMI / DIRECTEMAR */}
+              <div
+                data-testid="vhf-mayday-script"
+                className="p-5 rounded-2xl bg-black/90 border border-red-900/60 font-mono text-sm leading-relaxed space-y-3 select-text"
+              >
+                <div className="text-red-500 font-bold text-base tracking-wider">
+                  MAYDAY, MAYDAY, MAYDAY
+                </div>
+
                 <div>
-                  <h2 className="text-lg font-bold">
-                    B. Alerta Satelital (Iridium GO! / Garmin)
-                  </h2>
-                  <p className="text-xs font-mono opacity-75">
-                    Trama SBD ultracomprimida (&lt; 160 bytes) para gateway
-                    satelital local
+                  AQUÍ <strong className="text-white">{vesselName.toUpperCase()}</strong>,{" "}
+                  <strong className="text-white">{vesselName.toUpperCase()}</strong>,{" "}
+                  <strong className="text-white">{vesselName.toUpperCase()}</strong>
+                  <br />
+                  DISTINTIVO / MATRÍCULA:{" "}
+                  <strong className="text-white">{callSign}</strong> • MMSI:{" "}
+                  <strong className="text-white">{mmsi}</strong>
+                </div>
+
+                <div className="pt-1 text-slate-300">
+                  MAYDAY <strong className="text-white">{vesselName.toUpperCase()}</strong>{" "}
+                  <strong className="text-white">{callSign}</strong>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 text-white font-bold">
+                  POSICIÓN: {dms.latDms}, {dms.lonDms}
+                  <div className="text-xs font-normal text-slate-400 mt-0.5">
+                    ({liveCoords.lat.toFixed(5)}°S, {liveCoords.lon.toFixed(5)}°W • Datum WGS84)
+                  </div>
+                </div>
+
+                <div>
+                  NATURALEZA DE LA EMERGENCIA:{" "}
+                  <strong className="text-amber-400">
+                    {currentEmergencyDef?.description}
+                  </strong>
+                </div>
+
+                <div>
+                  ASISTENCIA REQUERIDA:{" "}
+                  <strong className="text-red-400">
+                    {currentEmergencyDef?.assistance}
+                  </strong>
+                </div>
+
+                <div>
+                  PERSONAS A BORDO:{" "}
+                  <strong className="text-emerald-400">{pobCount} PERSONAS</strong>
+                  <span className="text-slate-400 ml-2">
+                    (Barco tipo {vessel?.vessel_type || "velero"}, {vessel?.loa_meters || 12.4}m eslora)
+                  </span>
+                </div>
+
+                <div className="text-slate-300">
+                  INFORMACIÓN ADICIONAL: {currentEmergencyDef?.extraInfo}
+                </div>
+
+                <div className="text-red-500 font-bold tracking-wider pt-1">
+                  CAMBIO
+                </div>
+              </div>
+            </div>
+
+            {/* R-4.5.5: ALERTA SATELITAL HONESTA (DESHABILITADA SI NO HAY HARDWARE) */}
+            <div className="p-4 rounded-2xl bg-[#0d1524] border border-white/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Satellite className="w-5 h-5 text-slate-400" />
+                  <span className="font-mono text-xs font-bold uppercase text-slate-300">
+                    ALERTA SATELITAL (IRIDIUM / GARMIN INREACH)
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">
+                  {hasActiveSatelliteHardware ? "CONECTADO" : "NO DISPONIBLE"}
+                </span>
+              </div>
+
+              {!hasActiveSatelliteHardware ? (
+                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-xs text-slate-400 space-y-1 font-mono">
+                  <p className="font-semibold text-slate-300">
+                    Alerta satelital no disponible — no hay dispositivo vinculado.
+                  </p>
+                  <p className="text-[11px] opacity-75">
+                    Para activar transmisión satelital de emergencia se requiere un terminal físico
+                    Iridium GO! o Garmin inReach con suscripción activa configurado en el Hub de Integraciones.
                   </p>
                 </div>
-              </div>
-
-              <div className="space-y-2 font-mono text-xs">
-                <div className="flex justify-between opacity-75">
-                  <span>FORMATO SBD (SHORT BURST DATA):</span>
-                  <span>{compressedSatellitePayload.length} / 160 BYTES</span>
-                </div>
-                <div
-                  data-testid="satellite-sbd-payload"
-                  className="p-4 rounded-xl bg-black/80 border border-[#00E5FF]/40 text-[#00E5FF] break-all leading-relaxed"
+              ) : (
+                <button
+                  type="button"
+                  data-testid="transmit-satellite-sos-btn"
+                  className="w-full min-h-[52px] rounded-xl bg-red-600 hover:bg-red-700 text-white font-mono text-xs font-bold flex items-center justify-center gap-2 shadow-none border border-red-800"
                 >
-                  {compressedSatellitePayload}
-                </div>
-              </div>
-
-              <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-xs space-y-1">
-                <div className="font-semibold flex items-center gap-1.5 text-[#FF9F0A]">
-                  <ShieldAlert className="w-4 h-4" />
-                  <span>DESTINO GATEWAY SATELITAL:</span>
-                </div>
-                <div className="opacity-80">
-                  • MRCC Chile ( Valparaíso / Puerto Montt ) + Iridium GEOS IERCC
-                </div>
-                <div className="opacity-80">
-                  • Respaldo Local: Encolado prioritario en IndexedDB{" "}
-                  <code>sync_queue</code>
-                </div>
-              </div>
-
-              {satTransmitted && (
-                <div
-                  data-testid="satellite-sos-confirmed"
-                  className="p-4 rounded-xl bg-[#00E676]/15 border border-[#00E676] text-[#00E676] font-mono text-xs space-y-1"
-                >
-                  <div className="font-bold flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 shrink-0" />
-                    <span>TRAMA SATELITAL SBD TRANSMITIDA AL GATEWAY</span>
-                  </div>
-                  <div>ACK UTC: {satTimestamp}</div>
-                </div>
+                  <span>TRANSMITIR ALERTA SATELITAL SOS</span>
+                </button>
               )}
             </div>
-
-            <button
-              type="button"
-              data-testid="transmit-satellite-sos-btn"
-              onClick={handleSendSatelliteBurst}
-              className="w-full min-h-[60px] rounded-2xl bg-red-600 hover:bg-red-700 text-white font-mono text-sm font-bold flex items-center justify-center gap-2.5 shadow-none border border-red-800"
-            >
-              <Send className="w-5 h-5" />
-              <span>
-                {satTransmitted
-                  ? "RE-TRANSMITIR BURST SATELITAL SOS"
-                  : "EMITIR ALERTA SATELITAL (IRIDIUM / GARMIN)"}
-              </span>
-            </button>
           </div>
-        </div>
+        ) : (
+          <div className="p-8 rounded-2xl bg-[#0d1524] border border-white/5 text-center space-y-2">
+            <Radio className="w-8 h-8 mx-auto text-slate-500" />
+            <div className="text-sm font-semibold text-slate-300">
+              Selecciona una de las 5 categorías arriba para desplegar el guion MAYDAY correspondiente.
+            </div>
+            <p className="text-xs text-slate-500 font-mono">
+              El protocolo radiotelefónico internacional exige comunicar con precisión la naturaleza del peligro.
+            </p>
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );

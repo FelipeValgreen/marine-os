@@ -611,6 +611,13 @@ export function NauticalMap({
       }
     >
       <div ref={mapContainerRef} className="w-full h-full" />
+      {/* Safety Nautical Disclaimer - R-4.8.1 */}
+      <div
+        data-testid="nautical-map-disclaimer"
+        className="absolute bottom-2 right-2 pointer-events-none z-10 px-2.5 py-1 rounded bg-black/75 backdrop-blur border border-white/10 text-[10px] font-mono text-white/75 max-w-[340px] text-right"
+      >
+        Carta referencial — no apta para navegación. Usa cartas oficiales SHOA y tu plotter.
+      </div>
     </div>
   );
 }
