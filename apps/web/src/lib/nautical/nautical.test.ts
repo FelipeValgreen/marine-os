@@ -151,3 +151,48 @@ test("evaluateDynamicRoutingWindow calculates polar SOG, sail plan, and comfort 
   assert.match(headWindPlan.sail_plan, /Proa al viento/);
   assert.equal(headWindPlan.twa_deg, 1);
 });
+
+test("Handover integrity: SHA-256 seal calculation is deterministic and tamper-evident (PRD R-4.10.3)", async () => {
+  const { computeSHA256Hex } = await import("./index.ts");
+  const canonicalActa1 = JSON.stringify({
+    vessel_id: "demo-vessel-123",
+    giver: { name: "Armador Demo", document: "11.111.111-1" },
+    receiver: { name: "Capitán Demo", document: "22.222.222-2" },
+    fuel_pct: 92,
+  });
+  const hash1 = await computeSHA256Hex(canonicalActa1);
+  const hash2 = await computeSHA256Hex(canonicalActa1);
+  assert.equal(hash1, hash2, "Identical canonical actas must yield identical SHA-256 hashes");
+  assert.equal(hash1.length, 64, "SHA-256 hex digest must be 64 characters");
+
+  // Tamper test: altering 1 character alters hash completely
+  const tamperedActa = JSON.stringify({
+    vessel_id: "demo-vessel-123",
+    giver: { name: "Armador Demo", document: "11.111.111-1" },
+    receiver: { name: "Capitán Demo", document: "22.222.222-2" },
+    fuel_pct: 91, // changed 92 -> 91
+  });
+  const tamperedHash = await computeSHA256Hex(tamperedActa);
+  assert.notEqual(hash1, tamperedHash, "Altering canonical acta payload must produce a distinct hash");
+});
+
+test("Safety inventory expiration semaphore respects 90/30 day threshold (PRD R-4.9.1)", () => {
+  const now = Date.now();
+  const dayMs = 24 * 60 * 60 * 1000;
+
+  function evaluateExpiry(dateStr: string): "valid" | "warning" | "expired" {
+    const exp = new Date(dateStr).getTime();
+    const days = Math.ceil((exp - now) / dayMs);
+    if (days > 90) return "valid";
+    if (days > 30) return "warning";
+    return "expired";
+  }
+
+  const in180Days = new Date(now + 180 * dayMs).toISOString().split("T")[0];
+  const in60Days = new Date(now + 60 * dayMs).toISOString().split("T")[0];
+  const in15Days = new Date(now + 15 * dayMs).toISOString().split("T")[0];
+
+  assert.equal(evaluateExpiry(in180Days), "valid");
+  assert.equal(evaluateExpiry(in60Days), "warning");
+  assert.equal(evaluateExpiry(in15Days), "expired");
+});

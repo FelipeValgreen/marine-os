@@ -81,9 +81,9 @@ export function FleetManager() {
 
   // Genesis Handover State (Dealer / Astillero -> Dueño)
   const [genesisVessel, setGenesisVessel] = useState<VesselRecord | null>(null);
-  const [genesisBuyerName, setGenesisBuyerName] = useState("Cap. Matías Edwards");
-  const [genesisBuyerEmail, setGenesisBuyerEmail] = useState("matias.edwards@gmail.com");
-  const [genesisDealerName, setGenesisDealerName] = useState("Beneteau Americas Official Shipyard");
+  const [genesisBuyerName, setGenesisBuyerName] = useState("Capitán Demo (Armador)");
+  const [genesisBuyerEmail, setGenesisBuyerEmail] = useState("comprador.demo@marinos.app");
+  const [genesisDealerName, setGenesisDealerName] = useState("Astillero & Distribuidor Náutico Demo");
   const [genesisTransferType, setGenesisTransferType] = useState<"new_shipyard" | "brokerage_used">("new_shipyard");
   const [genesisToken, setGenesisToken] = useState<string | null>(null);
   const [copiedGenesisLink, setCopiedGenesisLink] = useState(false);

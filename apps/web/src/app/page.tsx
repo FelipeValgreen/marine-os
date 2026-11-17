@@ -238,6 +238,11 @@ export default function MarineOSHomePage() {
   const [vesselOperationalState, setVesselOperationalState] =
     useState<VesselOperationalState>("FONDEADO");
 
+  // Fleet & Inventory Categorization (PRD R-4.9.1)
+  const [inventoryTab, setInventoryTab] = useState<
+    "equipment" | "spares" | "safety"
+  >("equipment");
+
   // Passport & Marketplace State
   const [logbookTab, setLogbookTab] = useState<"entries" | "marketplace">("entries");
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
@@ -2056,13 +2061,21 @@ export default function MarineOSHomePage() {
                       {telemetry.oil_pressure_kpa} kPa
                     </div>
                   </div>
+                  {/* PRD R-4.9.2: Separar Batería de servicio (SOC %) de Alternador (V) */}
                   <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
                     <div className="opacity-60 text-[10px]">
-                      ALTERNADOR / SOC
+                      BATERÍA SERVICIO (SOC)
+                    </div>
+                    <div className="font-semibold text-base mt-1 text-[#34d399]">
+                      {telemetry.house_battery_soc_pct}%
+                    </div>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
+                    <div className="opacity-60 text-[10px]">
+                      ALTERNADOR (V)
                     </div>
                     <div className="font-semibold text-base mt-1 text-[var(--accent-primary)]">
-                      {telemetry.alternator_voltage_v.toFixed(1)}V (
-                      {telemetry.house_battery_soc_pct}%)
+                      {telemetry.alternator_voltage_v.toFixed(1)} V
                     </div>
                   </div>
                   <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
@@ -2072,21 +2085,29 @@ export default function MarineOSHomePage() {
                       {vessel?.draft_meters || 2.18}m
                     </div>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-                    <div className="opacity-60 text-[10px]">HORÓMETRO ACTUAL</div>
+                  {/* PRD R-4.9.3: Horómetro con fecha y autor de ingreso */}
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 col-span-2">
+                    <div className="flex items-center justify-between">
+                      <div className="opacity-60 text-[10px]">HORÓMETRO MOTOR PRINCIPAL</div>
+                      <span className="text-[10px] font-mono text-[#38bdf8]">Yanmar 4JH57</span>
+                    </div>
                     <div
                       data-testid="vessel-horometer-value"
-                      className="font-semibold text-base mt-1 text-[var(--accent-primary)]"
+                      className="font-semibold text-xl mt-1 text-[var(--accent-primary)]"
                     >
                       {vessel?.engine_hours_current || 1420.5} hrs
+                    </div>
+                    <div className="text-[10px] opacity-60 mt-1 font-mono">
+                      Ingreso verificado por {activeAccount.name} • Actualizado hoy
                     </div>
                   </div>
                 </div>
 
+                {/* PRD R-4.9.4: Intervalo de servicio configurable */}
                 <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-mono">
-                    <span className="opacity-80">Próximo servicio 1.500h:</span>
-                    <span className="text-[#00E676]">
+                    <span className="opacity-80">Próximo servicio programado (250 hrs):</span>
+                    <span className="text-[#34d399] font-bold">
                       Restan{" "}
                       {Math.max(
                         0,
@@ -2097,28 +2118,29 @@ export default function MarineOSHomePage() {
                       hrs
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleIncrementEngineHours(0.5)}
-                      className="marine-btn marine-btn-secondary text-xs px-2"
-                    >
-                      <span>+0.5h</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleIncrementEngineHours(1.0)}
-                      className="marine-btn marine-btn-secondary text-xs px-2"
-                    >
-                      <span>+1.0h</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleIncrementEngineHours(2.0)}
-                      className="marine-btn marine-btn-primary text-xs px-2"
-                    >
-                      <span>+2.0h</span>
-                    </button>
+                  {/* PRD R-4.9.3: Botones +0.5h identificados claramente como SIMULADOR */}
+                  <div className="flex items-center justify-between pt-1 border-t border-white/5">
+                    <span className="text-[10px] font-mono text-[#fbbf24] font-bold">
+                      [SIMULADOR]:
+                    </span>
+                    <div className="flex items-center gap-1.5 font-mono text-xs">
+                      <button
+                        type="button"
+                        onClick={() => handleIncrementEngineHours(0.5)}
+                        className="marine-btn marine-btn-secondary text-xs px-2.5 py-1 min-h-[36px]"
+                        title="Simular avance de horómetro"
+                      >
+                        +0.5h
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleIncrementEngineHours(1.0)}
+                        className="marine-btn marine-btn-secondary text-xs px-2.5 py-1 min-h-[36px]"
+                        title="Simular avance de horómetro"
+                      >
+                        +1.0h
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2155,79 +2177,184 @@ export default function MarineOSHomePage() {
               </div>
             </div>
 
+            {/* Right 7 Cols: Structured Inventory (PRD R-4.9.1: Equipos, Repuestos y Seguridad) */}
             <div className="lg:col-span-7 space-y-6">
               <div className="marine-card p-6 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
-                  <h2 className="text-lg font-semibold">
-                    Inventario de Tambuchos & Alertas SOLAS (
-                    {inventoryItems.length})
-                  </h2>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-3">
+                  <div>
+                    <h2 className="text-lg font-semibold">
+                      Inventario Técnico &amp; Pañol del Barco
+                    </h2>
+                    <p className="text-xs text-slate-300 opacity-70 mt-0.5">
+                      Gestión categorizada de equipos, stock de repuestos y elementos de seguridad con vencimiento.
+                    </p>
+                  </div>
                   <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-white/5 border border-white/5">
-                    Guardado en el Barco
+                    {inventoryItems.length} Registros
                   </span>
                 </div>
 
-                <div className="space-y-2.5">
-                  {inventoryItems.map((item) => {
-                    const isLow = item.quantity <= item.min_threshold;
-                    return (
-                      <div
-                        key={item.id}
-                        className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-3"
-                      >
-                        <div className="min-w-0">
-                          <div className="font-medium text-sm flex flex-wrap items-center gap-2">
-                            <span className="truncate">{item.item_name}</span>
-                            {isLow && (
-                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FF9F0A]/20 text-[#FF9F0A]">
-                                STOCK MÍNIMO
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-xs font-mono opacity-65 mt-0.5">
-                            {item.category} • Mínimo: {item.min_threshold}
-                            {item.expiration_date && (
-                              <span> • Vence: {item.expiration_date}</span>
-                            )}
-                          </div>
-                        </div>
+                {/* 3-Tab Categorization Bar (PRD R-4.9.1) */}
+                <div className="flex gap-2 p-1 rounded-2xl bg-white/[0.025] border border-white/5 font-mono text-xs">
+                  <button
+                    type="button"
+                    data-testid="inventory-tab-equipment-btn"
+                    onClick={() => setInventoryTab("equipment")}
+                    className={`flex-1 min-h-11 rounded-xl font-bold flex items-center justify-center gap-1.5 transition ${
+                      inventoryTab === "equipment"
+                        ? "bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/50"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    <span>⚙️ Equipos</span>
+                    <span className="text-[10px] opacity-70">
+                      ({inventoryItems.filter((i) => i.category === "equipment" || i.category === "propulsion" || i.category === "electricidad").length})
+                    </span>
+                  </button>
 
-                        <div className="flex items-center gap-2 font-mono">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleAdjustInventoryStock(
-                                item.id,
-                                -1,
-                                item.quantity
-                              )
-                            }
-                            className="marine-btn marine-btn-secondary px-3"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="min-h-14 px-3.5 flex items-center rounded-xl bg-white/5 border border-white/5 font-bold text-sm">
-                            {item.quantity} uds
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleAdjustInventoryStock(
-                                item.id,
-                                1,
-                                item.quantity
-                              )
-                            }
-                            className="marine-btn marine-btn-secondary px-3"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  <button
+                    type="button"
+                    data-testid="inventory-tab-spares-btn"
+                    onClick={() => setInventoryTab("spares")}
+                    className={`flex-1 min-h-11 rounded-xl font-bold flex items-center justify-center gap-1.5 transition ${
+                      inventoryTab === "spares"
+                        ? "bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/50"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    <span>🔧 Repuestos</span>
+                    <span className="text-[10px] opacity-70">
+                      ({inventoryItems.filter((i) => i.category === "spares" || i.category === "repuestos_motor" || i.category === "plomeria").length})
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    data-testid="inventory-tab-safety-btn"
+                    onClick={() => setInventoryTab("safety")}
+                    className={`flex-1 min-h-11 rounded-xl font-bold flex items-center justify-center gap-1.5 transition ${
+                      inventoryTab === "safety"
+                        ? "bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/50"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    <span>🛡️ Seguridad</span>
+                    <span className="text-[10px] opacity-70">
+                      ({inventoryItems.filter((i) => i.category === "safety" || i.category === "seguridad").length})
+                    </span>
+                  </button>
                 </div>
 
+                {/* Items List Filtered by Tab */}
+                <div className="space-y-3">
+                  {inventoryItems
+                    .filter((item) => {
+                      if (inventoryTab === "equipment") {
+                        return item.category === "equipment" || item.category === "propulsion" || item.category === "electricidad";
+                      }
+                      if (inventoryTab === "spares") {
+                        return item.category === "spares" || item.category === "repuestos_motor" || item.category === "plomeria";
+                      }
+                      return item.category === "safety" || item.category === "seguridad";
+                    })
+                    .map((item) => {
+                      const isLow = item.quantity <= item.min_threshold;
+                      // Calculate expiration days for safety items
+                      let expirationDays: number | null = null;
+                      if (item.expiration_date) {
+                        const exp = new Date(item.expiration_date).getTime();
+                        const diffMs = exp - Date.now();
+                        expirationDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                      }
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="p-4 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2.5"
+                        >
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold text-sm text-white flex flex-wrap items-center gap-2">
+                                <span>{item.item_name}</span>
+                                {inventoryTab === "spares" && isLow && (
+                                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/40 font-bold">
+                                    BAJO STOCK MÍNIMO
+                                  </span>
+                                )}
+                                {inventoryTab === "safety" && expirationDays !== null && (
+                                  <span
+                                    className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold border ${
+                                      expirationDays > 90
+                                        ? "bg-[#34d399]/20 text-[#34d399] border-[#34d399]/40"
+                                        : expirationDays > 30
+                                        ? "bg-[#fbbf24]/20 text-[#fbbf24] border-[#fbbf24]/40"
+                                        : "bg-[#f87171]/20 text-[#f87171] border-[#f87171]/50 animate-pulse"
+                                    }`}
+                                  >
+                                    {expirationDays > 90
+                                      ? `Vigente • Vence en ${expirationDays}d`
+                                      : expirationDays > 30
+                                      ? `Atención • Vence en ${expirationDays}d`
+                                      : `Vencido o Próximo • ${expirationDays}d`}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* PRD R-4.9.5: Especificación técnica y fuente */}
+                              {item.specification && (
+                                <div className="text-xs text-slate-300 opacity-80 mt-1 font-mono">
+                                  {item.specification}
+                                </div>
+                              )}
+                              {item.specification_source && (
+                                <div className="text-[10px] text-[var(--accent-primary)] opacity-70 mt-0.5 font-mono">
+                                  Fuente: {item.specification_source}
+                                </div>
+                              )}
+
+                              {inventoryTab === "equipment" && item.maintenance_interval_hours && (
+                                <div className="text-xs font-mono text-[#34d399] mt-1">
+                                  Intervalo de servicio: cada {item.maintenance_interval_hours} hrs / {item.maintenance_interval_months || 12} meses
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Quantity Adjusters for Spares */}
+                            {inventoryTab === "spares" && (
+                              <div className="flex items-center gap-2 font-mono shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => handleAdjustInventoryStock(item.id, -1, item.quantity)}
+                                  className="marine-btn marine-btn-secondary px-3 min-h-10"
+                                >
+                                  <Minus className="w-3.5 h-3.5" />
+                                </button>
+                                <span className="min-h-10 px-3 flex items-center rounded-xl bg-white/5 border border-white/5 font-bold text-xs">
+                                  {item.quantity} uds
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAdjustInventoryStock(item.id, 1, item.quantity)}
+                                  className="marine-btn marine-btn-secondary px-3 min-h-10"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            )}
+
+                            {inventoryTab === "safety" && item.expiration_date && (
+                              <div className="text-xs font-mono opacity-80 shrink-0 text-right">
+                                <div className="text-[10px] opacity-60">FECHA VENCIMIENTO</div>
+                                <div className="font-semibold text-white mt-0.5">{item.expiration_date}</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+
+                {/* Add Item Form */}
                 <form
                   onSubmit={handleAddInventoryItemOffline}
                   className="pt-3 border-t border-white/5 flex flex-wrap gap-2"
@@ -2236,21 +2363,21 @@ export default function MarineOSHomePage() {
                     type="text"
                     value={newItemName}
                     onChange={(e) => setNewItemName(e.target.value)}
-                    placeholder="Agregar repuesto o elemento SOLAS al barco..."
-                    className="flex-1 min-w-[180px] min-h-14 px-3.5 text-sm"
+                    placeholder="Nombre del componente o repuesto..."
+                    className="flex-1 min-w-[200px] min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
                   />
                   <select
                     value={newItemCategory}
                     onChange={(e) => setNewItemCategory(e.target.value)}
-                    className="min-h-14 px-3.5 font-mono text-xs"
+                    className="min-h-12 px-3.5 font-mono text-xs rounded-xl bg-white/5 border border-white/5"
                   >
-                    <option value="repuestos_motor">repuestos_motor</option>
-                    <option value="seguridad">seguridad</option>
-                    <option value="plomeria">plomeria</option>
+                    <option value="equipment">⚙️ Equipos</option>
+                    <option value="spares">🔧 Repuestos</option>
+                    <option value="safety">🛡️ Seguridad con Vencimiento</option>
                   </select>
                   <button
                     type="submit"
-                    className="marine-btn marine-btn-primary text-xs"
+                    className="marine-btn marine-btn-primary min-h-12 px-5 text-xs font-bold"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Agregar</span>

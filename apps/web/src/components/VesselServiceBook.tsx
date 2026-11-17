@@ -143,7 +143,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
     }
     pushToast({
       title: "Firma SHA-256 Copiada",
-      subtitle: "Certificado de integridad inmutable listo para peritaje de venta",
+      subtitle: "Sello de integridad SHA-256 listo para verificación técnica",
       tone: "cyan",
     });
   };
@@ -651,7 +651,7 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
                 <ShieldCheck className="w-4 h-4 text-[var(--accent-primary)] shrink-0 mt-0.5" />
                 <span className="opacity-80">
                   Al firmar, MarinOS generará una huella criptográfica SHA-256 basada en la hora de motor,
-                  embarcación y repuestos, sellando el registro en el historial inmutable.
+                  embarcación y repuestos, incorporando el sello de integridad en el registro técnico local.
                 </span>
               </div>
 

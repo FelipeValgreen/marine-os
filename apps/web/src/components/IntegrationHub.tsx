@@ -194,18 +194,22 @@ export function IntegrationHub() {
               <span
                 className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${
                   formData.signalk.enabled
-                    ? "bg-[#00E676]/15 text-[#00E676] border-[#00E676]/40"
+                    ? "bg-[#38bdf8]/15 text-[#38bdf8] border-[#38bdf8]/40"
                     : "bg-white/5 text-white/50 border-white/5"
                 }`}
               >
-                {formData.signalk.enabled ? "CONECTADO" : "DESCONECTADO"}
+                {formData.signalk.enabled ? "SIMULADO" : "DESCONECTADO"}
               </span>
             </div>
 
             <p className="text-xs text-slate-300 opacity-80 leading-relaxed font-normal">
               Lee RPM del motor Yanmar 4JH57, temperatura del refrigerante, presión de aceite,
-              sonda de profundidad y viento real desde la red marina NMEA 2000 o Raspberry Pi.
+              sonda de profundidad y viento real desde la red marina NMEA 2000 o multiplexor a bordo.
             </p>
+
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-mono leading-relaxed">
+              ⚠️ Una aplicación web servida bajo HTTPS no puede conectar directamente a http://192.168.x.x (restricción Mixed Content y PNA del navegador). Requiere un gateway WSS con certificado o un agente local a bordo.
+            </div>
 
             <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5 font-mono text-xs space-y-1">
               <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-55">ENDPOINT CONFIGURADO:</div>
@@ -262,17 +266,17 @@ export function IntegrationHub() {
               <span
                 className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${
                   formData.directemar.enabled
-                    ? "bg-[#00E676]/15 text-[#00E676] border-[#00E676]/40"
+                    ? "bg-[#38bdf8]/15 text-[#38bdf8] border-[#38bdf8]/40"
                     : "bg-white/5 text-white/50 border-white/5"
                 }`}
               >
-                {formData.directemar.enabled ? "CONECTADO" : "DESCONECTADO"}
+                {formData.directemar.enabled ? "SIMULADO" : "DESCONECTADO"}
               </span>
             </div>
 
             <p className="text-xs text-slate-300 opacity-80 leading-relaxed font-normal">
-              Transmisión electrónica de Zarpes y Recepciones oficiales, consulta automática de
-              vigencia de licencias de capitanes y sellado criptográfico legal del rol de tripulación.
+              Simulación de trámite para zarpes y recaladas locales, consulta de vigencia de credenciales
+              y sellado de integridad del rol de tripulación en almacenamiento local.
             </p>
 
             <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5 font-mono text-xs space-y-1">
@@ -321,13 +325,13 @@ export function IntegrationHub() {
                   <CloudSun className="w-6 h-6 text-[#00E676]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white tracking-tight">PredictWind / Open-Meteo</h3>
-                  <div className="text-xs text-slate-400 mt-0.5">Modelos ECMWF &amp; GFS Hiperlocales</div>
+                  <h3 className="text-base font-bold text-white tracking-tight">Open-Meteo (Modelos ECMWF &amp; GFS)</h3>
+                  <div className="text-xs text-slate-400 mt-0.5">Modelos Hiperlocales Marinos en Tiempo Real</div>
                 </div>
               </div>
 
-              <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/40 tracking-wider">
-                ACTIVO (EN VIVO)
+              <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-[#34d399]/15 text-[#34d399] border border-[#34d399]/40 tracking-wider">
+                CONECTADO (EN VIVO)
               </span>
             </div>
 
@@ -386,13 +390,9 @@ export function IntegrationHub() {
               </div>
 
               <span
-                className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${
-                  formData.satellite.enabled
-                    ? "bg-[#00E676]/15 text-[#00E676] border-[#00E676]/40"
-                    : "bg-white/5 text-white/50 border-white/5"
-                }`}
+                className="px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider bg-[#f87171]/15 text-[#f87171] border-[#f87171]/40"
               >
-                {formData.satellite.enabled ? "CONECTADO" : "STANDBY"}
+                NO DISPONIBLE (EMULADOR)
               </span>
             </div>
 

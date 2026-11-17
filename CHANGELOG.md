@@ -4,6 +4,40 @@ Todas las modificaciones notables de este proyecto están documentadas en este a
 
 ---
 
+## [Fase 4 — Producto de Flota y Handover Real] - 2026-11-16
+Rama: `fase-4-flota`
+
+### Añadido / Mejorado (Gestión de Flota, Inventario Técnico y Sello de Integridad en Entrega)
+- **Categorización Estricta del Inventario (PRD R-4.9.1):**
+  - Separado el inventario en 3 pestañas ergonómicas:
+    - **Equipos:** Motor Yanmar 4JH57, Generador Fischer Panda, Molinete Quick Dylan, con horómetros acumulados e intervalos de servicio configurables.
+    - **Repuestos:** Filtros Racor, impulsores, ánodos de sacrificio, con stock actual, umbral mínimo y alertas visuales.
+    - **Seguridad con Vencimiento:** Balsa salvavidas, EPIRB, extintores y pirotecnia SOLAS con semáforo preventivo a 90/30 días.
+- **Corrección Técnica de Especificaciones y Fuentes (PRD R-4.9.5):**
+  - Corregido: `Yanmar 4JH57` especificado como "Inyección Directa" (eliminada afirmación de "Common Rail").
+  - Corregido: `Filtro Racor R20P` especificado honestamente como 30 micras según catálogo Parker Racor (eliminado el claim erróneo de 10 micras).
+  - Cada repuesto incorpora campo de especificación técnica con su respectiva fuente documental (manual de taller o catálogo).
+- **Medición Real y Separada de Energía (PRD R-4.9.2):**
+  - Separada la lectura de "Batería de servicio (SOC %)" de "Alternador (V)" en tarjetas independientes.
+- **Registro Fidedigno de Horómetro (PRD R-4.9.3 / R-4.9.4):**
+  - Muestra autor y fecha de ingreso manual. Botones de incremento manual etiquetados explícitamente con el badge `[SIMULADOR]`.
+  - Próximo servicio calculado dinámicamente según horas restantes sin hardcodear garantías ficticias.
+- **Handover con Fotos Reales y Doble Firma Táctil (PRD R-4.10.1 - R-4.10.6):**
+  - Checklist ampliado a 12 sistemas críticos para navegación patagónica (combustible %, agua %, baterías, balsa, EPIRB, auxiliar, gas, velas, electrónica/VHF, cadena, grifos/sentina, SOLAS).
+  - Eliminado generador de fotos sintéticas / canvas artificiales: solo se aceptan fotografías reales mediante `<input type="file" accept="image/*" capture="environment">`. Requiere al menos 1 foto real para sellar.
+  - Doble firma táctil obligatoria: canvas individual para quien entrega (Armador/Saliente) y quien recibe (Capitán/Entrante) con nombre y RUT de ambas partes.
+  - Sello de integridad SHA-256 canónico que incluye el hash de cada imagen de evidencia y los datos del acta.
+  - Herramienta de "Verificar Integridad del Acta" (R-4.10.4) para recalcular y validar la integridad local del documento sellado.
+- **Transparencia en Integration Hub (PRD R-4.12.1 - R-4.12.3):**
+  - Signal K: rotulado como `SIMULADO` con nota técnica de Mixed Content y PNA.
+  - DIRECTEMAR: rotulado como `SIMULADO` (trámites demo locales).
+  - Open-Meteo: rotulado como `CONECTADO (EN VIVO)` (eliminado "PredictWind").
+  - Conectividad Satelital: rotulada como `NO DISPONIBLE (EMULADOR)`.
+- **Documento Entregable:**
+  - Creado `docs/ARQUITECTURA_A_BORDO.md` detallando las tres opciones de ingeniería viables (TLS local con CA, app empaquetada nativa y relay en la nube) para el consumo de telemetría NMEA 2000 sin violar restricciones de navegador.
+
+---
+
 ## [Fase 3 — Experiencia Móvil y Navegación] - 2026-11-16
 Rama: `fase-3-mobile`
 

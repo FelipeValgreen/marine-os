@@ -42,6 +42,8 @@ export interface VesselSystemQRRecord {
   created_at: string;
 }
 
+export type InventoryCategoryType = "equipment" | "spares" | "safety";
+
 export interface InventoryItemRecord {
   id: string;
   vessel_id: string;
@@ -51,6 +53,12 @@ export interface InventoryItemRecord {
   quantity: number;
   min_threshold: number;
   expiration_date: string | null;
+  specification?: string;
+  specification_source?: string;
+  maintenance_interval_hours?: number;
+  maintenance_interval_months?: number;
+  last_service_horometer?: number;
+  last_service_date?: string;
   warranty_expiration_date?: string | null;
   warranty_max_hours?: number | null;
   warranty_provider?: string;
@@ -152,6 +160,12 @@ export interface HandoverInspectionRecord {
   inspection_type: "checkin" | "checkout";
   checklist_data: HandoverChecklistItem[];
   photos_evidence: HandoverPhotoEvidence[];
+  giver_name?: string;
+  giver_document?: string;
+  giver_signature_svg?: string;
+  receiver_name?: string;
+  receiver_document?: string;
+  receiver_signature_svg?: string;
   signature_svg: string;
   integrity_hash: string;
   completed_offline_at: string;
@@ -824,17 +838,24 @@ export async function ensureDemoSeedData(): Promise<void> {
             },
           ]);
 
-          // 4. Inventory Items (with YachtPass Warranty & Compliance fields)
+          // 4. Inventory Items (Equipos, Repuestos y Seguridad con Vencimiento — PRD R-4.9.1)
           await db.inventory_items.bulkPut([
+            // --- EQUIPOS (con horómetros e intervalos de servicio) ---
             {
               id: "55555555-5555-5555-5555-555555555550",
               vessel_id: DEMO_IDS.VESSEL_ID,
               qr_node_id: DEMO_IDS.QR_YANMAR_ID,
-              item_name: "Motor Principal Yanmar 4JH57 Common Rail",
-              category: "propulsion",
+              item_name: "Motor Principal Yanmar 4JH57 (Inyección Directa)",
+              category: "equipment",
               quantity: 1,
               min_threshold: 1,
               expiration_date: null,
+              specification: "4 cilindros, 57 HP @ 3.000 RPM, aspiración natural",
+              specification_source: "Manual de Operación Yanmar 4JH57",
+              maintenance_interval_hours: 250,
+              maintenance_interval_months: 12,
+              last_service_horometer: 1250,
+              last_service_date: "2026-03-10",
               warranty_expiration_date: "2027-12-31",
               warranty_max_hours: 1500,
               warranty_provider: "Yanmar Marine International",
@@ -842,16 +863,60 @@ export async function ensureDemoSeedData(): Promise<void> {
               updated_at: now,
             },
             {
+              id: "55555555-5555-5555-5555-555555555555",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              qr_node_id: null,
+              item_name: "Generador Fischer Panda 5000i Neo",
+              category: "equipment",
+              quantity: 1,
+              min_threshold: 1,
+              expiration_date: null,
+              specification: "Inverter diésel monocilíndrico Farymann 4.0 kW 230V",
+              specification_source: "Manual Oficial Fischer Panda Serie Neo",
+              maintenance_interval_hours: 150,
+              maintenance_interval_months: 6,
+              last_service_horometer: 410,
+              last_service_date: "2026-06-15",
+              warranty_expiration_date: "2027-06-30",
+              warranty_max_hours: 800,
+              warranty_provider: "Fischer Panda GmbH",
+              warranty_status: "active",
+              updated_at: now,
+            },
+            {
+              id: "55555555-5555-5555-5555-555555555556",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              qr_node_id: "quick-windlass",
+              item_name: "Molinete de Proa Quick Dylan 1000W 12V",
+              category: "equipment",
+              quantity: 1,
+              min_threshold: 1,
+              expiration_date: null,
+              specification: "Barbotén 10mm DIN 766, tiro máx 850 kg",
+              specification_source: "Catálogo Técnico Quick Italy",
+              maintenance_interval_hours: 100,
+              maintenance_interval_months: 12,
+              last_service_horometer: 45,
+              last_service_date: "2026-01-20",
+              warranty_expiration_date: "2027-04-10",
+              warranty_provider: "Quick Nautical Equipment",
+              warranty_status: "active",
+              updated_at: now,
+            },
+
+            // --- REPUESTOS (con stock mínimo) ---
+            {
               id: "55555555-5555-5555-5555-555555555551",
               vessel_id: DEMO_IDS.VESSEL_ID,
               qr_node_id: DEMO_IDS.QR_YANMAR_ID,
-              item_name: "Impulsor Bomba Agua Yanmar + Empaquetadura",
-              category: "repuestos_motor",
+              item_name: "Impulsor Bomba Agua Salada Yanmar + O-ring",
+              category: "spares",
               quantity: 2,
               min_threshold: 1,
               expiration_date: null,
+              specification: "Neopreno marino Yanmar 129670-42531",
+              specification_source: "Catálogo Repuestos Yanmar",
               warranty_expiration_date: "2028-12-01",
-              warranty_max_hours: 1500,
               warranty_provider: "Yanmar Marine Chile",
               warranty_status: "active",
               updated_at: now,
@@ -860,28 +925,15 @@ export async function ensureDemoSeedData(): Promise<void> {
               id: "55555555-5555-5555-5555-555555555552",
               vessel_id: DEMO_IDS.VESSEL_ID,
               qr_node_id: DEMO_IDS.QR_YANMAR_ID,
-              item_name: "Filtro Combustible Racor R20P (10 micras)",
-              category: "repuestos_motor",
+              item_name: "Filtro Combustible Racor R20P (30 micras según fabricante Parker)",
+              category: "spares",
               quantity: 3,
               min_threshold: 2,
               expiration_date: null,
+              specification: "Elemento filtrante primario Aquabloc 30 micras",
+              specification_source: "Especificación Técnica Parker Racor",
               warranty_expiration_date: "2027-06-30",
-              warranty_max_hours: 1500,
               warranty_provider: "Parker Racor Certified",
-              warranty_status: "active",
-              updated_at: now,
-            },
-            {
-              id: "55555555-5555-5555-5555-555555555553",
-              vessel_id: DEMO_IDS.VESSEL_ID,
-              qr_node_id: null,
-              item_name: "Kit Bengalas Solas (4 Paracaídas + 4 Mano)",
-              category: "seguridad",
-              quantity: 1,
-              min_threshold: 1,
-              expiration_date: "2027-08-15",
-              warranty_expiration_date: "2027-08-15",
-              warranty_provider: "Comet Marine Safety",
               warranty_status: "active",
               updated_at: now,
             },
@@ -889,29 +941,92 @@ export async function ensureDemoSeedData(): Promise<void> {
               id: "55555555-5555-5555-5555-555555555554",
               vessel_id: DEMO_IDS.VESSEL_ID,
               qr_node_id: DEMO_IDS.QR_JABSCO_ID,
-              item_name: "Válvula Joker Repuesto Jabsco Twist n Lock",
-              category: "plomeria",
+              item_name: "Válvula Joker Twist 'n' Lock Jabsco",
+              category: "spares",
               quantity: 1,
               min_threshold: 1,
               expiration_date: null,
+              specification: "Válvula elastómero antiretorno WC marino",
+              specification_source: "Manual Jabsco Marine",
               warranty_expiration_date: "2028-01-01",
               warranty_provider: "Xylem Jabsco",
               warranty_status: "active",
               updated_at: now,
             },
             {
-              id: "55555555-5555-5555-5555-555555555555",
+              id: "55555555-5555-5555-5555-555555555557",
               vessel_id: DEMO_IDS.VESSEL_ID,
               qr_node_id: null,
-              item_name: "Generador Fischer Panda 5000i Neo",
-              category: "electricidad",
+              item_name: "Ánodos de Zinc para Eje 30mm y Hélice",
+              category: "spares",
+              quantity: 3,
+              min_threshold: 2,
+              expiration_date: null,
+              specification: "Aleación de sacrificio MIL-A-18001K agua de mar",
+              specification_source: "Estándar ABYC E-2 Protección Catódica",
+              updated_at: now,
+            },
+
+            // --- SEGURIDAD CON VENCIMIENTO (Semáforo 90/30 días) ---
+            {
+              id: "55555555-5555-5555-5555-555555555558",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              qr_node_id: null,
+              item_name: "Balsa Salvavidas Oceánica ISO 9650-1 (6 Personas)",
+              category: "safety",
               quantity: 1,
               min_threshold: 1,
-              expiration_date: null,
-              warranty_expiration_date: "2027-06-30",
-              warranty_max_hours: 800,
-              warranty_provider: "Fischer Panda GmbH",
+              expiration_date: "2027-11-20",
+              specification: "Valija rígida cubierta, doble fondo inflable, luz SOLAS",
+              specification_source: "Certificado Aprobación DGTM y MM",
+              warranty_expiration_date: "2027-11-20",
+              warranty_provider: "Plastimo / Lalizas Marine",
               warranty_status: "active",
+              updated_at: now,
+            },
+            {
+              id: "55555555-5555-5555-5555-555555555559",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              qr_node_id: null,
+              item_name: "Radiobaliza Satelital EPIRB Cospas-Sarsat 406 MHz",
+              category: "safety",
+              quantity: 1,
+              min_threshold: 1,
+              expiration_date: "2028-04-15",
+              specification: "Zafarrancho hidrostático Hammar H20 + Batería litio",
+              specification_source: "Homologación OMI / Cospas-Sarsat",
+              warranty_expiration_date: "2028-04-15",
+              warranty_provider: "ACR Electronics",
+              warranty_status: "active",
+              updated_at: now,
+            },
+            {
+              id: "55555555-5555-5555-5555-555555555553",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              qr_node_id: null,
+              item_name: "Kit Pirotecnia SOLAS (4 Bengalas Mano + 4 Paracaídas)",
+              category: "safety",
+              quantity: 1,
+              min_threshold: 1,
+              expiration_date: "2027-08-15",
+              specification: "Visibilidad 10 MN noche, paracaídas 300m altitud",
+              specification_source: "Comet Marine Safety / DIRECTEMAR",
+              warranty_expiration_date: "2027-08-15",
+              warranty_provider: "Comet Marine Safety",
+              warranty_status: "active",
+              updated_at: now,
+            },
+            {
+              id: "55555555-5555-5555-5555-555555555560",
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              qr_node_id: null,
+              item_name: "Extintor Polvo Químico Seco ABC 2.5 kg (Cabina)",
+              category: "safety",
+              quantity: 2,
+              min_threshold: 2,
+              expiration_date: "2026-12-15",
+              specification: "Manómetro de presión en zona verde, carga sellada",
+              specification_source: "Norma Chilena NCh 1430 / DS 90",
               updated_at: now,
             },
           ]);
