@@ -50,13 +50,13 @@ async def extract_crew_document(req: CrewDocumentOCRRequest) -> CrewDocumentOCRR
     """
     hint = (req.document_hint or "").lower()
 
-    if "felipe" in hint or "alta mar" in hint:
+    if "demo" in hint or "alta mar" in hint:
         license_type = "Capitán Deportivo de Alta Mar (DIRECTEMAR)"
         license_expiry = "2031-06-30"
         return CrewDocumentOCRResponse(
-            full_name="Cap. Felipe Valverde",
+            full_name="Capitán Demo",
             document_type="RUT",
-            document_number="13.452.890-1",
+            document_number="11.111.111-1",
             nationality="CL",
             license_type=license_type,
             license_number="CDAM-2021-9042",

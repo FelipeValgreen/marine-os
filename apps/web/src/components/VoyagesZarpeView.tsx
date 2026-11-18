@@ -344,9 +344,9 @@ export function VoyagesZarpeView({
     }
 
     if (presetType === "felipe") {
-      setFullName("Cap. Felipe Valverde");
+      setFullName("Capitán Demo");
       setDocType("RUT");
-      setDocNumber("13.452.890-1");
+      setDocNumber("11.111.111-1");
       setNationality("CL");
       setLicenseType("Capitán Deportivo de Alta Mar (DIRECTEMAR)");
       setLicenseExpiry("2031-06-30");
@@ -1091,7 +1091,7 @@ export function VoyagesZarpeView({
                         required
                         value={docNumber}
                         onChange={(e) => setDocNumber(e.target.value)}
-                        placeholder="13.452.890-1"
+                        placeholder="11.111.111-1"
                         className="w-full min-h-11 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
                       />
                     </div>

@@ -1113,9 +1113,9 @@ export async function ensureDemoSeedData(): Promise<void> {
               id: "77777777-7777-7777-7777-777777777771",
               voyage_id: DEMO_IDS.VOYAGE_ID,
               role: "skipper",
-              full_name: "Cap. Felipe Valverde",
+              full_name: "Capitán Demo",
               document_type: "RUT",
-              document_number: "13.452.890-1",
+              document_number: "11.111.111-1",
               nationality: "CL",
               license_type: "Capitán Deportivo de Alta Mar (DIRECTEMAR)",
               license_expiry: "2031-06-30",
@@ -1126,7 +1126,7 @@ export async function ensureDemoSeedData(): Promise<void> {
             {
               id: "77777777-7777-7777-7777-777777777772",
               voyage_id: DEMO_IDS.VOYAGE_ID,
-              role: "skipper",
+              role: "crew",
               full_name: "Skipper Rodrigo Soto",
               document_type: "RUT",
               document_number: "16.781.234-K",
@@ -1156,10 +1156,10 @@ export async function ensureDemoSeedData(): Promise<void> {
           // 7b. Seed Initial Frequent Crew / Contacts (Agenda de Tripulación Frecuente)
           const initialFrequentCrew: CrewContactRecord[] = [
             {
-              id: "contact-felipe-valverde",
-              full_name: "Cap. Felipe Valverde",
+              id: "contact-capitan-demo",
+              full_name: "Capitán Demo",
               document_type: "RUT",
-              document_number: "13.452.890-1",
+              document_number: "11.111.111-1",
               nationality: "Chilena",
               license_type: "Capitán Deportivo de Alta Mar (DIRECTEMAR)",
               license_number: "ARM-CL-94821",

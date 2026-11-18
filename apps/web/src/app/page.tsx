@@ -2655,7 +2655,7 @@ export default function MarineOSHomePage() {
                       {activeAccount.name}
                     </div>
                     <div className="text-xs opacity-75 font-medium text-slate-300">
-                      {activeAccount.email || "filipo.valverde@gmail.com"} •{" "}
+                      {activeAccount.email || "demo@marinos.app"} •{" "}
                       <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
                     </div>
                   </div>
