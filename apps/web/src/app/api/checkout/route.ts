@@ -26,46 +26,41 @@ export async function POST(req: Request) {
     const isFleet = planTier === "b2b_fleet";
     const isAnnual = billingCycle === "annual";
 
-    let unitAmount = 1900; // $19.00 USD
-    let name = "MarinOS Skipper Pro (Mensual)";
-    let description = "Modo Alta Mar, Gimbal UI, Telemetría NMEA 2000 y Bitácora IA";
+    const STRIPE_PRICES: Record<string, string> = {
+      b2c_pro_monthly: process.env.STRIPE_PRICE_PRO_MONTHLY || "price_1UdBvqHOvlvyMtdaohaLRtjo",
+      b2c_pro_annual: process.env.STRIPE_PRICE_PRO_ANNUAL || "price_1UdBvxHOvlvyMtdaf7hvQ3eG",
+      b2b_fleet_monthly: process.env.STRIPE_PRICE_FLEET_MONTHLY || "price_1UdBw3HOvlvyMtdaSXLIWl2U",
+      b2b_fleet_annual: process.env.STRIPE_PRICE_FLEET_ANNUAL || "price_1UdBw9HOvlvyMtda0YDtIEzM",
+    };
 
-    if (isPro && isAnnual) {
-      unitAmount = 19000; // $190.00 USD/año
-      name = "MarinOS Skipper Pro (Anual 20% OFF)";
-      description = "Acceso anual con Modo Alta Mar, Gimbal UI y PTT por Voz Ilimitado";
-    } else if (isFleet && !isAnnual) {
-      unitAmount = 7900; // $79.00 USD/mes
-      name = "MarinOS B2B Fleet & Astilleros (Mensual)";
-      description = "Flota ilimitada, Genesis Handover, Libro Inmutable SHA-256 y OCR";
-    } else if (isFleet && isAnnual) {
-      unitAmount = 82800; // $828.00 USD/año ($69/mes)
-      name = "MarinOS B2B Fleet & Astilleros (Anual 20% OFF)";
-      description = "Licencia anual para empresas de charter, astilleros y concesionarios";
-    }
+    const targetPriceId = STRIPE_PRICES[`${planTier}_${billingCycle}`];
 
     const host = req.headers.get("origin") || req.headers.get("host") || "https://marine-os-sigma.vercel.app";
     const finalSuccessUrl = successUrl || `${host}/?checkout_status=success&tier=${planTier}`;
     const finalCancelUrl = cancelUrl || `${host}/?checkout_status=cancelled`;
 
-    const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name,
-              description,
-              images: ["https://marine-os-sigma.vercel.app/icon-512.png"],
+    const lineItems = targetPriceId
+      ? [{ price: targetPriceId, quantity: 1 }]
+      : [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: isPro ? "MarinOS Skipper Pro" : "MarinOS B2B Fleet & Astilleros",
+                description: "Suscripción táctica y gestión de flota",
+                images: ["https://marine-os-sigma.vercel.app/icon-512.png"],
+              },
+              unit_amount: isPro ? (isAnnual ? 19000 : 1900) : isAnnual ? 82800 : 7900,
+              recurring: {
+                interval: isAnnual ? ("year" as const) : ("month" as const),
+              },
             },
-            unit_amount: unitAmount,
-            recurring: {
-              interval: isAnnual ? "year" : "month",
-            },
+            quantity: 1,
           },
-          quantity: 1,
-        },
-      ],
+        ];
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: lineItems,
       mode: "subscription",
       success_url: finalSuccessUrl,
       cancel_url: finalCancelUrl,
