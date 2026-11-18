@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -83,6 +83,7 @@ import { FlashChecklist } from "@/components/FlashChecklist";
 import { DigitalVHF } from "@/components/DigitalVHF";
 import { FloatingPTTButton } from "@/components/FloatingPTTButton";
 import { CommercializationPaywall } from "@/components/CommercializationPaywall";
+import { BackofficeManager } from "@/components/BackofficeManager";
 
 interface LiveMarineWeatherState {
   source: string;
@@ -383,8 +384,90 @@ export default function MarineOSHomePage() {
   // 1. BRIDGE: REAL SIGNAL K / NMEA 2000 TELEMETRY + NATIVE GPS + OPEN-METEO
   // =========================================================================
   const [gpsMode, setGpsMode] = useState<"simulator" | "native_gps">(
-    "simulator"
+    "native_gps"
   );
+  // Real on-water navigation camera and wake lock controls
+  const [followVessel, setFollowVessel] = useState<boolean>(true);
+  const [orientationMode, setOrientationMode] = useState<
+    "north-up" | "course-up"
+  >("north-up");
+  const [wakeLockActive, setWakeLockActive] = useState<boolean>(false);
+  const wakeLockSentinelRef = useRef<WakeLockSentinel | null>(null);
+
+  const toggleWakeLock = useCallback(async () => {
+    if (typeof navigator === "undefined" || !("wakeLock" in navigator)) {
+      pushToast({
+        title: "Wake Lock no compatible",
+        subtitle:
+          "Tu navegador no soporta mantener la pantalla activa de forma programática",
+        tone: "amber",
+      });
+      return;
+    }
+
+    if (wakeLockSentinelRef.current && !wakeLockSentinelRef.current.released) {
+      await wakeLockSentinelRef.current.release();
+      wakeLockSentinelRef.current = null;
+      setWakeLockActive(false);
+      pushToast({
+        title: "Ahorro de pantalla activado",
+        subtitle: "La pantalla se suspenderá normalmente según los ajustes del sistema",
+        tone: "cyan",
+      });
+    } else {
+      try {
+        const sentinel = await navigator.wakeLock.request("screen");
+        wakeLockSentinelRef.current = sentinel;
+        setWakeLockActive(true);
+        sentinel.addEventListener("release", () => {
+          setWakeLockActive(false);
+        });
+        pushToast({
+          title: "Pantalla Siempre Activa (Wake Lock)",
+          subtitle: "La pantalla no se apagará mientras navegues a bordo",
+          tone: "emerald",
+        });
+      } catch (err: unknown) {
+        console.warn("Wake lock failed:", err);
+        setWakeLockActive(false);
+      }
+    }
+  }, [pushToast]);
+
+  // Keep screen awake automatically in At-Sea mode
+  useEffect(() => {
+    let active = true;
+    async function handleWakeLock() {
+      if (
+        isAtSeaMode &&
+        document.visibilityState === "visible" &&
+        typeof navigator !== "undefined" &&
+        "wakeLock" in navigator &&
+        (!wakeLockSentinelRef.current || wakeLockSentinelRef.current.released)
+      ) {
+        try {
+          const sentinel = await navigator.wakeLock.request("screen");
+          if (active) {
+            wakeLockSentinelRef.current = sentinel;
+            setWakeLockActive(true);
+            sentinel.addEventListener("release", () => {
+              if (active) setWakeLockActive(false);
+            });
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    handleWakeLock();
+    document.addEventListener("visibilitychange", handleWakeLock);
+    return () => {
+      active = false;
+      document.removeEventListener("visibilitychange", handleWakeLock);
+    };
+  }, [isAtSeaMode]);
+
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [drawerTab, setDrawerTab] = useState<
     "anchorage" | "routing" | "copilot"
@@ -553,26 +636,28 @@ export default function MarineOSHomePage() {
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
+        const rawSpeed = pos.coords.speed;
         const sogKn =
-          pos.coords.speed !== null && !Number.isNaN(pos.coords.speed)
-            ? Math.round(pos.coords.speed * 1.94384 * 10) / 10
-            : 6.2;
+          rawSpeed !== null && !Number.isNaN(rawSpeed) && rawSpeed > 0.05
+            ? Math.round(rawSpeed * 1.94384 * 10) / 10
+            : 0.0;
+        const rawHeading = pos.coords.heading;
         const cogDeg =
-          pos.coords.heading !== null && !Number.isNaN(pos.coords.heading)
-            ? Math.round(pos.coords.heading)
-            : 190;
+          rawHeading !== null && !Number.isNaN(rawHeading)
+            ? Math.round(rawHeading)
+            : undefined;
         setTelemetry((prev) => ({
           ...prev,
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
           sog_kn: sogKn,
-          cog_deg: cogDeg,
+          cog_deg: cogDeg !== undefined ? cogDeg : prev.cog_deg,
         }));
       },
-      () => {
-        // Keep last valid fix if permission denied
+      (err) => {
+        console.warn("Native GPS watch error:", err.message);
       },
-      { enableHighAccuracy: true, maximumAge: 2000, timeout: 8000 }
+      { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
     );
 
     return () => {
@@ -1273,6 +1358,14 @@ export default function MarineOSHomePage() {
             trackPoints={
               isRecordingTrack ? recordedPoints : activeReplayTrack?.points || []
             }
+            vesselCogDeg={telemetry.cog_deg}
+            vesselSogKn={telemetry.sog_kn}
+            followVessel={followVessel}
+            onToggleFollowVessel={setFollowVessel}
+            orientationMode={orientationMode}
+            onToggleOrientation={setOrientationMode}
+            wakeLockActive={wakeLockActive}
+            onToggleWakeLock={toggleWakeLock}
             onSelectAnchorage={(a) => {
               setSelectedAnchorageSlug(a.slug);
               setDrawerTab("anchorage");
@@ -2497,6 +2590,13 @@ export default function MarineOSHomePage() {
   // ===========================================================================
   if (activeSection === "academy") {
     return <MarineAcademy onRelaunchSeaTrials={relaunchSeaTrials} />;
+  }
+
+  // ===========================================================================
+  // VIEW 9: BACKOFFICE & OPERATIONAL COMMAND (ADMIN, USERS, PAYMENTS & AUDIT)
+  // ===========================================================================
+  if (activeSection === "admin") {
+    return <BackofficeManager pushToast={pushToast} />;
   }
 
   // ===========================================================================

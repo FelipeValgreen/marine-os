@@ -393,6 +393,7 @@ export interface UserProfileAccount {
   avatarInitials: string;
   /** Optional downscaled JPEG data URL (stored locally in IndexedDB). */
   avatarDataUrl?: string;
+  isLicenseVerified?: boolean;
   updated_at?: string;
 }
 

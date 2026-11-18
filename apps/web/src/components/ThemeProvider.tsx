@@ -67,7 +67,8 @@ export type MarineSection =
   | "logbook"
   | "integrations"
   | "handover"
-  | "academy";
+  | "academy"
+  | "admin";
 
 export interface ToastNotification {
   id: string;
@@ -187,6 +188,13 @@ const NAV_ITEMS: {
       shortLabel: "Aprende",
       shortcut: "⌘9",
       icon: LifeBuoy,
+    },
+    {
+      id: "admin",
+      label: "Backoffice • Usuarios y Pagos",
+      shortLabel: "Backoffice",
+      shortcut: "⌘0",
+      icon: ShieldCheck,
     },
   ];
 
@@ -1106,6 +1114,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   { id: "integrations", label: "Integraciones", icon: Sliders, desc: "NMEA y satelital" },
                   { id: "handover", label: "Entrega", icon: ShieldCheck, desc: "Acta y sello SHA-256" },
                   { id: "academy", label: "Aprende", icon: LifeBuoy, desc: "Seguridad marítima" },
+                  { id: "admin", label: "Backoffice", icon: ShieldCheck, desc: "Usuarios, pagos y auditoría" },
                 ].map((item) => {
                   const Icon = item.icon;
                   const isCurrent = activeSection === item.id;
@@ -1239,7 +1248,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
                 {/* 5th Item: Más */}
                 {(() => {
-                  const isMoreActive = ["crew", "logbook", "integrations", "handover", "academy"].includes(activeSection);
+                  const isMoreActive = ["crew", "logbook", "integrations", "handover", "academy", "admin"].includes(activeSection);
                   return (
                     <button
                       type="button"

@@ -192,11 +192,10 @@ export function IntegrationHub() {
               </div>
 
               <span
-                className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${
-                  formData.signalk.enabled
-                    ? "bg-[#38bdf8]/15 text-[#38bdf8] border-[#38bdf8]/40"
-                    : "bg-white/5 text-white/50 border-white/5"
-                }`}
+                className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${formData.signalk.enabled
+                  ? "bg-[#38bdf8]/15 text-[#38bdf8] border-[#38bdf8]/40"
+                  : "bg-white/5 text-white/50 border-white/5"
+                  }`}
               >
                 {formData.signalk.enabled ? "SIMULADO" : "DESCONECTADO"}
               </span>
@@ -264,11 +263,10 @@ export function IntegrationHub() {
               </div>
 
               <span
-                className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${
-                  formData.directemar.enabled
-                    ? "bg-[#38bdf8]/15 text-[#38bdf8] border-[#38bdf8]/40"
-                    : "bg-white/5 text-white/50 border-white/5"
-                }`}
+                className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold border tracking-wider ${formData.directemar.enabled
+                  ? "bg-[#38bdf8]/15 text-[#38bdf8] border-[#38bdf8]/40"
+                  : "bg-white/5 text-white/50 border-white/5"
+                  }`}
               >
                 {formData.directemar.enabled ? "SIMULADO" : "DESCONECTADO"}
               </span>
@@ -407,8 +405,8 @@ export function IntegrationHub() {
                 {formData.satellite.provider === "garmin_inreach"
                   ? "Garmin inReach (MapShare)"
                   : formData.satellite.provider === "iridium_go"
-                  ? "Iridium GO! (Wi-Fi 192.168.10.1)"
-                  : "Iridium GO! Emulador de Alta Mar"}
+                    ? "Iridium GO! (Wi-Fi 192.168.10.1)"
+                    : "Iridium GO! Emulador de Alta Mar"}
               </div>
             </div>
           </div>
@@ -460,121 +458,121 @@ export function IntegrationHub() {
               className="w-full max-w-md rounded-3xl bg-[#040B16] border border-white/5 p-6 space-y-5 shadow-2xl shadow-black/80"
               onClick={(e) => e.stopPropagation()}
             >
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
-              <div className="flex items-center gap-2">
-                <Radio className="w-5 h-5 text-[#00E5FF]" />
-                <h3 className="font-bold text-base text-white">Configurar Gateway Signal K</h3>
-              </div>
-              <button type="button" onClick={() => setActiveModal(null)}>
-                <X className="w-5 h-5 text-white/70" />
-              </button>
-            </div>
-
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                await handleSaveAll();
-                setActiveModal(null);
-                pushToast({
-                  title: "Signal K Configurado",
-                  subtitle: `Guardado host ${formData.signalk.host}:${formData.signalk.port}`,
-                  tone: "emerald",
-                });
-              }}
-              className="space-y-4 text-xs font-mono"
-            >
-              <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-                <span className="font-bold">Habilitar Integración Signal K</span>
-                <input
-                  type="checkbox"
-                  checked={formData.signalk.enabled}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      signalk: { ...formData.signalk, enabled: e.target.checked },
-                    })
-                  }
-                  className="w-5 h-5 rounded cursor-pointer"
-                />
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <div className="flex items-center gap-2">
+                  <Radio className="w-5 h-5 text-[#00E5FF]" />
+                  <h3 className="font-bold text-base text-white">Configurar Gateway Signal K</h3>
+                </div>
+                <button type="button" onClick={() => setActiveModal(null)}>
+                  <X className="w-5 h-5 text-white/70" />
+                </button>
               </div>
 
-              <div>
-                <label className="block opacity-70 mb-1">Host IP local del Barco *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.signalk.host}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      signalk: { ...formData.signalk, host: e.target.value },
-                    })
-                  }
-                  placeholder="192.168.1.100 o localhost"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block opacity-70 mb-1">Puerto (Default 3000)</label>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await handleSaveAll();
+                  setActiveModal(null);
+                  pushToast({
+                    title: "Signal K Configurado",
+                    subtitle: `Guardado host ${formData.signalk.host}:${formData.signalk.port}`,
+                    tone: "emerald",
+                  });
+                }}
+                className="space-y-4 text-xs font-mono"
+              >
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="font-bold">Habilitar Integración Signal K</span>
                   <input
-                    type="number"
-                    value={formData.signalk.port}
+                    type="checkbox"
+                    checked={formData.signalk.enabled}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        signalk: {
-                          ...formData.signalk,
-                          port: parseInt(e.target.value, 10) || 3000,
-                        },
+                        signalk: { ...formData.signalk, enabled: e.target.checked },
                       })
                     }
-                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
+                    className="w-5 h-5 rounded cursor-pointer"
                   />
                 </div>
 
                 <div>
-                  <label className="block opacity-70 mb-1">Protocolo</label>
-                  <select
-                    value={formData.signalk.protocol}
+                  <label className="block opacity-70 mb-1">Host IP local del Barco *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.signalk.host}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        signalk: {
-                          ...formData.signalk,
-                          protocol: e.target.value as "http" | "https",
-                        },
+                        signalk: { ...formData.signalk, host: e.target.value },
                       })
                     }
-                    className="w-full min-h-12 px-2 text-xs rounded-xl bg-white/5 border border-white/5"
-                  >
-                    <option value="http">HTTP (Red Barco)</option>
-                    <option value="https">HTTPS</option>
-                  </select>
+                    placeholder="192.168.1.100 o localhost"
+                    className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
+                  />
                 </div>
-              </div>
 
-              <div className="pt-3 border-t border-white/5 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveModal(null)}
-                  className="marine-btn marine-btn-secondary text-xs px-4"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="marine-btn marine-btn-primary text-xs px-5 font-bold tracking-tight shadow-lg"
-                >
-                  Guardar Conexión
-                </button>
-              </div>
-            </form>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block opacity-70 mb-1">Puerto (Default 3000)</label>
+                    <input
+                      type="number"
+                      value={formData.signalk.port}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          signalk: {
+                            ...formData.signalk,
+                            port: parseInt(e.target.value, 10) || 3000,
+                          },
+                        })
+                      }
+                      className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block opacity-70 mb-1">Protocolo</label>
+                    <select
+                      value={formData.signalk.protocol}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          signalk: {
+                            ...formData.signalk,
+                            protocol: e.target.value as "http" | "https",
+                          },
+                        })
+                      }
+                      className="w-full min-h-12 px-2 text-xs rounded-xl bg-white/5 border border-white/5"
+                    >
+                      <option value="http">HTTP (Red Barco)</option>
+                      <option value="https">HTTPS</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-white/5 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveModal(null)}
+                    className="marine-btn marine-btn-secondary text-xs px-4"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="marine-btn marine-btn-primary text-xs px-5 font-bold tracking-tight shadow-lg"
+                  >
+                    Guardar Conexión
+                  </button>
+                </div>
+              </form>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
 
       {/* =======================================================================
           MODAL 2: CONFIGURAR DIRECTEMAR
@@ -604,112 +602,112 @@ export function IntegrationHub() {
                   <Shield className="w-5 h-5 text-[var(--accent-primary)]" />
                   <h3 className="font-bold text-base text-white tracking-tight">Credenciales DIRECTEMAR SITPORT</h3>
                 </div>
-              <button type="button" onClick={() => setActiveModal(null)}>
-                <X className="w-5 h-5 text-white/70" />
-              </button>
-            </div>
-
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                await handleSaveAll();
-                setActiveModal(null);
-                pushToast({
-                  title: "Credenciales DIRECTEMAR Guardadas",
-                  subtitle: `Matrícula ${formData.directemar.vessel_registration} asociada`,
-                  tone: "emerald",
-                });
-              }}
-              className="space-y-4 text-xs font-mono"
-            >
-              <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-                <span className="font-bold">Habilitar e-Zarpe Directemar</span>
-                <input
-                  type="checkbox"
-                  checked={formData.directemar.enabled}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      directemar: { ...formData.directemar, enabled: e.target.checked },
-                    })
-                  }
-                  className="w-5 h-5 rounded cursor-pointer"
-                />
-              </div>
-
-              <div>
-                <label className="block opacity-70 mb-1">Matrícula Oficial de la Nave *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.directemar.vessel_registration}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      directemar: {
-                        ...formData.directemar,
-                        vessel_registration: e.target.value.toUpperCase(),
-                      },
-                    })
-                  }
-                  placeholder="CB-4582"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
-                />
-              </div>
-
-              <div>
-                <label className="block opacity-70 mb-1">RUT o Usuario Armador *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.directemar.username}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      directemar: { ...formData.directemar, username: e.target.value },
-                    })
-                  }
-                  placeholder="11.111.111-1"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
-                />
-              </div>
-
-              <div>
-                <label className="block opacity-70 mb-1">Token API Privado SITPORT</label>
-                <input
-                  type="password"
-                  value={formData.directemar.api_key}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      directemar: { ...formData.directemar, api_key: e.target.value },
-                    })
-                  }
-                  placeholder="••••••••••••••••••••••••"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
-                />
-              </div>
-
-              <div className="pt-3 border-t border-white/5 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveModal(null)}
-                  className="marine-btn marine-btn-secondary text-xs px-4"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="marine-btn marine-btn-primary text-xs px-5 font-bold tracking-tight shadow-lg"
-                >
-                  Guardar Credenciales
+                <button type="button" onClick={() => setActiveModal(null)}>
+                  <X className="w-5 h-5 text-white/70" />
                 </button>
               </div>
-            </form>
+
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await handleSaveAll();
+                  setActiveModal(null);
+                  pushToast({
+                    title: "Credenciales DIRECTEMAR Guardadas",
+                    subtitle: `Matrícula ${formData.directemar.vessel_registration} asociada`,
+                    tone: "emerald",
+                  });
+                }}
+                className="space-y-4 text-xs font-mono"
+              >
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="font-bold">Habilitar e-Zarpe Directemar</span>
+                  <input
+                    type="checkbox"
+                    checked={formData.directemar.enabled}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        directemar: { ...formData.directemar, enabled: e.target.checked },
+                      })
+                    }
+                    className="w-5 h-5 rounded cursor-pointer"
+                  />
+                </div>
+
+                <div>
+                  <label className="block opacity-70 mb-1">Matrícula Oficial de la Nave *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.directemar.vessel_registration}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        directemar: {
+                          ...formData.directemar,
+                          vessel_registration: e.target.value.toUpperCase(),
+                        },
+                      })
+                    }
+                    placeholder="CB-4582"
+                    className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
+                  />
+                </div>
+
+                <div>
+                  <label className="block opacity-70 mb-1">RUT o Usuario Armador *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.directemar.username}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        directemar: { ...formData.directemar, username: e.target.value },
+                      })
+                    }
+                    placeholder="11.111.111-1"
+                    className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
+                  />
+                </div>
+
+                <div>
+                  <label className="block opacity-70 mb-1">Token API Privado SITPORT</label>
+                  <input
+                    type="password"
+                    value={formData.directemar.api_key}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        directemar: { ...formData.directemar, api_key: e.target.value },
+                      })
+                    }
+                    placeholder="••••••••••••••••••••••••"
+                    className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
+                  />
+                </div>
+
+                <div className="pt-3 border-t border-white/5 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveModal(null)}
+                    className="marine-btn marine-btn-secondary text-xs px-4"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="marine-btn marine-btn-primary text-xs px-5 font-bold tracking-tight shadow-lg"
+                  >
+                    Guardar Credenciales
+                  </button>
+                </div>
+              </form>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
 
       {/* =======================================================================
           MODAL 3: METEOROLOGÍA & MODELOS
@@ -818,107 +816,107 @@ export function IntegrationHub() {
                 </button>
               </div>
 
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                await handleSaveAll();
-                setActiveModal(null);
-                pushToast({
-                  title: "Enlace Satelital Configurado",
-                  subtitle: `Proveedor: ${formData.satellite.provider}`,
-                  tone: "emerald",
-                });
-              }}
-              className="space-y-4 text-xs font-mono"
-            >
-              <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-                <span className="font-bold">Habilitar Satelital</span>
-                <input
-                  type="checkbox"
-                  checked={formData.satellite.enabled}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      satellite: { ...formData.satellite, enabled: e.target.checked },
-                    })
-                  }
-                  className="w-5 h-5 rounded cursor-pointer"
-                />
-              </div>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await handleSaveAll();
+                  setActiveModal(null);
+                  pushToast({
+                    title: "Enlace Satelital Configurado",
+                    subtitle: `Proveedor: ${formData.satellite.provider}`,
+                    tone: "emerald",
+                  });
+                }}
+                className="space-y-4 text-xs font-mono"
+              >
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="font-bold">Habilitar Satelital</span>
+                  <input
+                    type="checkbox"
+                    checked={formData.satellite.enabled}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        satellite: { ...formData.satellite, enabled: e.target.checked },
+                      })
+                    }
+                    className="w-5 h-5 rounded cursor-pointer"
+                  />
+                </div>
 
-              <div>
-                <label className="block opacity-70 mb-1">Proveedor / Dispositivo</label>
-                <select
-                  value={formData.satellite.provider}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      satellite: {
-                        ...formData.satellite,
-                        provider: e.target.value as "none" | "iridium_go" | "garmin_inreach",
-                      },
-                    })
-                  }
-                  className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
-                >
-                  <option value="iridium_go">Iridium GO! (Wi-Fi Local)</option>
-                  <option value="garmin_inreach">Garmin inReach (MapShare Feed)</option>
-                  <option value="none">Sin Dispositivo</option>
-                </select>
-              </div>
+                <div>
+                  <label className="block opacity-70 mb-1">Proveedor / Dispositivo</label>
+                  <select
+                    value={formData.satellite.provider}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        satellite: {
+                          ...formData.satellite,
+                          provider: e.target.value as "none" | "iridium_go" | "garmin_inreach",
+                        },
+                      })
+                    }
+                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
+                  >
+                    <option value="iridium_go">Iridium GO! (Wi-Fi Local)</option>
+                    <option value="garmin_inreach">Garmin inReach (MapShare Feed)</option>
+                    <option value="none">Sin Dispositivo</option>
+                  </select>
+                </div>
 
-              <div>
-                <label className="block opacity-70 mb-1">IP Local / Host Iridium GO!</label>
-                <input
-                  type="text"
-                  value={formData.satellite.iridium_host}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      satellite: { ...formData.satellite, iridium_host: e.target.value },
-                    })
-                  }
-                  placeholder="192.168.10.1"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
-                />
-              </div>
+                <div>
+                  <label className="block opacity-70 mb-1">IP Local / Host Iridium GO!</label>
+                  <input
+                    type="text"
+                    value={formData.satellite.iridium_host}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        satellite: { ...formData.satellite, iridium_host: e.target.value },
+                      })
+                    }
+                    placeholder="192.168.10.1"
+                    className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
+                  />
+                </div>
 
-              <div>
-                <label className="block opacity-70 mb-1">IMEI del Dispositivo o MapShare ID</label>
-                <input
-                  type="text"
-                  value={formData.satellite.device_imei}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      satellite: { ...formData.satellite, device_imei: e.target.value },
-                    })
-                  }
-                  placeholder="300434063991200"
-                  className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
-                />
-              </div>
+                <div>
+                  <label className="block opacity-70 mb-1">IMEI del Dispositivo o MapShare ID</label>
+                  <input
+                    type="text"
+                    value={formData.satellite.device_imei}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        satellite: { ...formData.satellite, device_imei: e.target.value },
+                      })
+                    }
+                    placeholder="300434063991200"
+                    className="w-full min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
+                  />
+                </div>
 
-              <div className="pt-3 border-t border-white/5 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveModal(null)}
-                  className="marine-btn marine-btn-secondary text-xs px-4"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="marine-btn marine-btn-primary text-xs px-5 font-bold tracking-tight shadow-lg"
-                >
-                  Guardar Conexión
-                </button>
-              </div>
-            </form>
+                <div className="pt-3 border-t border-white/5 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveModal(null)}
+                    className="marine-btn marine-btn-secondary text-xs px-4"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="marine-btn marine-btn-primary text-xs px-5 font-bold tracking-tight shadow-lg"
+                  >
+                    Guardar Conexión
+                  </button>
+                </div>
+              </form>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

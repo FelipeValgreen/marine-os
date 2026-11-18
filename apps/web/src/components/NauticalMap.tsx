@@ -1,10 +1,21 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useLiveQuery } from "dexie-react-hooks";
-import { haversineDistanceMeters, type GPXWaypoint } from "@/lib/nautical";
+import {
+  Compass,
+  Crosshair,
+  Navigation,
+  ChevronRight,
+  Zap,
+} from "lucide-react";
+import {
+  haversineDistanceMeters,
+  calculateBearingDeg,
+  type GPXWaypoint,
+} from "@/lib/nautical";
 import {
   db,
   type AnchorageSpatialRecord,
@@ -12,7 +23,7 @@ import {
   type CommunityReportRecord,
 } from "@/lib/offline/db";
 
-interface NauticalMapProps {
+export interface NauticalMapProps {
   waypoints: GPXWaypoint[];
   anchorages: AnchorageSpatialRecord[];
   selectedAnchorage: AnchorageSpatialRecord | null;
@@ -25,6 +36,43 @@ interface NauticalMapProps {
   trackPoints?: TrackPoint[];
   communityReports?: CommunityReportRecord[];
   onSelectAnchorage?: (anchorage: AnchorageSpatialRecord) => void;
+  // Live Navigation Props
+  vesselCogDeg?: number;
+  vesselSogKn?: number;
+  followVessel?: boolean;
+  onToggleFollowVessel?: (follow: boolean) => void;
+  orientationMode?: "north-up" | "course-up";
+  onToggleOrientation?: (mode: "north-up" | "course-up") => void;
+  activeTargetWaypoint?: GPXWaypoint | null;
+  wakeLockActive?: boolean;
+  onToggleWakeLock?: () => void;
+}
+
+/**
+ * Calculates endpoint given start [lat, lon], bearing in degrees, and distance in meters (WGS84 spherical).
+ */
+function calculateDestination(
+  lat: number,
+  lon: number,
+  bearingDeg: number,
+  distMeters: number
+): [number, number] {
+  const R = 6371000;
+  const d = distMeters / R;
+  const θ = (bearingDeg * Math.PI) / 180;
+  const φ1 = (lat * Math.PI) / 180;
+  const λ1 = (lon * Math.PI) / 180;
+
+  const sinφ2 =
+    Math.sin(φ1) * Math.cos(d) + Math.cos(φ1) * Math.sin(d) * Math.cos(θ);
+  const φ2 = Math.asin(sinφ2);
+  const y = Math.sin(θ) * Math.sin(d) * Math.cos(φ1);
+  const x = Math.cos(d) - Math.sin(φ1) * sinφ2;
+  const λ2 = λ1 + Math.atan2(y, x);
+
+  const destLon = (((λ2 * 180) / Math.PI + 540) % 360) - 180;
+  const destLat = (φ2 * 180) / Math.PI;
+  return [destLon, destLat];
 }
 
 /**
@@ -69,19 +117,122 @@ export function NauticalMap({
   anchorPosition,
   swingRadiusMeters,
   isDragging = false,
+  isNight = false,
   fullScreen = false,
   trackPoints = [],
   communityReports,
   onSelectAnchorage,
+  vesselCogDeg = 0,
+  vesselSogKn = 0,
+  followVessel: controlledFollowVessel,
+  onToggleFollowVessel,
+  orientationMode: controlledOrientation,
+  onToggleOrientation,
+  activeTargetWaypoint: controlledTargetWp,
+  wakeLockActive = false,
+  onToggleWakeLock,
 }: NauticalMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [filter24hOnly, setFilter24hOnly] = useState(true);
 
+  // Uncontrolled fallback state
+  const [internalFollow, setInternalFollow] = useState(true);
+  const [internalOrientation, setInternalOrientation] = useState<
+    "north-up" | "course-up"
+  >("north-up");
+  const [selectedWpIdx, setSelectedWpIdx] = useState<number>(0);
+  const [hudCollapsed, setHudCollapsed] = useState(false);
+
+  const followVessel =
+    controlledFollowVessel !== undefined
+      ? controlledFollowVessel
+      : internalFollow;
+  const orientationMode =
+    controlledOrientation !== undefined
+      ? controlledOrientation
+      : internalOrientation;
+
+  const setFollow = useCallback(
+    (val: boolean) => {
+      setInternalFollow(val);
+      onToggleFollowVessel?.(val);
+    },
+    [onToggleFollowVessel]
+  );
+
+  const setOrientation = useCallback(
+    (mode: "north-up" | "course-up") => {
+      setInternalOrientation(mode);
+      onToggleOrientation?.(mode);
+    },
+    [onToggleOrientation]
+  );
+
   const vesselPositionRef = useRef(vesselPosition);
   useEffect(() => {
     vesselPositionRef.current = vesselPosition;
   }, [vesselPosition]);
+
+  // Target waypoint calculation
+  const activeWp = useMemo(() => {
+    if (controlledTargetWp) return controlledTargetWp;
+    if (waypoints && waypoints.length > 0) {
+      return waypoints[selectedWpIdx] || waypoints[0];
+    }
+    return null;
+  }, [controlledTargetWp, waypoints, selectedWpIdx]);
+
+  // Active Navigation Calculations (DTW, BTW, ETA, Steering Deviation)
+  const navStats = useMemo(() => {
+    if (!activeWp) return null;
+    const distMeters = haversineDistanceMeters(
+      vesselPosition.lat,
+      vesselPosition.lon,
+      activeWp.lat,
+      activeWp.lon
+    );
+    const dtwNm = Math.round((distMeters / 1852) * 10) / 10;
+    const btwDeg = calculateBearingDeg(
+      vesselPosition.lat,
+      vesselPosition.lon,
+      activeWp.lat,
+      activeWp.lon
+    );
+
+    let etaText = "--:--";
+    let minutesToWp: number | null = null;
+    if (vesselSogKn && vesselSogKn > 0.4) {
+      const hours = dtwNm / vesselSogKn;
+      minutesToWp = Math.round(hours * 60);
+      const now = new Date();
+      const arrival = new Date(now.getTime() + minutesToWp * 60 * 1000);
+      const hh = String(arrival.getHours()).padStart(2, "0");
+      const mm = String(arrival.getMinutes()).padStart(2, "0");
+      etaText = `${hh}:${mm} (${minutesToWp < 60 ? `${minutesToWp}m` : `${Math.floor(minutesToWp / 60)}h ${minutesToWp % 60}m`})`;
+    }
+
+    // Steering deviation relative to target bearing
+    let steerAdvice = "EN RUMBO";
+    let steerDelta = 0;
+    if (vesselCogDeg !== undefined && vesselSogKn && vesselSogKn > 0.4) {
+      steerDelta = ((btwDeg - vesselCogDeg + 540) % 360) - 180;
+      if (steerDelta > 2) {
+        steerAdvice = `CAER ESTRIBOR +${Math.round(steerDelta)}°`;
+      } else if (steerDelta < -2) {
+        steerAdvice = `CAER BABOR ${Math.round(steerDelta)}°`;
+      }
+    }
+
+    return {
+      wpName: activeWp.name || `WP #${selectedWpIdx + 1}`,
+      dtwNm,
+      btwDeg,
+      etaText,
+      steerAdvice,
+      steerDelta,
+    };
+  }, [activeWp, vesselPosition, vesselSogKn, vesselCogDeg, selectedWpIdx]);
 
   const liveReports = useLiveQuery(() => db.community_reports.toArray(), [], []);
   const allReports = communityReports || liveReports || [];
@@ -95,6 +246,40 @@ export function NauticalMap({
       return age >= 0 && age <= ttlMs;
     });
   }, [allReports, filter24hOnly]);
+
+  // Compute 10-minute course projection vector
+  const courseVectorGeoJSON = useMemo(() => {
+    if (!vesselSogKn || vesselSogKn < 0.4 || vesselCogDeg === undefined) {
+      return {
+        type: "Feature" as const,
+        properties: {},
+        geometry: {
+          type: "LineString" as const,
+          coordinates: [],
+        },
+      };
+    }
+    // 10 minutes projection distance in meters
+    const vectorDistMeters = (vesselSogKn / 6) * 1852;
+    const dest = calculateDestination(
+      vesselPosition.lat,
+      vesselPosition.lon,
+      vesselCogDeg,
+      Math.max(300, vectorDistMeters)
+    );
+
+    return {
+      type: "Feature" as const,
+      properties: {},
+      geometry: {
+        type: "LineString" as const,
+        coordinates: [
+          [vesselPosition.lon, vesselPosition.lat],
+          [dest[0], dest[1]],
+        ],
+      },
+    };
+  }, [vesselPosition, vesselCogDeg, vesselSogKn]);
 
   const addNauticalOverlays = (map: maplibregl.Map) => {
     if (!map.getSource("openseamap-seamarks")) {
@@ -196,9 +381,9 @@ export function NauticalMap({
         type: "circle",
         source: "gpx-waypoints",
         paint: {
-          "circle-radius": 5,
+          "circle-radius": 6,
           "circle-color": "#040B16",
-          "circle-stroke-width": 2,
+          "circle-stroke-width": 2.5,
           "circle-stroke-color": "#00E5FF",
         },
       });
@@ -335,6 +520,25 @@ export function NauticalMap({
       });
     }
 
+    // Dynamic Course Projection Vector (10min predictor)
+    if (!map.getSource("course-vector-source")) {
+      map.addSource("course-vector-source", {
+        type: "geojson",
+        data: courseVectorGeoJSON,
+      });
+
+      map.addLayer({
+        id: "course-vector-line",
+        type: "line",
+        source: "course-vector-source",
+        paint: {
+          "line-color": isNight ? "#FF453A" : "#00E5FF",
+          "line-width": 2.5,
+          "line-dasharray": [4, 2],
+        },
+      });
+    }
+
     if (!map.getSource("vessel-pos")) {
       map.addSource("vessel-pos", {
         type: "geojson",
@@ -353,9 +557,9 @@ export function NauticalMap({
         type: "circle",
         source: "vessel-pos",
         paint: {
-          "circle-radius": 18,
-          "circle-color": "#00E5FF",
-          "circle-opacity": 0.22,
+          "circle-radius": 20,
+          "circle-color": isNight ? "#FF1E1E" : "#00E5FF",
+          "circle-opacity": 0.25,
         },
       });
 
@@ -364,8 +568,8 @@ export function NauticalMap({
         type: "circle",
         source: "vessel-pos",
         paint: {
-          "circle-radius": 7.5,
-          "circle-color": "#00E5FF",
+          "circle-radius": 8,
+          "circle-color": isNight ? "#FF1E1E" : "#00E5FF",
           "circle-stroke-width": 2.5,
           "circle-stroke-color": "#040B16",
         },
@@ -373,6 +577,7 @@ export function NauticalMap({
     }
   };
 
+  // Initialize MapLibre GL
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
@@ -380,7 +585,7 @@ export function NauticalMap({
       container: mapContainerRef.current,
       style: CARTO_DARK_MATTER_STYLE,
       center: [vesselPosition.lon, vesselPosition.lat],
-      zoom: 10.6,
+      zoom: 11.2,
       attributionControl: false,
     });
 
@@ -388,6 +593,11 @@ export function NauticalMap({
       new maplibregl.NavigationControl({ showCompass: true }),
       "bottom-right"
     );
+
+    // Disable follow mode when user manually drags or touches the map
+    map.on("dragstart", () => {
+      setFollow(false);
+    });
 
     map.on("load", () => {
       addNauticalOverlays(map);
@@ -463,11 +673,11 @@ export function NauticalMap({
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; font-family: monospace; margin-bottom: 8px;">
               <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
                 <div style="opacity: 0.55;">CONDICIÓN VIENTO</div>
-                <div style="font-weight: bold; color: #FF9F0A;">${p.wind_conditions || 'Calma'}</div>
+                <div style="font-weight: bold; color: #FF9F0A;">${p.wind_conditions || "Calma"}</div>
               </div>
               <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
                 <div style="opacity: 0.55;">CADENA & TENEDERO</div>
-                <div style="font-weight: bold; color: #00E676;">${p.chain_payout_m ? p.chain_payout_m + 'm ' : ''}${p.seabed_type || 'Arena'}</div>
+                <div style="font-weight: bold; color: #00E676;">${p.chain_payout_m ? p.chain_payout_m + "m " : ""}${p.seabed_type || "Arena"}</div>
               </div>
             </div>
 
@@ -503,6 +713,7 @@ export function NauticalMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Update GeoJSON layers on state/props change
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
@@ -566,6 +777,13 @@ export function NauticalMap({
           coordinates: [vesselPosition.lon, vesselPosition.lat],
         },
       });
+    }
+
+    const courseVectorSource = map.getSource("course-vector-source") as
+      | maplibregl.GeoJSONSource
+      | undefined;
+    if (courseVectorSource) {
+      courseVectorSource.setData(courseVectorGeoJSON);
     }
 
     const swingSource = map.getSource("swing-circle") as
@@ -635,8 +853,37 @@ export function NauticalMap({
     isDragging,
     trackPoints,
     effectiveReports,
+    courseVectorGeoJSON,
   ]);
 
+  // FOLLOW-ME CAMERA ENGINE: Smoothly ease camera to vessel position if follow is active
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !followVessel) return;
+
+    map.easeTo({
+      center: [vesselPosition.lon, vesselPosition.lat],
+      duration: 650,
+      essential: true,
+    });
+  }, [vesselPosition, followVessel]);
+
+  // ORIENTATION ENGINE: North-Up (0°) vs Course-Up (vessel COG)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (orientationMode === "course-up" && vesselCogDeg !== undefined) {
+      // Rotate map bearing to COG (Course-Up makes boat point to top of screen)
+      map.rotateTo(vesselCogDeg, { duration: 600 });
+    } else if (orientationMode === "north-up") {
+      if (Math.abs(map.getBearing()) > 0.5) {
+        map.rotateTo(0, { duration: 600 });
+      }
+    }
+  }, [orientationMode, vesselCogDeg]);
+
+  // Anchor selection zoom
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !selectedAnchorage) return;
@@ -647,6 +894,28 @@ export function NauticalMap({
     });
   }, [selectedAnchorage]);
 
+  // Handler to toggle orientation mode
+  const handleToggleOrientation = () => {
+    if (orientationMode === "north-up") {
+      setOrientation("course-up");
+    } else {
+      setOrientation("north-up");
+    }
+  };
+
+  // Handler to toggle / center follow-me
+  const handleToggleFollow = () => {
+    const nextState = !followVessel;
+    setFollow(nextState);
+    if (nextState && mapRef.current) {
+      mapRef.current.easeTo({
+        center: [vesselPosition.lon, vesselPosition.lat],
+        duration: 700,
+        essential: true,
+      });
+    }
+  };
+
   return (
     <div
       className={
@@ -656,25 +925,212 @@ export function NauticalMap({
       }
     >
       <div ref={mapContainerRef} className="w-full h-full" />
-      {/* Tactical Radio Comunidad TTL Filter Pill */}
-      <div className="absolute top-3 left-3 z-10 flex items-center gap-2 bg-[#040B16]/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono shadow-xl">
-        <span className="w-2 h-2 rounded-full bg-[#FF5722] animate-pulse" />
-        <span className="text-white/90 font-medium">Radio Comunidad</span>
+
+      {/* TOP FLOATING ACTIVE NAVIGATION HUD OVERLAY */}
+      {navStats && (
+        <div className="absolute top-3 left-3 right-3 sm:left-4 sm:right-auto z-20 max-w-md">
+          <div
+            className={`rounded-2xl border backdrop-blur-xl shadow-2xl transition-all ${
+              isNight
+                ? "bg-black/95 border-[#FF1E1E]/40 text-[#FF453A]"
+                : "bg-[#040B16]/95 border-white/10 text-white"
+            }`}
+          >
+            {/* Header row */}
+            <div className="flex items-center justify-between px-3.5 py-2 border-b border-white/5 text-xs font-mono">
+              <div className="flex items-center gap-2 truncate">
+                <Navigation className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span className="font-semibold text-white truncate">
+                  {navStats.wpName}
+                </span>
+                {waypoints.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedWpIdx((prev) => (prev + 1) % waypoints.length)
+                    }
+                    className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-cyan-400 flex items-center gap-0.5 transition"
+                    title="Pasar al siguiente Waypoint"
+                  >
+                    Sig <ChevronRight className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setHudCollapsed((c) => !c)}
+                className="text-[10px] text-white/50 hover:text-white transition px-1"
+              >
+                {hudCollapsed ? "Ver HUD" : "Ocultar"}
+              </button>
+            </div>
+
+            {/* Tactical Glanceable Telemetry Grid */}
+            {!hudCollapsed && (
+              <div className="p-3 grid grid-cols-4 gap-2 text-center font-mono">
+                {/* DTW */}
+                <div className="p-1.5 rounded-lg bg-white/5 border border-white/5">
+                  <div className="text-[9px] uppercase tracking-wider opacity-60">
+                    DTW
+                  </div>
+                  <div className="text-base sm:text-lg font-bold text-cyan-400">
+                    {navStats.dtwNm}{" "}
+                    <span className="text-[10px] font-normal opacity-70">
+                      NM
+                    </span>
+                  </div>
+                </div>
+
+                {/* BTW */}
+                <div className="p-1.5 rounded-lg bg-white/5 border border-white/5">
+                  <div className="text-[9px] uppercase tracking-wider opacity-60">
+                    BTW
+                  </div>
+                  <div className="text-base sm:text-lg font-bold text-emerald-400">
+                    {navStats.btwDeg}°
+                  </div>
+                </div>
+
+                {/* SOG */}
+                <div className="p-1.5 rounded-lg bg-white/5 border border-white/5">
+                  <div className="text-[9px] uppercase tracking-wider opacity-60">
+                    SOG
+                  </div>
+                  <div className="text-base sm:text-lg font-bold text-white">
+                    {(vesselSogKn || 0).toFixed(1)}{" "}
+                    <span className="text-[10px] font-normal opacity-70">
+                      kn
+                    </span>
+                  </div>
+                </div>
+
+                {/* ETA */}
+                <div className="p-1.5 rounded-lg bg-white/5 border border-white/5">
+                  <div className="text-[9px] uppercase tracking-wider opacity-60">
+                    ETA
+                  </div>
+                  <div className="text-xs sm:text-sm font-bold text-amber-400 pt-1">
+                    {navStats.etaText}
+                  </div>
+                </div>
+
+                {/* Steering Guidance Advice Bar */}
+                <div className="col-span-4 mt-1 flex items-center justify-between px-2.5 py-1 rounded-md bg-white/5 border border-white/5 text-[11px]">
+                  <span className="opacity-60">Rumbo a gobernar:</span>
+                  <span
+                    className={`font-bold font-mono ${
+                      Math.abs(navStats.steerDelta) <= 2
+                        ? "text-emerald-400"
+                        : "text-amber-400 animate-pulse"
+                    }`}
+                  >
+                    {navStats.steerAdvice}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* FLOATING TACTICAL CONTROL BAR (Follow-Me, Course-Up, Wake Lock, Radio TTL) */}
+      <div className="absolute top-3 right-3 z-20 flex flex-col items-end gap-2">
+        {/* Follow-Me Auto-Center Button */}
         <button
           type="button"
-          onClick={() => setFilter24hOnly((prev) => !prev)}
-          className="ml-1 text-[11px] px-2 py-0.5 rounded border border-white/15 bg-white/5 hover:bg-white/10 text-orange-400 font-mono transition-colors"
-          title="Alternar entre reportes de las últimas 24h o historial completo"
+          onClick={handleToggleFollow}
+          data-testid="follow-vessel-btn"
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${
+            followVessel
+              ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-cyan-900/30"
+              : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
+          }`}
+          title={
+            followVessel
+              ? "Cámara bloqueada al barco (Follow-Me activo)"
+              : "Cámara libre. Clic para centrar y seguir al barco"
+          }
         >
-          {filter24hOnly ? "Filtro: 24h TTL" : "Filtro: Histórico"}
+          <Crosshair
+            className={`w-4 h-4 ${
+              followVessel ? "text-cyan-400 animate-spin" : "opacity-60"
+            }`}
+          />
+          <span>{followVessel ? "SIGUIENDO BARCO" : "CENTRAR BARCO"}</span>
         </button>
+
+        {/* Orientation Toggle: North-Up vs Course-Up */}
+        <button
+          type="button"
+          onClick={handleToggleOrientation}
+          data-testid="orientation-toggle-btn"
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${
+            orientationMode === "course-up"
+              ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-emerald-900/30"
+              : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
+          }`}
+          title="Alternar entre orientación Norte Arriba y Proa Arriba"
+        >
+          <Compass
+            className={`w-4 h-4 ${
+              orientationMode === "course-up" ? "text-emerald-400" : "opacity-60"
+            }`}
+          />
+          <span>
+            {orientationMode === "course-up"
+              ? `PROA ARRIBA (${vesselCogDeg ?? 0}°)`
+              : "NORTE ARRIBA (0°)"}
+          </span>
+        </button>
+
+        {/* Screen Wake Lock Button */}
+        {onToggleWakeLock && (
+          <button
+            type="button"
+            onClick={onToggleWakeLock}
+            data-testid="wake-lock-toggle-btn"
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${
+              wakeLockActive
+                ? "bg-amber-500/20 text-amber-300 border-amber-500/50"
+                : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
+            }`}
+            title="Mantener pantalla activa (evita que el dispositivo se apague en el cockpit)"
+          >
+            <Zap
+              className={`w-4 h-4 ${
+                wakeLockActive ? "text-amber-400 animate-pulse" : "opacity-60"
+              }`}
+            />
+            <span>
+              {wakeLockActive ? "PANTALLA ACTIVA" : "AHORRO PANTALLA"}
+            </span>
+          </button>
+        )}
+
+        {/* Radio Comunidad TTL Filter Pill */}
+        <div className="flex items-center gap-2 bg-[#040B16]/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono shadow-xl">
+          <span className="w-2 h-2 rounded-full bg-[#FF5722] animate-pulse" />
+          <span className="text-white/90 font-medium hidden sm:inline">
+            Radio Comunidad
+          </span>
+          <button
+            type="button"
+            onClick={() => setFilter24hOnly((prev) => !prev)}
+            className="text-[11px] px-2 py-0.5 rounded border border-white/15 bg-white/5 hover:bg-white/10 text-orange-400 font-mono transition-colors"
+            title="Alternar entre reportes de las últimas 24h o historial completo"
+          >
+            {filter24hOnly ? "Filtro: 24h TTL" : "Filtro: Histórico"}
+          </button>
+        </div>
       </div>
+
       {/* Safety Nautical Disclaimer - R-4.8.1 */}
       <div
         data-testid="nautical-map-disclaimer"
-        className="absolute bottom-2 right-2 pointer-events-none z-10 px-2.5 py-1 rounded bg-black/75 backdrop-blur border border-white/10 text-[10px] font-mono text-white/75 max-w-[340px] text-right"
+        className="absolute bottom-2 right-2 pointer-events-none z-10 px-2.5 py-1 rounded bg-black/85 backdrop-blur border border-white/10 text-[10px] font-mono text-white/75 max-w-[340px] text-right"
       >
-        Carta referencial — no apta para navegación. Usa cartas oficiales SHOA y tu plotter.
+        Carta referencial — no apta para navegación. Usa cartas oficiales SHOA y
+        tu plotter.
       </div>
     </div>
   );
