@@ -47,6 +47,31 @@ export function GimbalUI({
   const [devicePitch, setDevicePitch] = useState<number>(0);
   const [hasGyroscope, setHasGyroscope] = useState<boolean>(false);
   const [simulatedSwell, setSimulatedSwell] = useState<boolean>(false);
+  const [needsIosPermission, setNeedsIosPermission] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      typeof (DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> })?.requestPermission === "function"
+    ) {
+      setNeedsIosPermission(true);
+    }
+  }, []);
+
+  const requestIosGyroPermission = async () => {
+    try {
+      const DeviceOrientationEventAny = DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> };
+      if (typeof DeviceOrientationEventAny?.requestPermission === "function") {
+        const permissionState = await DeviceOrientationEventAny.requestPermission();
+        if (permissionState === "granted") {
+          setNeedsIosPermission(false);
+          setHasGyroscope(true);
+        }
+      }
+    } catch (err) {
+      console.warn("Error requesting iOS gyro permission:", err);
+    }
+  };
 
   // Listen to physical gyroscope
   useEffect(() => {
@@ -117,6 +142,17 @@ export function GimbalUI({
             )}
             <span>HORIZON LOCK: {horizonLockEnabled ? "ACTIVO" : "DESACTIVADO"}</span>
           </button>
+
+          {needsIosPermission && (
+            <button
+              type="button"
+              onClick={requestIosGyroPermission}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/20 border border-cyan-400 text-cyan-300 font-mono text-xs font-bold animate-pulse"
+              title="Permitir giroscopio de iPhone/iPad para Horizon Lock"
+            >
+              <span>🧭 Habilitar Giroscopio iOS</span>
+            </button>
+          )}
         </div>
 
         {/* Gyro & Heel Angle Indicator */}

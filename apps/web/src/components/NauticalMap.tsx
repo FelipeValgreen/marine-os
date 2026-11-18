@@ -10,6 +10,8 @@ import {
   Navigation,
   ChevronRight,
   Zap,
+  Lock,
+  Unlock,
 } from "lucide-react";
 import {
   haversineDistanceMeters,
@@ -143,6 +145,41 @@ export function NauticalMap({
   >("north-up");
   const [selectedWpIdx, setSelectedWpIdx] = useState<number>(0);
   const [hudCollapsed, setHudCollapsed] = useState(false);
+
+  // P1.2: Touch-Lock (Wet Screen / Rain Protection)
+  const [isTouchLocked, setIsTouchLocked] = useState<boolean>(false);
+  const [unlockPressStart, setUnlockPressStart] = useState<number | null>(null);
+  const [unlockProgressPct, setUnlockProgressPct] = useState<number>(0);
+  const unlockTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastHeadingRef = useRef<number>(0);
+
+  const startUnlockHold = useCallback(() => {
+    setUnlockPressStart(Date.now());
+    const startTime = Date.now();
+    unlockTimerRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(100, Math.round((elapsed / 2500) * 100));
+      setUnlockProgressPct(pct);
+      if (elapsed >= 2500) {
+        if (unlockTimerRef.current) clearInterval(unlockTimerRef.current);
+        setIsTouchLocked(false);
+        setUnlockPressStart(null);
+        setUnlockProgressPct(0);
+        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+          navigator.vibrate([100, 50, 150]);
+        }
+      }
+    }, 50);
+  }, []);
+
+  const cancelUnlockHold = useCallback(() => {
+    if (unlockTimerRef.current) {
+      clearInterval(unlockTimerRef.current);
+      unlockTimerRef.current = null;
+    }
+    setUnlockPressStart(null);
+    setUnlockProgressPct(0);
+  }, []);
 
   const followVessel =
     controlledFollowVessel !== undefined
@@ -869,19 +906,37 @@ export function NauticalMap({
   }, [vesselPosition, followVessel]);
 
   // ORIENTATION ENGINE: North-Up (0°) vs Course-Up (vessel COG)
+  // P1.1: Deadband / Damping Filter: Only rotate when speed >= 0.5 kn and angular delta > 2.5°
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    if (orientationMode === "course-up" && vesselCogDeg !== undefined) {
-      // Rotate map bearing to COG (Course-Up makes boat point to top of screen)
-      map.rotateTo(vesselCogDeg, { duration: 600 });
+    if (orientationMode === "course-up") {
+      if (
+        vesselSogKn !== undefined &&
+        vesselSogKn >= 0.5 &&
+        vesselCogDeg !== undefined
+      ) {
+        const angularDiff = Math.abs(
+          ((vesselCogDeg - lastHeadingRef.current + 540) % 360) - 180
+        );
+        if (angularDiff > 2.5) {
+          lastHeadingRef.current = vesselCogDeg;
+          map.rotateTo(vesselCogDeg, { duration: 600 });
+        }
+      } else if (
+        lastHeadingRef.current &&
+        Math.abs(map.getBearing() - lastHeadingRef.current) > 1.0
+      ) {
+        // Freeze at last stable heading when stationary / drifting
+        map.rotateTo(lastHeadingRef.current, { duration: 400 });
+      }
     } else if (orientationMode === "north-up") {
       if (Math.abs(map.getBearing()) > 0.5) {
         map.rotateTo(0, { duration: 600 });
       }
     }
-  }, [orientationMode, vesselCogDeg]);
+  }, [orientationMode, vesselCogDeg, vesselSogKn]);
 
   // Anchor selection zoom
   useEffect(() => {
@@ -930,11 +985,10 @@ export function NauticalMap({
       {navStats && (
         <div className="absolute top-3 left-3 right-3 sm:left-4 sm:right-auto z-20 max-w-md">
           <div
-            className={`rounded-2xl border backdrop-blur-xl shadow-2xl transition-all ${
-              isNight
-                ? "bg-black/95 border-[#FF1E1E]/40 text-[#FF453A]"
-                : "bg-[#040B16]/95 border-white/10 text-white"
-            }`}
+            className={`rounded-2xl border backdrop-blur-xl shadow-2xl transition-all ${isNight
+              ? "bg-black/95 border-[#FF1E1E]/40 text-[#FF453A]"
+              : "bg-[#040B16]/95 border-white/10 text-white"
+              }`}
           >
             {/* Header row */}
             <div className="flex items-center justify-between px-3.5 py-2 border-b border-white/5 text-xs font-mono">
@@ -1018,11 +1072,10 @@ export function NauticalMap({
                 <div className="col-span-4 mt-1 flex items-center justify-between px-2.5 py-1 rounded-md bg-white/5 border border-white/5 text-[11px]">
                   <span className="opacity-60">Rumbo a gobernar:</span>
                   <span
-                    className={`font-bold font-mono ${
-                      Math.abs(navStats.steerDelta) <= 2
-                        ? "text-emerald-400"
-                        : "text-amber-400 animate-pulse"
-                    }`}
+                    className={`font-bold font-mono ${Math.abs(navStats.steerDelta) <= 2
+                      ? "text-emerald-400"
+                      : "text-amber-400 animate-pulse"
+                      }`}
                   >
                     {navStats.steerAdvice}
                   </span>
@@ -1040,11 +1093,10 @@ export function NauticalMap({
           type="button"
           onClick={handleToggleFollow}
           data-testid="follow-vessel-btn"
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${
-            followVessel
-              ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-cyan-900/30"
-              : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
-          }`}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${followVessel
+            ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-cyan-900/30"
+            : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
+            }`}
           title={
             followVessel
               ? "Cámara bloqueada al barco (Follow-Me activo)"
@@ -1052,9 +1104,8 @@ export function NauticalMap({
           }
         >
           <Crosshair
-            className={`w-4 h-4 ${
-              followVessel ? "text-cyan-400 animate-spin" : "opacity-60"
-            }`}
+            className={`w-4 h-4 ${followVessel ? "text-cyan-400 animate-spin" : "opacity-60"
+              }`}
           />
           <span>{followVessel ? "SIGUIENDO BARCO" : "CENTRAR BARCO"}</span>
         </button>
@@ -1064,17 +1115,15 @@ export function NauticalMap({
           type="button"
           onClick={handleToggleOrientation}
           data-testid="orientation-toggle-btn"
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${
-            orientationMode === "course-up"
-              ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-emerald-900/30"
-              : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
-          }`}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${orientationMode === "course-up"
+            ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-emerald-900/30"
+            : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
+            }`}
           title="Alternar entre orientación Norte Arriba y Proa Arriba"
         >
           <Compass
-            className={`w-4 h-4 ${
-              orientationMode === "course-up" ? "text-emerald-400" : "opacity-60"
-            }`}
+            className={`w-4 h-4 ${orientationMode === "course-up" ? "text-emerald-400" : "opacity-60"
+              }`}
           />
           <span>
             {orientationMode === "course-up"
@@ -1089,23 +1138,40 @@ export function NauticalMap({
             type="button"
             onClick={onToggleWakeLock}
             data-testid="wake-lock-toggle-btn"
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${
-              wakeLockActive
-                ? "bg-amber-500/20 text-amber-300 border-amber-500/50"
-                : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
-            }`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${wakeLockActive
+              ? "bg-amber-500/20 text-amber-300 border-amber-500/50"
+              : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
+              }`}
             title="Mantener pantalla activa (evita que el dispositivo se apague en el cockpit)"
           >
             <Zap
-              className={`w-4 h-4 ${
-                wakeLockActive ? "text-amber-400 animate-pulse" : "opacity-60"
-              }`}
+              className={`w-4 h-4 ${wakeLockActive ? "text-amber-400 animate-pulse" : "opacity-60"
+                }`}
             />
             <span>
               {wakeLockActive ? "PANTALLA ACTIVA" : "AHORRO PANTALLA"}
             </span>
           </button>
         )}
+
+        {/* Touch Lock Toggle Button (Wet Screen / Rain Protection) */}
+        <button
+          type="button"
+          onClick={() => setIsTouchLocked((prev) => !prev)}
+          data-testid="touch-lock-toggle-btn"
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${isTouchLocked
+            ? "bg-cyan-500/30 text-cyan-300 border-cyan-400 shadow-cyan-900/40"
+            : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
+            }`}
+          title="Bloquear pantalla táctil contra lluvia y toques accidentales"
+        >
+          {isTouchLocked ? (
+            <Lock className="w-4 h-4 text-cyan-400 animate-pulse" />
+          ) : (
+            <Unlock className="w-4 h-4 opacity-60" />
+          )}
+          <span>{isTouchLocked ? "TÁCTIL BLOQUEADO" : "BLOQUEAR TÁCTIL"}</span>
+        </button>
 
         {/* Radio Comunidad TTL Filter Pill */}
         <div className="flex items-center gap-2 bg-[#040B16]/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono shadow-xl">
@@ -1123,6 +1189,43 @@ export function NauticalMap({
           </button>
         </div>
       </div>
+
+      {/* Touch Lock Full Screen Overlay & Unlock Floating CTA */}
+      {isTouchLocked && (
+        <>
+          <div
+            className="absolute inset-0 z-30 pointer-events-auto bg-black/15 backdrop-blur-[0.5px]"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          />
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2 pointer-events-auto">
+            <div className="bg-[#040B16]/95 border border-cyan-500/50 px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-2.5 text-xs font-mono text-cyan-300">
+              <Lock className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <span>TÁCTIL BLOQUEADO (PROTECCIÓN LLUVIA)</span>
+            </div>
+            <button
+              type="button"
+              onMouseDown={startUnlockHold}
+              onMouseUp={cancelUnlockHold}
+              onTouchStart={startUnlockHold}
+              onTouchEnd={cancelUnlockHold}
+              data-testid="hold-to-unlock-btn"
+              className="relative px-6 py-3 rounded-2xl bg-cyan-500 text-black font-mono font-bold text-xs shadow-xl active:scale-95 transition-transform overflow-hidden select-none cursor-pointer flex items-center gap-2"
+            >
+              <div
+                className="absolute inset-0 bg-white/40 transition-all"
+                style={{ width: `${unlockProgressPct}%` }}
+              />
+              <Unlock className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">
+                {unlockPressStart ? `Mantén presionado... ${unlockProgressPct}%` : "Mantén presionado 2.5s para desbloquear"}
+              </span>
+            </button>
+          </div>
+        </>
+      )}
 
       {/* Safety Nautical Disclaimer - R-4.8.1 */}
       <div

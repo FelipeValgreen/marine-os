@@ -6,7 +6,7 @@ Este documento técnico detalla las restricciones de red del navegador, la topol
 
 ## 1. El Problema Técnico: Restricción de Contenido Mixto y PNA
 
-Cuando la aplicación web de MarinOS se sirve bajo **HTTPS** (ej. `https://marinos.app` o `https://marine-os-sigma.vercel.app`):
+Cuando la aplicación web de MarinOS se sirve bajo **HTTPS** (ej. `https://marine-os.vercel.app` o `https://marinos.app`):
 
 1. **Mixed Content Blocking:** El navegador (Safari en iOS/iPadOS, Chrome en Android/macOS) bloquea terminantemente cualquier petición `http://` no encriptada hacia una IP de red local (ej. `http://192.168.1.100:3000/signalk/v1/api`).
 2. **Private Network Access (PNA):** Las especificaciones W3C de PNA prohíben que contextos públicos de internet inicien conexiones indiscriminadas contra subredes RFC 1918 privadas (`192.168.x.x`, `10.x.x.x`) a menos que el dispositivo local responda con encabezados CORS de pre-vuelo específicos y conexión TLS confiable.

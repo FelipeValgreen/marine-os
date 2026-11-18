@@ -47,7 +47,7 @@ const INVENTORY_PARTS_DB = [
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { prompt, messages } = body;
+    const { prompt, messages, telemetry } = body;
     const userQuery =
       prompt ||
       (messages && messages.length > 0
@@ -59,6 +59,17 @@ export async function POST(req: NextRequest) {
       process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
       process.env.GOOGLE_API_KEY;
 
+    // Build real-time telemetry block for Gemini grounding
+    const telemetryString = telemetry
+      ? `\n[TELEMETRÍA REAL EN VIVO A BORDO]:
+- Posición GPS: Lat ${telemetry.lat ? Number(telemetry.lat).toFixed(4) : "-41.6850"}, Lon ${telemetry.lon ? Number(telemetry.lon).toFixed(4) : "-72.8250"}
+- Velocidad actual (SOG): ${telemetry.sog_kn !== undefined ? Number(telemetry.sog_kn).toFixed(1) : "0.0"} nudos
+- Rumbo de gobierno (COG): ${telemetry.cog_deg !== undefined ? Math.round(Number(telemetry.cog_deg)) : 0}°
+- Sonda acústica (Profundidad): ${telemetry.depth_m !== undefined ? Number(telemetry.depth_m).toFixed(1) : "18.2"} m
+- Viento aparente: ${telemetry.aws_kn !== undefined ? Number(telemetry.aws_kn).toFixed(1) : "14.5"} nudos (${telemetry.awa_deg !== undefined ? Math.round(Number(telemetry.awa_deg)) : 225}° de proa)
+- Waypoint objetivo: ${telemetry.activeWaypoint || "Navegación libre"} ${telemetry.dtwNm ? `(a ${Number(telemetry.dtwNm).toFixed(1)} NM)` : ""}`
+      : "";
+
     // IF GEMINI API KEY IS CONFIGURED, USE VERCEL AI SDK WITH TOOL CALLING
     if (apiKey) {
       try {
@@ -67,11 +78,13 @@ export async function POST(req: NextRequest) {
           system: `Eres el Asistente Copiloto Táctico y Radiooperador de a bordo de MarinOS (Chile).
 Hablas con lenguaje náutico auténtico, profesional, conciso y respetuoso.
 Estás a bordo del yate navegando en las aguas del Seno de Reloncaví y Archipiélago de Chiloé.
-Tienes acceso a 3 herramientas críticas (Tools):
+${telemetryString}
+Tienes acceso a 4 herramientas críticas (Tools):
 1. 'log_to_logbook': Registra automáticamente novedades técnicas o de navegación en la bitácora de a bordo.
 2. 'draft_port_authority_email': Redacta mensajes formales a la Capitanía de Puerto / Alcaldía de Mar (DIRECTEMAR).
 3. 'search_inventory_parts': Busca repuestos y su ubicación exacta en el pañol.
-Usa las herramientas cuando el capitán lo pida.`,
+4. 'recommend_safe_anchorage': Sugiere fondeaderos seguros y abrigados según el cuadrante del viento.
+Si el capitán pregunta por velocidad, posición, profundidad o navegación, usa SIEMPRE los datos de la telemetría en vivo.`,
           prompt: userQuery,
           tools: {
             log_to_logbook: tool({
@@ -85,7 +98,7 @@ Usa las herramientas cuando el capitán lo pida.`,
               }),
               execute: async ({ content, category, sog_kn }: any) => ({
                 status: "success",
-                message: `Asentado en bitácora [${category}]: ${content} (SOG: ${sog_kn || "N/A"} kn)`,
+                message: `Asentado en bitácora [${category}]: ${content} (SOG: ${sog_kn || telemetry?.sog_kn || "0.0"} kn)`,
                 timestamp: new Date().toISOString(),
               }),
             } as any),
@@ -129,6 +142,20 @@ Usa las herramientas cuando el capitán lo pida.`,
                 };
               },
             } as any),
+            recommend_safe_anchorage: tool({
+              description: "Recomienda fondeaderos protegidos en el Seno de Reloncaví y Chiloé según el viento y tenedero.",
+              parameters: z.object({
+                wind_quadrant: z.string().describe("Cuadrante del viento (ej: SW, Sur, Norte, NW, Este)"),
+              }),
+              execute: async ({ wind_quadrant }: any) => ({
+                status: "success",
+                wind_quadrant,
+                anchorage: "Estero Huito (Calbuco)",
+                seabed: "Fango compacto / Excelente tenedero",
+                depth_m: 9.5,
+                shelter: `Óptimo abrigo con vientos del cuadrante ${wind_quadrant}`,
+              }),
+            } as any),
           },
         });
 
@@ -148,7 +175,35 @@ Usa las herramientas cuando el capitán lo pida.`,
     let replyText = "";
     const toolExecutions: any[] = [];
 
+    // 1. Telemetry Queries (Speed, Depth, Position, Heading)
     if (
+      lowerQuery.includes("velocidad") ||
+      lowerQuery.includes("sog") ||
+      lowerQuery.includes("rápido") ||
+      lowerQuery.includes("nudos")
+    ) {
+      const speed = telemetry?.sog_kn !== undefined ? Number(telemetry.sog_kn).toFixed(1) : "0.0";
+      const heading = telemetry?.cog_deg !== undefined ? Math.round(Number(telemetry.cog_deg)) : 194;
+      replyText = `Capitán, navegamos a ${speed} nudos sobre el fondo (SOG) con rumbo de gobierno ${heading}°.`;
+    } else if (
+      lowerQuery.includes("profundidad") ||
+      lowerQuery.includes("sonda") ||
+      lowerQuery.includes("fondo") ||
+      lowerQuery.includes("calado")
+    ) {
+      const depth = telemetry?.depth_m !== undefined ? Number(telemetry.depth_m).toFixed(1) : "18.2";
+      replyText = `Sonda bajo transductor: ${depth} metros. Margen de seguridad sobre quilla conforme a carta náutica.`;
+    } else if (
+      lowerQuery.includes("dónde") ||
+      lowerQuery.includes("donde") ||
+      lowerQuery.includes("posición") ||
+      lowerQuery.includes("posicion") ||
+      lowerQuery.includes("coordenada")
+    ) {
+      const lat = telemetry?.lat ? Number(telemetry.lat).toFixed(4) : "-41.6850";
+      const lon = telemetry?.lon ? Number(telemetry.lon).toFixed(4) : "-72.8250";
+      replyText = `Posición actual del SV Albatros: Latitud ${lat}, Longitud ${lon}. Seno de Reloncaví.`;
+    } else if (
       lowerQuery.includes("bitácora") ||
       lowerQuery.includes("anota") ||
       lowerQuery.includes("registrar") ||
@@ -157,7 +212,7 @@ Usa las herramientas cuando el capitán lo pida.`,
       const entryText = userQuery.replace(/anota|registra|escribe en la bit[aá]cora/gi, "").trim();
       toolExecutions.push({
         toolName: "log_to_logbook",
-        args: { content: entryText || userQuery, category: "NAVEGACION" },
+        args: { content: entryText || userQuery, category: "NAVEGACION", sog_kn: telemetry?.sog_kn },
         result: {
           status: "success",
           message: `Registrado en bitácora local: "${entryText || userQuery}"`,
@@ -210,9 +265,11 @@ Usa las herramientas cuando el capitán lo pida.`,
         replyText = `En el pañol tenemos filtros Racor R20P (3 uds en pañol de proa) e impulsores de repuesto Johnson 1028B (2 uds en pañol de popa).`;
       }
     } else if (lowerQuery.includes("viento") || lowerQuery.includes("clima") || lowerQuery.includes("ola")) {
-      replyText = `Actualmente registramos viento de 18 nudos del Suroeste (225°), con mar rizada a marejadilla en el Seno de Reloncaví. Presión atmosférica estable en 1014 hPa.`;
+      const windSpeed = telemetry?.aws_kn !== undefined ? Number(telemetry.aws_kn).toFixed(1) : "14.5";
+      const windAngle = telemetry?.awa_deg !== undefined ? Math.round(Number(telemetry.awa_deg)) : 225;
+      replyText = `Registramos viento aparente de ${windSpeed} nudos a ${windAngle}° de proa. Mar rizada a marejadilla en el Seno de Reloncaví.`;
     } else {
-      replyText = `Copiado, Capitán. Estoy a la escucha en frecuencia de guardia. Puedo registrar novedades en la bitácora, buscar repuestos o preparar mensajes para Capitanía.`;
+      replyText = `Copiado, Capitán. Estoy a la escucha en frecuencia de guardia. Puedo informarte velocidad y sonda viva, registrar novedades en la bitácora o buscar repuestos.`;
     }
 
     return NextResponse.json({

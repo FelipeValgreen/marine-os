@@ -21,12 +21,29 @@ interface ISpeechRecognitionEvent {
   results: ArrayLike<ArrayLike<{ transcript: string }>>;
 }
 
+export interface TelemetryContextData {
+  sog_kn?: number;
+  cog_deg?: number;
+  lat?: number;
+  lon?: number;
+  depth_m?: number;
+  aws_kn?: number;
+  awa_deg?: number;
+  activeWaypoint?: string;
+  dtwNm?: number;
+}
+
 interface FloatingPTTButtonProps {
   onOpenSOS?: () => void;
   onOpenDigitalVHF?: () => void;
+  telemetry?: TelemetryContextData;
 }
 
-export function FloatingPTTButton({ onOpenSOS, onOpenDigitalVHF }: FloatingPTTButtonProps) {
+export function FloatingPTTButton({
+  onOpenSOS,
+  onOpenDigitalVHF,
+  telemetry,
+}: FloatingPTTButtonProps) {
   const [isListening, setIsListening] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>("");
   const [aiResponse, setAiResponse] = useState<string | null>(null);
@@ -115,7 +132,7 @@ export function FloatingPTTButton({ onOpenSOS, onOpenDigitalVHF }: FloatingPTTBu
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: queryText }),
+        body: JSON.stringify({ prompt: queryText, telemetry }),
       });
       const data = await res.json();
       const reply = data.reply || "Mensaje recibido en puente.";
@@ -129,11 +146,11 @@ export function FloatingPTTButton({ onOpenSOS, onOpenDigitalVHF }: FloatingPTTBu
               id: `ptt-log-${Date.now()}`,
               voyage_id: "demo-trip-albatros-2026",
               timestamp: new Date().toISOString(),
-              lat: -41.685,
-              lon: -72.825,
-              sog_kn: 0,
-              cog_deg: 0,
-              wind_kn: 18,
+              lat: telemetry?.lat ?? -41.685,
+              lon: telemetry?.lon ?? -72.825,
+              sog_kn: telemetry?.sog_kn ?? 0,
+              cog_deg: telemetry?.cog_deg ?? 0,
+              wind_kn: telemetry?.aws_kn ?? 18,
               engine_hours: 1240.5,
               notes: item.args?.content || queryText,
               author: "Capitán (VHF PTT)",

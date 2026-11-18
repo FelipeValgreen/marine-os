@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -850,6 +850,29 @@ export default function MarineOSHomePage() {
     alternator_voltage_v: telemetry.alternator_voltage_v,
     engine_hours: vessel?.engine_hours_current ?? 1420.5,
   };
+
+  const liveTelemetryContext = useMemo(
+    () => ({
+      sog_kn: telemetry.sog_kn,
+      cog_deg: telemetry.cog_deg,
+      lat: effectiveVesselLat,
+      lon: effectiveVesselLon,
+      depth_m: telemetry.depth_m,
+      aws_kn: telemetry.aws_kn,
+      awa_deg: telemetry.awa_deg,
+      activeWaypoint: parsedRoute.waypoints[0]?.name || "Canales de Chiloé",
+    }),
+    [
+      telemetry.sog_kn,
+      telemetry.cog_deg,
+      effectiveVesselLat,
+      effectiveVesselLon,
+      telemetry.depth_m,
+      telemetry.aws_kn,
+      telemetry.awa_deg,
+      parsedRoute.waypoints,
+    ]
+  );
 
   const handleSimulateDragWithAudio = () => {
     setVesselOffsetMeters(Math.ceil(scopeCalc.swingRadiusMeters + 22));
@@ -2172,6 +2195,7 @@ export default function MarineOSHomePage() {
         <FloatingPTTButton
           onOpenSOS={openSOS}
           onOpenDigitalVHF={() => setIsDigitalVHFOpen(true)}
+          telemetry={liveTelemetryContext}
         />
       </div>
     );
@@ -2545,6 +2569,7 @@ export default function MarineOSHomePage() {
         <FloatingPTTButton
           onOpenSOS={openSOS}
           onOpenDigitalVHF={() => setIsDigitalVHFOpen(true)}
+          telemetry={liveTelemetryContext}
         />
       </div>
     );
@@ -4038,6 +4063,7 @@ export default function MarineOSHomePage() {
       <FloatingPTTButton
         onOpenSOS={openSOS}
         onOpenDigitalVHF={() => setIsDigitalVHFOpen(true)}
+        telemetry={liveTelemetryContext}
       />
 
       {/* Commercialization & Pricing Paywall Modal */}

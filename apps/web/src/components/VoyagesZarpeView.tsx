@@ -486,8 +486,114 @@ export function VoyagesZarpeView({
       title: "DOCUMENTO DE APOYO PARA ZARPE",
       subtitle: `${vessel?.name || "SV Albatros"} • POB: ${crewList.length} • Para presentar ante Autoridad Marítima`,
       sha256Hash: digest,
-      tokenBadge: "BORRADOR APOYO",
+      tokenBadge: "DOCUMENTO LISTO",
     });
+
+    // P1.3: Generate formal printable DIRECTEMAR Zarpe document with auto-print
+    if (typeof window !== "undefined") {
+      const printWindow = window.open("", "_blank");
+      if (printWindow) {
+        const rowsHtml = crewList
+          .map(
+            (c, i) => `
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ccc; text-align: center;">${i + 1}</td>
+            <td style="padding: 8px; border: 1px solid #ccc; font-weight: bold;">${c.full_name}</td>
+            <td style="padding: 8px; border: 1px solid #ccc;">${c.document_type}: ${c.document_number}</td>
+            <td style="padding: 8px; border: 1px solid #ccc;">${c.nationality || "Chilena"}</td>
+            <td style="padding: 8px; border: 1px solid #ccc; text-transform: uppercase;">${c.role}</td>
+            <td style="padding: 8px; border: 1px solid #ccc;">${c.license_type || "N/A"}${c.license_number ? ` (#${c.license_number})` : ""}</td>
+          </tr>
+        `
+          )
+          .join("");
+
+        const printHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Rol de Zarpe - ${vessel?.name || "SV Albatros"}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; padding: 40px; color: #111; max-width: 800px; margin: auto; }
+            h1 { font-size: 18px; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
+            h2 { font-size: 14px; text-transform: uppercase; margin-top: 0; color: #555; text-align: center; border-bottom: 2px solid #222; padding-bottom: 12px; }
+            .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; font-size: 12px; }
+            .meta-box { background: #f8f9fa; padding: 12px; border: 1px solid #ddd; border-radius: 6px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
+            th { background: #f0f0f0; padding: 8px; border: 1px solid #ccc; text-align: left; }
+            .footer-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 50px; font-size: 12px; }
+            .sig-line { border-top: 1px solid #000; padding-top: 8px; text-align: center; }
+            .crypto-seal { margin-top: 30px; padding: 10px; background: #eef2f6; border: 1px dashed #999; font-family: monospace; font-size: 10px; word-break: break-all; }
+            @media print { body { padding: 0; } }
+          </style>
+        </head>
+        <body>
+          <h1>Armada de Chile • Dirección General del Territorio Marítimo</h1>
+          <h2>Declaración de Zarpe y Rol de Dotación (Documento de Apoyo)</h2>
+
+          <div class="meta-grid">
+            <div class="meta-box">
+              <strong>DATOS DE LA NAVE:</strong><br>
+              Nombre: <strong>${vessel?.name || "SV Albatros"}</strong><br>
+              Matrícula: <strong>${vessel?.registration_number || "1284-PTT"}</strong><br>
+              Tipo: ${vessel?.vessel_type || "Velero"} • Eslora: ${vessel?.loa_meters || 12.43}m<br>
+              MMSI: ${vessel?.mmsi || "725001234"} • Señal Distintiva: ${vessel?.call_sign || "CB2400"}
+            </div>
+            <div class="meta-box">
+              <strong>DATOS DEL VIAJE:</strong><br>
+              Puerto Zarpe: <strong>${currentVoyage?.departure_port || "Marina Puerto Montt"}</strong><br>
+              Puerto Destino: <strong>${currentVoyage?.arrival_port || "Caleta Mechuque"}</strong><br>
+              Fecha/Hora Estimada: ${new Date().toLocaleDateString("es-CL")} • POB Total: <strong>${crewList.length} personas</strong><br>
+              Equipos: Radio VHF Ch 16/71 • Salvavidas y Pirotecnia conforme
+            </div>
+          </div>
+
+          <h3>Dotación y Pasajeros a Bordo (POB: ${crewList.length})</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nombre y Apellidos</th>
+                <th>Identificación</th>
+                <th>Nacionalidad</th>
+                <th>Rol</th>
+                <th>Licencia Marítima</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <div class="crypto-seal">
+            <strong>SELLO CRIPTOGRÁFICO DE INTEGRIDAD SHA-256:</strong><br>
+            ${digest}
+          </div>
+
+          <div class="footer-signatures">
+            <div class="sig-line">
+              <strong>Firma y Nombre del Patrón al Mando</strong><br>
+              RUT: ${crewList.find((c) => c.role === "skipper")?.document_number || "11.111.111-1"}
+            </div>
+            <div class="sig-line">
+              <strong>Recepción Autoridad Marítima / Alcaldía de Mar</strong><br>
+              Timbre, Fecha y Folio
+            </div>
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+        </html>
+        `;
+
+        printWindow.document.write(printHtml);
+        printWindow.document.close();
+      }
+    }
   };
 
   // ===========================================================================

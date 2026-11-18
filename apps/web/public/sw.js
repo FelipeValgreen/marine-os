@@ -11,6 +11,9 @@ const PRECACHE_ROUTES = [
   "/qr/quick-windlass",
   "/manifest.json",
   "/icon.svg",
+  "/apple-touch-icon.png",
+  "/icon-192.png",
+  "/icon-512.png",
 ];
 
 /**
