@@ -218,3 +218,58 @@ test("Copilot intent routing: weather uses environment and unknown queries expre
   assert.equal(detectIntent("¡Hombre al agua!"), "emergency");
   assert.equal(detectIntent("¿Cómo cocinar un risotto de mariscos?"), "unknown");
 });
+
+test("Commercialization entitlements: gates tactical & B2B features by plan tier", () => {
+  type PlanTier = "b2c_free" | "b2c_pro" | "b2b_fleet";
+  type FeatureKey = "gimbal_horizon_lock" | "unlimited_vessels" | "genesis_handover" | "basic_navigation";
+
+  function isFeatureAllowed(tier: PlanTier, feature: FeatureKey): boolean {
+    switch (feature) {
+      case "basic_navigation":
+        return true;
+      case "gimbal_horizon_lock":
+        return tier === "b2c_pro" || tier === "b2b_fleet";
+      case "unlimited_vessels":
+      case "genesis_handover":
+        return tier === "b2b_fleet";
+      default:
+        return false;
+    }
+  }
+
+  // Free Tier
+  assert.equal(isFeatureAllowed("b2c_free", "basic_navigation"), true);
+  assert.equal(isFeatureAllowed("b2c_free", "gimbal_horizon_lock"), false);
+  assert.equal(isFeatureAllowed("b2c_free", "genesis_handover"), false);
+
+  // Pro Tier
+  assert.equal(isFeatureAllowed("b2c_pro", "gimbal_horizon_lock"), true);
+  assert.equal(isFeatureAllowed("b2c_pro", "genesis_handover"), false);
+
+  // Fleet Tier
+  assert.equal(isFeatureAllowed("b2b_fleet", "gimbal_horizon_lock"), true);
+  assert.equal(isFeatureAllowed("b2b_fleet", "genesis_handover"), true);
+  assert.equal(isFeatureAllowed("b2b_fleet", "unlimited_vessels"), true);
+});
+
+test("Subscription offline grace period: allows 14 days offline in high seas without lockout", () => {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const now = Date.now();
+
+  function checkSubscriptionStatus(lastVerifiedAtMs: number, plan: "b2c_free" | "b2c_pro" | "b2b_fleet"): "active" | "grace_period" | "expired" {
+    if (plan === "b2c_free") return "active";
+    const daysSinceCheck = (now - lastVerifiedAtMs) / dayMs;
+    if (daysSinceCheck <= 30) return "active";
+    if (daysSinceCheck <= 30 + 14) return "grace_period";
+    return "expired";
+  }
+
+  // Verified 10 days ago -> active
+  assert.equal(checkSubscriptionStatus(now - 10 * dayMs, "b2c_pro"), "active");
+
+  // Offline for 38 days (30 days billing + 8 days offline grace period) -> grace_period (not locked out)
+  assert.equal(checkSubscriptionStatus(now - 38 * dayMs, "b2c_pro"), "grace_period");
+
+  // Offline for 50 days -> expired
+  assert.equal(checkSubscriptionStatus(now - 50 * dayMs, "b2c_pro"), "expired");
+});

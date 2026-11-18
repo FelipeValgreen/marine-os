@@ -29,6 +29,7 @@ import {
   ShieldCheck,
   Compass,
   Ship,
+  LogOut,
   Mic,
   UserCog,
   ShoppingBag,
@@ -69,6 +70,7 @@ import {
   MarineCopilot,
   type CopilotTelemetryContext,
 } from "@/components/MarineCopilot";
+import { ContextualTooltip } from "@/components/ContextualTooltip";
 import { VesselServiceBook } from "@/components/VesselServiceBook";
 import { MarineAcademy } from "@/components/MarineAcademy";
 import { DamageControl } from "@/components/DamageControl";
@@ -80,6 +82,7 @@ import { GimbalUI } from "@/components/GimbalUI";
 import { FlashChecklist } from "@/components/FlashChecklist";
 import { DigitalVHF } from "@/components/DigitalVHF";
 import { FloatingPTTButton } from "@/components/FloatingPTTButton";
+import { CommercializationPaywall } from "@/components/CommercializationPaywall";
 
 interface LiveMarineWeatherState {
   source: string;
@@ -177,13 +180,13 @@ function evaluateLicenseExpirySemaphore(expiryDateStr: string): {
 
 import { getApiBaseUrl } from "@/lib/api";
 
-const API_URL = getApiBaseUrl();
-
 export type VesselOperationalState =
   | "AMARRADO"
   | "FONDEADO"
   | "NAVEGANDO_MOTOR"
   | "NAVEGANDO_VELA";
+
+const API_URL = getApiBaseUrl();
 
 export default function MarineOSHomePage() {
   const {
@@ -191,6 +194,7 @@ export default function MarineOSHomePage() {
     setTheme,
     activeAccount,
     updatePassportProfile,
+    logoutSession,
     activeSection,
     setActiveSection,
     requestedVesselSubView,
@@ -207,6 +211,10 @@ export default function MarineOSHomePage() {
   const [isFlashChecklistOpen, setIsFlashChecklistOpen] = useState<boolean>(false);
   const [isDigitalVHFOpen, setIsDigitalVHFOpen] = useState<boolean>(false);
   const [tacticalViewMode, setTacticalViewMode] = useState<"gimbal" | "chart">("gimbal");
+
+  // Operational Vessel State Machine (PRD R-4.2)
+  const [vesselOperationalState, setVesselOperationalState] =
+    useState<VesselOperationalState>("FONDEADO");
 
   // Live Dexie IndexedDB Queries
   const userPrefs = useLiveQuery(() => db.user_preferences.get("default"), []);
@@ -245,19 +253,22 @@ export default function MarineOSHomePage() {
     []
   );
 
-  // Operational Vessel State Machine (PRD 3.1)
-  const [vesselOperationalState, setVesselOperationalState] =
-    useState<VesselOperationalState>("FONDEADO");
-
-  // Fleet & Inventory Categorization (PRD R-4.9.1)
-  const [inventoryTab, setInventoryTab] = useState<
-    "equipment" | "spares" | "safety"
-  >("equipment");
-
   // Passport & Marketplace State
   const [logbookTab, setLogbookTab] = useState<"entries" | "marketplace">("entries");
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   const [profileFormData, setProfileFormData] = useState<Partial<UserProfileAccount>>({});
+
+  // Commercialization & Subscription State
+  const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false);
+  const [activeOrgTier, setActiveOrgTier] = useState<"b2c_free" | "b2c_pro" | "b2b_fleet">("b2b_fleet");
+
+  useEffect(() => {
+    db.organizations.toArray().then((orgs) => {
+      if (orgs.length > 0 && orgs[0].plan_tier) {
+        setActiveOrgTier(orgs[0].plan_tier);
+      }
+    });
+  }, []);
 
   // Split-Bill & Social Trophy Passport State
   const [isSharingPassport, setIsSharingPassport] = useState<boolean>(false);
@@ -803,7 +814,7 @@ export default function MarineOSHomePage() {
     });
     pushToast({
       title: `Horómetro Actualizado: ${nextHours} hrs`,
-      subtitle: "Sincronizado en el barco",
+      subtitle: "Sincronizado en IndexedDB (vessels)",
       tone: "cyan",
     });
   };
@@ -890,7 +901,7 @@ export default function MarineOSHomePage() {
       payload: entry,
     });
     pushToast({
-      title: "Bitácora de Voz Registrada (Manos Libres)",
+      title: "Bitácora de Voz Registrada (Zero Data Entry)",
       subtitle: `"${transcribedText}" • ${currentDms.combined} • ${currentHorometer}h`,
       tone: "emerald",
     });
@@ -1117,7 +1128,7 @@ export default function MarineOSHomePage() {
         setReplayIndex(0);
         pushToast({
           title: `Sea Time Log +${distNm} MN Registradas`,
-          subtitle: `${recordedPoints.length} puntos guardados en el dispositivo`,
+          subtitle: `${recordedPoints.length} puntos guardados en IndexedDB`,
           tone: "emerald",
         });
       }
@@ -1304,30 +1315,36 @@ export default function MarineOSHomePage() {
           )}
         </div>
 
-        {/* 1 & 2. RESPONSIVE BRIDGE TOP BAR (PRD 5.4 - Coordenadas 100% visibles en 390px) */}
-        <header className="fixed top-2 sm:top-4 inset-x-2 sm:inset-x-4 lg:left-20 z-30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 pointer-events-none">
-          {/* Top-Left: Vessel + Coordenadas DMS */}
-          <div className="flex flex-wrap items-center gap-1.5 pointer-events-auto">
-            <div className="marine-pill px-3 py-1.5 sm:px-3.5 sm:py-2 flex items-center gap-2 max-w-[calc(100vw-1rem)] sm:max-w-none">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] animate-pulse shrink-0" />
-              <span className="font-semibold text-xs sm:text-sm tracking-tight truncate max-w-[100px] sm:max-w-none">
+        {/* 1. TOP-LEFT COMPACT PILL + LIVE YANMAR 4JH57 SIGNAL K CAPSULE */}
+        <div className="fixed top-4 left-3 lg:left-20 z-30 flex flex-wrap items-center gap-2 max-w-[calc(100vw-9rem)]">
+          <div className="marine-pill px-3.5 py-2 flex flex-wrap items-center gap-2.5">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#00E676] animate-pulse" />
+              <span className="font-semibold text-xs sm:text-sm tracking-tight truncate max-w-[140px] sm:max-w-none">
                 {vessel?.name || "SV Albatros"}
               </span>
-              <span className="opacity-25">|</span>
-              <span
-                data-testid="nautical-dms-coords"
-                className="font-mono text-xs sm:text-sm font-bold text-[var(--color-data)] truncate"
-              >
-                {currentDms.combined}
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-black">
+                v2.4
               </span>
             </div>
 
-            <div className="hidden sm:inline-flex relative items-center rounded-full bg-black/40 p-0.5 sm:p-1 border border-white/5 marine-pill">
+            <span className="opacity-25">|</span>
+
+            <span
+              data-testid="nautical-dms-coords"
+              className="font-mono text-xs sm:text-sm font-medium text-[#00E5FF] truncate"
+            >
+              {currentDms.combined}
+            </span>
+
+            <span className="hidden sm:inline opacity-25">|</span>
+
+            <div className="relative inline-flex items-center rounded-full bg-black/40 p-1 border border-white/5">
               <button
                 type="button"
                 data-testid="gps-mode-simulator-btn"
                 onClick={() => setGpsMode("simulator")}
-                className={`min-h-[36px] px-2.5 sm:px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "simulator"
+                className={`min-h-14 px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "simulator"
                   ? "bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-bold"
                   : "opacity-60 hover:opacity-100"
                   }`}
@@ -1338,214 +1355,234 @@ export default function MarineOSHomePage() {
                 type="button"
                 data-testid="gps-mode-native-btn"
                 onClick={() => setGpsMode("native_gps")}
-                className={`min-h-[36px] px-2.5 sm:px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "native_gps"
+                className={`min-h-14 px-3.5 py-1 rounded-full text-xs font-mono font-medium transition ${gpsMode === "native_gps"
                   ? "bg-[#1a2332] text-[var(--accent-primary)] border border-[var(--accent-primary)]/40 font-bold"
                   : "opacity-60 hover:opacity-100"
                   }`}
               >
                 GPS REAL
               </button>
-            </div>
-
-            <div
-              data-testid="signalk-engine-pill"
-              className="hidden xl:flex marine-pill px-3.5 py-2 items-center gap-3 font-mono text-xs"
-            >
-              <Activity className="w-3.5 h-3.5 text-[#34D399]" />
-              <span>YANMAR {telemetry.rpm} RPM</span>
-              <span className="opacity-25">•</span>
-              <span>{telemetry.coolant_temp_c.toFixed(1)}°C</span>
-              <span className="opacity-25">•</span>
-              <span>{telemetry.oil_pressure_kpa} kPa</span>
-              <span className="opacity-25">•</span>
-              <span className="text-[var(--color-data)]">
-                {telemetry.alternator_voltage_v.toFixed(1)}V
-              </span>
+              <ContextualTooltip
+                preferenceKey="tooltip_gps_seen"
+                title="Conmutador GPS Real / Simulador"
+                description="Alterna en vivo entre el GPS Nativo del dispositivo (watchPosition) y el Simulador del Seno de Reloncaví."
+                positionClass="top-full left-0 mt-3"
+              />
             </div>
           </div>
 
-          {/* Top-Right: Quick Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto self-end sm:self-auto overflow-x-auto max-w-[calc(100vw-1rem)] no-scrollbar py-0.5">
-            {/* Prominent Bimodal Switch: MODO TIERRA vs MODO ALTA MAR (FASE 1) */}
-            <button
-              type="button"
-              data-testid="bimodal-navigation-mode-toggle"
-              onClick={() => {
-                toggleNavigationMode();
-                pushToast({
-                  title: !isAtSeaMode ? "Modo Alta Mar Activado" : "Modo Tierra Activado",
-                  subtitle: !isAtSeaMode
-                    ? "UI Táctica: Telemetría gigante, Horizon Lock, PTT y VHF"
-                    : "UI Administrativa: Flota, Finanzas, Gastos y Documentos",
-                  tone: !isAtSeaMode ? "coral" : "cyan",
-                });
-              }}
-              className={`min-h-[44px] sm:min-h-14 px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-full flex items-center gap-2 font-mono text-xs font-bold transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${
-                isAtSeaMode
-                  ? "bg-[#C2410C] hover:bg-[#D94A1A] text-white border border-orange-400/50 shadow-lg"
-                  : "bg-[#1E293B] hover:bg-[#334155] text-slate-300 border border-white/10"
+          <div
+            data-testid="signalk-engine-pill"
+            className="hidden xl:flex marine-pill px-3.5 py-2 items-center gap-3 font-mono text-xs"
+          >
+            <Activity className="w-3.5 h-3.5 text-[#00E676]" />
+            <span>YANMAR {telemetry.rpm} RPM</span>
+            <span className="opacity-25">•</span>
+            <span>{telemetry.coolant_temp_c.toFixed(1)}°C</span>
+            <span className="opacity-25">•</span>
+            <span>{telemetry.oil_pressure_kpa} kPa</span>
+            <span className="opacity-25">•</span>
+            <span className="text-[#00E5FF]">
+              {telemetry.alternator_voltage_v.toFixed(1)}V
+            </span>
+          </div>
+        </div>
+
+        {/* Top-Right: Quick Actions */}
+        <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto self-end sm:self-auto overflow-x-auto max-w-[calc(100vw-1rem)] no-scrollbar py-0.5">
+          {/* Commercialization Subscription Tier Badge */}
+          <button
+            type="button"
+            data-testid="subscription-tier-badge-btn"
+            onClick={() => setIsPaywallOpen(true)}
+            className="marine-pill min-h-[44px] sm:min-h-14 px-3 sm:px-3.5 py-1.5 sm:py-2 flex items-center gap-1.5 text-xs font-mono font-bold text-amber-400 border-amber-500/40 hover:border-amber-400 transition"
+            title="Ver Planes y Suscripción MarinOS"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline opacity-80">PLAN:</span>
+            <span>
+              {activeOrgTier === "b2b_fleet"
+                ? "B2B FLEET"
+                : activeOrgTier === "b2c_pro"
+                ? "PRO"
+                : "FREE"}
+            </span>
+          </button>
+
+          {/* Prominent Bimodal Switch: MODO TIERRA vs MODO ALTA MAR (FASE 1) */}
+          <button
+            type="button"
+            data-testid="bimodal-navigation-mode-toggle"
+            onClick={() => {
+              toggleNavigationMode();
+              pushToast({
+                title: !isAtSeaMode ? "Modo Alta Mar Activado" : "Modo Tierra Activado",
+                subtitle: !isAtSeaMode
+                  ? "UI Táctica: Telemetría gigante, Horizon Lock, PTT y VHF"
+                  : "UI Administrativa: Flota, Finanzas, Gastos y Documentos",
+                tone: !isAtSeaMode ? "coral" : "cyan",
+              });
+            }}
+            className={`min-h-[44px] sm:min-h-14 px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-full flex items-center gap-2 font-mono text-xs font-bold transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${isAtSeaMode
+              ? "bg-[#C2410C] hover:bg-[#D94A1A] text-white border border-orange-400/50 shadow-lg"
+              : "bg-[#1E293B] hover:bg-[#334155] text-slate-300 border border-white/10"
               }`}
-              title="Alternar entre Modo Tierra (Administrativo) y Modo Alta Mar (Táctico)"
-            >
-              <span
-                className={`w-2.5 h-2.5 rounded-full ${
-                  isAtSeaMode ? "bg-white animate-pulse" : "bg-slate-400"
+            title="Alternar entre Modo Tierra (Administrativo) y Modo Alta Mar (Táctico)"
+          >
+            <span
+              className={`w-2.5 h-2.5 rounded-full ${isAtSeaMode ? "bg-white animate-pulse" : "bg-slate-400"
                 }`}
-              />
-              <span className="hidden sm:inline">
-                {isAtSeaMode ? "MODO ALTA MAR" : "MODO TIERRA"}
-              </span>
-              <span className="sm:hidden">
-                {isAtSeaMode ? "ALTA MAR" : "TIERRA"}
-              </span>
-            </button>
+            />
+            <span className="hidden sm:inline">
+              {isAtSeaMode ? "MODO ALTA MAR" : "MODO TIERRA"}
+            </span>
+            <span className="sm:hidden">
+              {isAtSeaMode ? "ALTA MAR" : "TIERRA"}
+            </span>
+          </button>
 
-            {/* Tactical View Switch (Gimbal vs Carta) in Alta Mar Mode */}
-            {isAtSeaMode && (
-              <button
-                type="button"
-                data-testid="tactical-view-toggle-btn"
-                onClick={() =>
-                  setTacticalViewMode((prev) => (prev === "gimbal" ? "chart" : "gimbal"))
-                }
-                className="marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-4 py-1.5 sm:py-2.5 flex items-center gap-1.5 text-xs font-mono font-bold text-cyan-400 border-cyan-500/40"
-              >
-                <span>{tacticalViewMode === "gimbal" ? "VER CARTA" : "VER GIMBAL"}</span>
-              </button>
-            )}
-
-            {/* Operational Vessel State Pill (PRD R-4.2) */}
+          {/* Tactical View Switch (Gimbal vs Carta) in Alta Mar Mode */}
+          {isAtSeaMode && (
             <button
               type="button"
-              data-testid="vessel-operational-state-pill"
-              onClick={() => {
-                const nextState: VesselOperationalState =
-                  vesselOperationalState === "AMARRADO"
-                    ? "FONDEADO"
-                    : vesselOperationalState === "FONDEADO"
+              data-testid="tactical-view-toggle-btn"
+              onClick={() =>
+                setTacticalViewMode((prev) => (prev === "gimbal" ? "chart" : "gimbal"))
+              }
+              className="marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-4 py-1.5 sm:py-2.5 flex items-center gap-1.5 text-xs font-mono font-bold text-cyan-400 border-cyan-500/40"
+            >
+              <span>{tacticalViewMode === "gimbal" ? "VER CARTA" : "VER GIMBAL"}</span>
+            </button>
+          )}
+
+          {/* Operational Vessel State Pill (PRD R-4.2) */}
+          <button
+            type="button"
+            data-testid="vessel-operational-state-pill"
+            onClick={() => {
+              const nextState: VesselOperationalState =
+                vesselOperationalState === "AMARRADO"
+                  ? "FONDEADO"
+                  : vesselOperationalState === "FONDEADO"
                     ? "NAVEGANDO_MOTOR"
                     : vesselOperationalState === "NAVEGANDO_MOTOR"
-                    ? "NAVEGANDO_VELA"
-                    : "AMARRADO";
-                setVesselOperationalState(nextState);
+                      ? "NAVEGANDO_VELA"
+                      : "AMARRADO";
+              setVesselOperationalState(nextState);
+              pushToast({
+                title: `Estado Operacional: ${nextState.replace("_", " ")}`,
+                subtitle: "Máquina de estados actualizada",
+                tone: "cyan",
+              });
+            }}
+            className="marine-pill min-h-14 px-3 sm:px-4 py-2.5 flex items-center gap-2 text-xs font-mono font-bold"
+            title="Alternar estado operacional del barco"
+          >
+            <Ship className="w-3.5 h-3.5 text-[var(--accent-primary)] shrink-0" />
+            <span className="hidden sm:inline">{vesselOperationalState.replace("_", " ")}</span>
+            <span className="sm:hidden">{vesselOperationalState.slice(0, 3)}</span>
+          </button>
+
+          {/* One-Touch Scotopic Night Mode Toggle (PRD 5.1) */}
+          <button
+            type="button"
+            data-testid="bridge-night-mode-toggle-btn"
+            onClick={() => {
+              if (theme === "night-red-shift") {
+                setTheme("midnight-ocean");
                 pushToast({
-                  title: `Estado Operacional: ${nextState.replace("_", " ")}`,
-                  subtitle: "Máquina de estados actualizada",
+                  title: "Modo Océano Activado",
+                  subtitle: "Visión normal de puente",
                   tone: "cyan",
                 });
-              }}
-              className="marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-4 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2 text-xs font-mono font-bold"
-              title="Alternar estado operacional del barco"
-            >
-              <Ship className="w-3.5 h-3.5 text-[var(--accent-primary)] shrink-0" />
-              <span className="hidden sm:inline">{vesselOperationalState.replace("_", " ")}</span>
-              <span className="sm:hidden">{vesselOperationalState.slice(0, 3)}</span>
-            </button>
-
-            {/* One-Touch Scotopic Night Mode Toggle (PRD 5.1) */}
-            <button
-              type="button"
-              data-testid="bridge-night-mode-toggle-btn"
-              onClick={() => {
-                if (theme === "night-red-shift") {
-                  setTheme("midnight-ocean");
-                  pushToast({
-                    title: "Modo Océano Activado",
-                    subtitle: "Visión normal de puente",
-                    tone: "cyan",
-                  });
-                } else {
-                  setTheme("night-red-shift");
-                  pushToast({
-                    title: "Modo Noche (Red-Shift) Activado",
-                    subtitle: "Preservación estricta de visión escotópica",
-                    tone: "coral",
-                  });
-                }
-              }}
-              className={`marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-3.5 py-1.5 sm:py-2.5 flex items-center gap-1.5 font-mono text-xs font-bold transition ${
-                theme === "night-red-shift"
-                  ? "border-red-600 bg-red-950/60 text-red-500"
-                  : ""
+              } else {
+                setTheme("night-red-shift");
+                pushToast({
+                  title: "Modo Noche (Red-Shift) Activado",
+                  subtitle: "Preservación estricta de visión escotópica",
+                  tone: "coral",
+                });
+              }
+            }}
+            className={`marine-pill min-h-14 px-3 sm:px-3.5 py-2.5 flex items-center gap-1.5 font-mono text-xs font-bold transition ${theme === "night-red-shift"
+              ? "border-red-600 bg-red-950/60 text-red-500"
+              : ""
               }`}
-              title="Atajo de un toque: Modo Noche (Rojo Escotópico)"
-              aria-label="Alternar modo noche rojo escotópico"
-            >
-              <Eye className="w-4 h-4 text-red-500 shrink-0" />
-              <span className="hidden xl:inline">{theme === "night-red-shift" ? "Noche ON" : "Noche"}</span>
-            </button>
+            title="Atajo de un toque: Modo Noche (Rojo Escotópico)"
+            aria-label="Alternar modo noche rojo escotópico"
+          >
+            <Eye className="w-4 h-4 text-red-500 shrink-0" />
+            <span className="hidden xl:inline">{theme === "night-red-shift" ? "Noche ON" : "Noche"}</span>
+          </button>
 
-            {/* Desktop Only ⌘K (PRD 5.4) */}
-            <button
-              type="button"
-              data-testid="bridge-cmd-k-btn"
-              onClick={openCommandCenter}
-              title="Abrir Command Center (⌘K)"
-              className="hidden lg:flex marine-pill min-h-14 px-3.5 py-2.5 items-center gap-1.5 font-mono text-xs font-bold"
-            >
-              <span className="text-[var(--accent-primary)]">⌘K</span>
-              <span>Comando</span>
-            </button>
+          <button
+            type="button"
+            data-testid="bridge-cmd-k-btn"
+            onClick={openCommandCenter}
+            title="Abrir Command Center (⌘K)"
+            className="marine-pill min-h-14 px-3.5 py-2.5 flex items-center gap-1.5 font-mono text-xs font-bold"
+          >
+            <span className="text-[var(--accent-primary)]">⌘K</span>
+            <span className="hidden lg:inline">Comando</span>
+          </button>
 
-            <button
-              type="button"
-              data-testid="open-passage-planner-btn"
-              onClick={() => {
-                setDrawerTab("routing");
+          <button
+            type="button"
+            data-testid="open-passage-planner-btn"
+            onClick={() => {
+              setDrawerTab("routing");
+              setDrawerOpen(true);
+            }}
+            className={`marine-pill min-h-14 px-3.5 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${drawerOpen && drawerTab === "routing"
+              ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
+              : ""
+              }`}
+          >
+            <Compass className="w-4 h-4 text-[#00E676] shrink-0" />
+            <span className="hidden md:inline">Planificador 48h</span>
+          </button>
+
+          <button
+            type="button"
+            data-testid="open-copilot-drawer-btn"
+            onClick={() => {
+              setDrawerTab("copilot");
+              setDrawerOpen(true);
+            }}
+            className={`marine-pill min-h-14 px-4 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${drawerOpen && drawerTab === "copilot"
+              ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
+              : ""
+              }`}
+          >
+            <Sparkles className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
+            <span className="hidden sm:inline">Copiloto IA</span>
+          </button>
+
+          <button
+            type="button"
+            data-testid="toggle-anchorage-drawer-btn"
+            onClick={() => {
+              if (drawerOpen && drawerTab === "anchorage") {
+                setDrawerOpen(false);
+              } else {
+                setDrawerTab("anchorage");
                 setDrawerOpen(true);
-              }}
-              className={`marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-3.5 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition ${drawerOpen && drawerTab === "routing"
-                ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
+              }
+            }}
+            className={`marine-pill min-h-14 px-4 sm:px-5 py-2.5 flex items-center gap-2 text-xs sm:text-sm font-semibold transition ${anchorWatch.isDragging
+              ? "bg-[#FF2D55] text-white border-[#FF2D55] animate-pulse"
+              : drawerOpen && drawerTab === "anchorage"
+                ? "border-[var(--accent-primary)]/50 text-[var(--accent-primary)]"
                 : ""
-                }`}
-            >
-              <Compass className="w-4 h-4 text-[#34D399] shrink-0" />
-              <span className="hidden md:inline">Planificador 48h</span>
-            </button>
-
-            <button
-              type="button"
-              data-testid="open-copilot-drawer-btn"
-              onClick={() => {
-                setDrawerTab("copilot");
-                setDrawerOpen(true);
-              }}
-              className={`marine-pill min-h-[44px] sm:min-h-14 px-2.5 sm:px-4 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition ${drawerOpen && drawerTab === "copilot"
-                ? "border-[var(--accent-primary)]/60 text-[var(--accent-primary)]"
-                : ""
-                }`}
-            >
-              <Sparkles className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
-              <span className="hidden sm:inline">Copiloto IA</span>
-            </button>
-
-            <button
-              type="button"
-              data-testid="toggle-anchorage-drawer-btn"
-              onClick={() => {
-                if (drawerOpen && drawerTab === "anchorage") {
-                  setDrawerOpen(false);
-                } else {
-                  setDrawerTab("anchorage");
-                  setDrawerOpen(true);
-                }
-              }}
-              className={`marine-pill min-h-[44px] sm:min-h-14 px-3 sm:px-5 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition ${anchorWatch.isDragging
-                ? "bg-[#FF2D55] text-white border-[#FF2D55] animate-pulse"
-                : drawerOpen && drawerTab === "anchorage"
-                  ? "border-[var(--accent-primary)]/50 text-[var(--accent-primary)]"
-                  : ""
-                }`}
-            >
-              <CloudSun className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
-              <span className="hidden xs:inline">Fondeo & Clima</span>
-              <span className="xs:hidden">Fondeo</span>
-              <span className="hidden sm:inline font-mono text-xs px-2 py-0.5 rounded-full bg-white/10">
-                {liveWeather.windSpeedKn.toFixed(1)} kn • {liveWeather.score}%
-              </span>
-            </button>
-          </div>
-        </header>
+              }`}
+          >
+            <CloudSun className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
+            <span>Fondeo & Clima</span>
+            <span className="hidden sm:inline font-mono text-xs px-2 py-0.5 rounded-full bg-white/10">
+              {liveWeather.windSpeedKn.toFixed(1)} kn • {liveWeather.score}%
+            </span>
+          </button>
+        </div>
 
         {/* 3. BOTTOM-LEFT MINIMALIST TELEMETRY HUD (4 Clean Numbers: SOG, COG, PROF, VIENTO) */}
         <div className="fixed bottom-20 lg:bottom-6 left-3 right-3 sm:right-auto lg:left-20 z-30">
@@ -1682,7 +1719,7 @@ export default function MarineOSHomePage() {
                           WEATHER ROUTING • EVOLUCIÓN 48 HORAS
                         </div>
                         <h3 className="text-base font-sans font-bold mt-0.5">
-                          Planificador de Zarpe (Pronóstico Open-Meteo)
+                          Planificador de Zarpe (PredictWind Engine)
                         </h3>
                       </div>
 
@@ -2154,21 +2191,13 @@ export default function MarineOSHomePage() {
                       {telemetry.oil_pressure_kpa} kPa
                     </div>
                   </div>
-                  {/* PRD R-4.9.2: Separar Batería de servicio (SOC %) de Alternador (V) */}
                   <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
                     <div className="opacity-60 text-[10px]">
-                      BATERÍA SERVICIO (SOC)
-                    </div>
-                    <div className="font-semibold text-base mt-1 text-[#34d399]">
-                      {telemetry.house_battery_soc_pct}%
-                    </div>
-                  </div>
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-                    <div className="opacity-60 text-[10px]">
-                      ALTERNADOR (V)
+                      ALTERNADOR / SOC
                     </div>
                     <div className="font-semibold text-base mt-1 text-[var(--accent-primary)]">
-                      {telemetry.alternator_voltage_v.toFixed(1)} V
+                      {telemetry.alternator_voltage_v.toFixed(1)}V (
+                      {telemetry.house_battery_soc_pct}%)
                     </div>
                   </div>
                   <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
@@ -2178,29 +2207,21 @@ export default function MarineOSHomePage() {
                       {vessel?.draft_meters || 2.18}m
                     </div>
                   </div>
-                  {/* PRD R-4.9.3: Horómetro con fecha y autor de ingreso */}
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 col-span-2">
-                    <div className="flex items-center justify-between">
-                      <div className="opacity-60 text-[10px]">HORÓMETRO MOTOR PRINCIPAL</div>
-                      <span className="text-[10px] font-mono text-[#38bdf8]">Yanmar 4JH57</span>
-                    </div>
+                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
+                    <div className="opacity-60 text-[10px]">HORÓMETRO ACTUAL</div>
                     <div
                       data-testid="vessel-horometer-value"
-                      className="font-semibold text-xl mt-1 text-[var(--accent-primary)]"
+                      className="font-semibold text-base mt-1 text-[var(--accent-primary)]"
                     >
                       {vessel?.engine_hours_current || 1420.5} hrs
-                    </div>
-                    <div className="text-[10px] opacity-60 mt-1 font-mono">
-                      Ingreso verificado por {activeAccount.name} • Actualizado hoy
                     </div>
                   </div>
                 </div>
 
-                {/* PRD R-4.9.4: Intervalo de servicio configurable */}
                 <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-mono">
-                    <span className="opacity-80">Próximo servicio programado (250 hrs):</span>
-                    <span className="text-[#34d399] font-bold">
+                    <span className="opacity-80">Próximo servicio 1.500h:</span>
+                    <span className="text-[#00E676]">
                       Restan{" "}
                       {Math.max(
                         0,
@@ -2211,29 +2232,28 @@ export default function MarineOSHomePage() {
                       hrs
                     </span>
                   </div>
-                  {/* PRD R-4.9.3: Botones +0.5h identificados claramente como SIMULADOR */}
-                  <div className="flex items-center justify-between pt-1 border-t border-white/5">
-                    <span className="text-[10px] font-mono text-[#fbbf24] font-bold">
-                      [SIMULADOR]:
-                    </span>
-                    <div className="flex items-center gap-1.5 font-mono text-xs">
-                      <button
-                        type="button"
-                        onClick={() => handleIncrementEngineHours(0.5)}
-                        className="marine-btn marine-btn-secondary text-xs px-2.5 py-1 min-h-[36px]"
-                        title="Simular avance de horómetro"
-                      >
-                        +0.5h
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleIncrementEngineHours(1.0)}
-                        className="marine-btn marine-btn-secondary text-xs px-2.5 py-1 min-h-[36px]"
-                        title="Simular avance de horómetro"
-                      >
-                        +1.0h
-                      </button>
-                    </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleIncrementEngineHours(0.5)}
+                      className="marine-btn marine-btn-secondary text-xs px-2"
+                    >
+                      <span>+0.5h</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleIncrementEngineHours(1.0)}
+                      className="marine-btn marine-btn-secondary text-xs px-2"
+                    >
+                      <span>+1.0h</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleIncrementEngineHours(2.0)}
+                      className="marine-btn marine-btn-primary text-xs px-2"
+                    >
+                      <span>+2.0h</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -2270,184 +2290,79 @@ export default function MarineOSHomePage() {
               </div>
             </div>
 
-            {/* Right 7 Cols: Structured Inventory (PRD R-4.9.1: Equipos, Repuestos y Seguridad) */}
             <div className="lg:col-span-7 space-y-6">
               <div className="marine-card p-6 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-3">
-                  <div>
-                    <h2 className="text-lg font-semibold">
-                      Inventario Técnico &amp; Pañol del Barco
-                    </h2>
-                    <p className="text-xs text-slate-300 opacity-70 mt-0.5">
-                      Gestión categorizada de equipos, stock de repuestos y elementos de seguridad con vencimiento.
-                    </p>
-                  </div>
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
+                  <h2 className="text-lg font-semibold">
+                    Inventario de Tambuchos & Alertas SOLAS (
+                    {inventoryItems.length})
+                  </h2>
                   <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-white/5 border border-white/5">
-                    {inventoryItems.length} Registros
+                    IndexedDB Sync
                   </span>
                 </div>
 
-                {/* 3-Tab Categorization Bar (PRD R-4.9.1) */}
-                <div className="flex gap-2 p-1 rounded-2xl bg-white/[0.025] border border-white/5 font-mono text-xs">
-                  <button
-                    type="button"
-                    data-testid="inventory-tab-equipment-btn"
-                    onClick={() => setInventoryTab("equipment")}
-                    className={`flex-1 min-h-11 rounded-xl font-bold flex items-center justify-center gap-1.5 transition ${
-                      inventoryTab === "equipment"
-                        ? "bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/50"
-                        : "text-white/60 hover:text-white"
-                    }`}
-                  >
-                    <span>⚙️ Equipos</span>
-                    <span className="text-[10px] opacity-70">
-                      ({inventoryItems.filter((i) => i.category === "equipment" || i.category === "propulsion" || i.category === "electricidad").length})
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    data-testid="inventory-tab-spares-btn"
-                    onClick={() => setInventoryTab("spares")}
-                    className={`flex-1 min-h-11 rounded-xl font-bold flex items-center justify-center gap-1.5 transition ${
-                      inventoryTab === "spares"
-                        ? "bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/50"
-                        : "text-white/60 hover:text-white"
-                    }`}
-                  >
-                    <span>🔧 Repuestos</span>
-                    <span className="text-[10px] opacity-70">
-                      ({inventoryItems.filter((i) => i.category === "spares" || i.category === "repuestos_motor" || i.category === "plomeria").length})
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    data-testid="inventory-tab-safety-btn"
-                    onClick={() => setInventoryTab("safety")}
-                    className={`flex-1 min-h-11 rounded-xl font-bold flex items-center justify-center gap-1.5 transition ${
-                      inventoryTab === "safety"
-                        ? "bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/50"
-                        : "text-white/60 hover:text-white"
-                    }`}
-                  >
-                    <span>🛡️ Seguridad</span>
-                    <span className="text-[10px] opacity-70">
-                      ({inventoryItems.filter((i) => i.category === "safety" || i.category === "seguridad").length})
-                    </span>
-                  </button>
-                </div>
-
-                {/* Items List Filtered by Tab */}
-                <div className="space-y-3">
-                  {inventoryItems
-                    .filter((item) => {
-                      if (inventoryTab === "equipment") {
-                        return item.category === "equipment" || item.category === "propulsion" || item.category === "electricidad";
-                      }
-                      if (inventoryTab === "spares") {
-                        return item.category === "spares" || item.category === "repuestos_motor" || item.category === "plomeria";
-                      }
-                      return item.category === "safety" || item.category === "seguridad";
-                    })
-                    .map((item) => {
-                      const isLow = item.quantity <= item.min_threshold;
-                      // Calculate expiration days for safety items
-                      let expirationDays: number | null = null;
-                      if (item.expiration_date) {
-                        const exp = new Date(item.expiration_date).getTime();
-                        const diffMs = exp - Date.now();
-                        expirationDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-                      }
-
-                      return (
-                        <div
-                          key={item.id}
-                          className="p-4 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2.5"
-                        >
-                          <div className="flex flex-wrap items-start justify-between gap-3">
-                            <div className="min-w-0 flex-1">
-                              <div className="font-semibold text-sm text-white flex flex-wrap items-center gap-2">
-                                <span>{item.item_name}</span>
-                                {inventoryTab === "spares" && isLow && (
-                                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#fbbf24]/20 text-[#fbbf24] border border-[#fbbf24]/40 font-bold">
-                                    BAJO STOCK MÍNIMO
-                                  </span>
-                                )}
-                                {inventoryTab === "safety" && expirationDays !== null && (
-                                  <span
-                                    className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold border ${
-                                      expirationDays > 90
-                                        ? "bg-[#34d399]/20 text-[#34d399] border-[#34d399]/40"
-                                        : expirationDays > 30
-                                        ? "bg-[#fbbf24]/20 text-[#fbbf24] border-[#fbbf24]/40"
-                                        : "bg-[#f87171]/20 text-[#f87171] border-[#f87171]/50 animate-pulse"
-                                    }`}
-                                  >
-                                    {expirationDays > 90
-                                      ? `Vigente • Vence en ${expirationDays}d`
-                                      : expirationDays > 30
-                                      ? `Atención • Vence en ${expirationDays}d`
-                                      : `Vencido o Próximo • ${expirationDays}d`}
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* PRD R-4.9.5: Especificación técnica y fuente */}
-                              {item.specification && (
-                                <div className="text-xs text-slate-300 opacity-80 mt-1 font-mono">
-                                  {item.specification}
-                                </div>
-                              )}
-                              {item.specification_source && (
-                                <div className="text-[10px] text-[var(--accent-primary)] opacity-70 mt-0.5 font-mono">
-                                  Fuente: {item.specification_source}
-                                </div>
-                              )}
-
-                              {inventoryTab === "equipment" && item.maintenance_interval_hours && (
-                                <div className="text-xs font-mono text-[#34d399] mt-1">
-                                  Intervalo de servicio: cada {item.maintenance_interval_hours} hrs / {item.maintenance_interval_months || 12} meses
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Quantity Adjusters for Spares */}
-                            {inventoryTab === "spares" && (
-                              <div className="flex items-center gap-2 font-mono shrink-0">
-                                <button
-                                  type="button"
-                                  onClick={() => handleAdjustInventoryStock(item.id, -1, item.quantity)}
-                                  className="marine-btn marine-btn-secondary px-3 min-h-10"
-                                >
-                                  <Minus className="w-3.5 h-3.5" />
-                                </button>
-                                <span className="min-h-10 px-3 flex items-center rounded-xl bg-white/5 border border-white/5 font-bold text-xs">
-                                  {item.quantity} uds
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleAdjustInventoryStock(item.id, 1, item.quantity)}
-                                  className="marine-btn marine-btn-secondary px-3 min-h-10"
-                                >
-                                  <Plus className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
+                <div className="space-y-2.5">
+                  {inventoryItems.map((item) => {
+                    const isLow = item.quantity <= item.min_threshold;
+                    return (
+                      <div
+                        key={item.id}
+                        className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-3"
+                      >
+                        <div className="min-w-0">
+                          <div className="font-medium text-sm flex flex-wrap items-center gap-2">
+                            <span className="truncate">{item.item_name}</span>
+                            {isLow && (
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FF9F0A]/20 text-[#FF9F0A]">
+                                STOCK MÍNIMO
+                              </span>
                             )}
-
-                            {inventoryTab === "safety" && item.expiration_date && (
-                              <div className="text-xs font-mono opacity-80 shrink-0 text-right">
-                                <div className="text-[10px] opacity-60">FECHA VENCIMIENTO</div>
-                                <div className="font-semibold text-white mt-0.5">{item.expiration_date}</div>
-                              </div>
+                          </div>
+                          <div className="text-xs font-mono opacity-65 mt-0.5">
+                            {item.category} • Mínimo: {item.min_threshold}
+                            {item.expiration_date && (
+                              <span> • Vence: {item.expiration_date}</span>
                             )}
                           </div>
                         </div>
-                      );
-                    })}
+
+                        <div className="flex items-center gap-2 font-mono">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleAdjustInventoryStock(
+                                item.id,
+                                -1,
+                                item.quantity
+                              )
+                            }
+                            className="marine-btn marine-btn-secondary px-3"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="min-h-14 px-3.5 flex items-center rounded-xl bg-white/5 border border-white/5 font-bold text-sm">
+                            {item.quantity} uds
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleAdjustInventoryStock(
+                                item.id,
+                                1,
+                                item.quantity
+                              )
+                            }
+                            className="marine-btn marine-btn-secondary px-3"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
-                {/* Add Item Form */}
                 <form
                   onSubmit={handleAddInventoryItemOffline}
                   className="pt-3 border-t border-white/5 flex flex-wrap gap-2"
@@ -2456,21 +2371,21 @@ export default function MarineOSHomePage() {
                     type="text"
                     value={newItemName}
                     onChange={(e) => setNewItemName(e.target.value)}
-                    placeholder="Nombre del componente o repuesto..."
-                    className="flex-1 min-w-[200px] min-h-12 px-3.5 text-xs rounded-xl bg-white/5 border border-white/5"
+                    placeholder="Agregar repuesto o elemento SOLAS al barco..."
+                    className="flex-1 min-w-[180px] min-h-14 px-3.5 text-sm"
                   />
                   <select
                     value={newItemCategory}
                     onChange={(e) => setNewItemCategory(e.target.value)}
-                    className="min-h-12 px-3.5 font-mono text-xs rounded-xl bg-white/5 border border-white/5"
+                    className="min-h-14 px-3.5 font-mono text-xs"
                   >
-                    <option value="equipment">⚙️ Equipos</option>
-                    <option value="spares">🔧 Repuestos</option>
-                    <option value="safety">🛡️ Seguridad con Vencimiento</option>
+                    <option value="repuestos_motor">repuestos_motor</option>
+                    <option value="seguridad">seguridad</option>
+                    <option value="plomeria">plomeria</option>
                   </select>
                   <button
                     type="submit"
-                    className="marine-btn marine-btn-primary min-h-12 px-5 text-xs font-bold"
+                    className="marine-btn marine-btn-primary text-xs"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Agregar</span>
@@ -2659,27 +2574,12 @@ export default function MarineOSHomePage() {
                       <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      data-testid="edit-passport-profile-btn"
-                      onClick={handleOpenEditProfile}
-                      className="marine-btn marine-btn-secondary min-h-10 text-xs px-3 py-1.5 flex items-center gap-1.5"
-                      title="Editar perfil náutico"
-                    >
-                      <UserCog className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
-                      <span className="hidden sm:inline">Editar Perfil</span>
-                    </button>
-                    <button
-                      type="button"
-                      data-testid="share-digital-trophy-btn"
-                      onClick={() => setIsSharingPassport(true)}
-                      className="marine-btn marine-btn-primary min-h-10 text-xs px-3 py-1.5 flex items-center gap-1.5"
-                      title="Compartir trofeo digital"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Compartir</span>
-                    </button>
+                  <div className="text-2xl font-bold tracking-tight text-white mt-0.5">
+                    {activeAccount.name}
+                  </div>
+                  <div className="text-xs opacity-75 font-medium text-slate-300">
+                    {activeAccount.email || "filipo.valverde@gmail.com"} •{" "}
+                    <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
                   </div>
                 </div>
 
@@ -2737,7 +2637,7 @@ export default function MarineOSHomePage() {
                           <span>🛡️</span> Fondeo Seguro: 10 Noches
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 text-white border border-white/20 font-semibold shadow-sm">
-                          <span>🇨🇱</span> Título Deportivo (Declaración Capitán)
+                          <span>🇨🇱</span> DIRECTEMAR Verificado
                         </span>
                       </div>
                     </div>
@@ -3018,13 +2918,13 @@ export default function MarineOSHomePage() {
                 </h2>
                 <p className="text-xs text-slate-300 opacity-80 leading-relaxed font-normal">
                   Suma automática de tu historial base certificado más todas las
-                  travesías GPS grabadas en el dispositivo.
+                  travesías GPS grabadas en IndexedDB.
                 </p>
               </div>
 
               <div className="p-5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2">
                 <div className="text-[10px] font-bold tracking-[0.15em] uppercase opacity-65 text-slate-300">
-                  TOTAL TIEMPO DE MAR (HORAS Y MILLAS)
+                  TOTAL SEA TIME (INDEXEDDB + TRACKS)
                 </div>
                 <div
                   data-testid="sea-time-total-miles"
@@ -3666,7 +3566,7 @@ export default function MarineOSHomePage() {
                         setProfileFormData({ ...profileFormData, name: e.target.value })
                       }
                       className="w-full min-h-12 px-3.5 text-sm rounded-xl bg-white/5 border border-white/5"
-                      placeholder="Ej. Felipe Valverde"
+                      placeholder="Ej. Capitán Demo"
                     />
                   </div>
 
@@ -4039,6 +3939,16 @@ export default function MarineOSHomePage() {
         onOpenSOS={openSOS}
         onOpenDigitalVHF={() => setIsDigitalVHFOpen(true)}
       />
+
+      {/* Commercialization & Pricing Paywall Modal */}
+      <CommercializationPaywall
+        isOpen={isPaywallOpen}
+        onClose={() => setIsPaywallOpen(false)}
+        currentTier={activeOrgTier}
+        onPlanUpdated={(newTier) => setActiveOrgTier(newTier)}
+        pushToast={pushToast}
+      />
+
     </>
   );
 }
