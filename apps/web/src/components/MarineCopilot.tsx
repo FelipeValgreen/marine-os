@@ -17,7 +17,7 @@ import {
   Package,
 } from "lucide-react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/lib/offline/db";
+import { db, COMPREHENSIVE_VESSEL_MANUALS } from "@/lib/offline/db";
 import { useMarineContext } from "@/components/ThemeProvider";
 
 export interface CopilotTelemetryContext {
@@ -272,83 +272,67 @@ Nota de fondeo: Viento favorable para tenederos resguardados del cuadrante ${win
       return;
     }
 
-    // 3. INTENT: MECÁNICA & MANUALES (R-4.13.3: RAG real sobre documentos del usuario)
-    const isMechanic =
-      queryText.includes("motor") ||
-      queryText.includes("yanmar") ||
-      queryText.includes("impulsor") ||
-      queryText.includes("racor") ||
-      queryText.includes("filtro") ||
-      queryText.includes("temperatura") ||
-      queryText.includes("aceite") ||
-      queryText.includes("bomba") ||
-      queryText.includes("generador") ||
-      queryText.includes("fischer") ||
-      queryText.includes("molinete") ||
-      queryText.includes("ancla") ||
-      queryText.includes("bano") ||
-      queryText.includes("jabsco") ||
-      queryText.includes("repuesto");
+    // 3. INTENT: RAG OFFLINE COMPLETO SOBRE TODOS LOS MANUALES TÉCNICOS Y NÁUTICOS (R-4.13.3)
+    // Gather all local manuals (Dexie database + preloaded comprehensive offline library)
+    const allManuals: Array<{ manual_title: string; page_number: number; content: string; related_qr_slug?: string; keywords?: string[]; category?: string }> = [
+      ...(manualChunks || []),
+      ...(COMPREHENSIVE_VESSEL_MANUALS || [])
+    ];
 
-    if (isMechanic) {
-      // Find matching manual chunk
-      const matchedChunk = manualChunks?.find((chunk) => {
-        const title = chunk.manual_title.toLowerCase();
-        const content = chunk.content.toLowerCase();
-        if (queryText.includes("racor") || queryText.includes("combustible")) {
-          return title.includes("racor") || content.includes("racor");
-        }
-        if (queryText.includes("jabsco") || queryText.includes("baño")) {
-          return title.includes("jabsco") || content.includes("jabsco");
-        }
-        if (queryText.includes("molinete") || queryText.includes("ancla")) {
-          return title.includes("quick") || content.includes("molinete");
-        }
-        return title.includes("yanmar") || content.includes("yanmar");
-      });
+    // Tokenize query eliminating Spanish stop-words
+    const stopWords = new Set(["de", "la", "el", "los", "las", "un", "una", "en", "para", "con", "por", "que", "como", "cual", "donde", "tiene", "esta", "este"]);
+    const queryTokens = queryText
+      .replace(/[^a-záéíóúüñ0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((t) => t.length > 2 && !stopWords.has(t));
 
-      // Find matching spare item in inventory
+    // Calculate relevance score for each manual chunk
+    let bestManual: (typeof allManuals)[0] | null = null;
+    let highestScore = 0;
+
+    for (const manual of allManuals) {
+      let score = 0;
+      const lowerTitle = manual.manual_title.toLowerCase();
+      const lowerContent = manual.content.toLowerCase();
+      const keywords = manual.keywords || [];
+
+      for (const token of queryTokens) {
+        if (lowerTitle.includes(token)) score += 5;
+        if (lowerContent.includes(token)) score += 2;
+        if (keywords.some((k) => k.includes(token))) score += 4;
+      }
+
+      if (score > highestScore) {
+        highestScore = score;
+        bestManual = manual;
+      }
+    }
+
+    if (bestManual && highestScore >= 2) {
+      // Find matching spare item in onboard inventory
       const matchedSpare = inventoryItems?.find((item) => {
         const name = item.item_name.toLowerCase();
-        if (queryText.includes("racor") || queryText.includes("combustible")) {
-          return name.includes("racor");
-        }
-        if (queryText.includes("impulsor") || queryText.includes("agua")) {
-          return name.includes("impulsor");
-        }
-        if (queryText.includes("jabsco") || queryText.includes("baño")) {
-          return name.includes("joker") || name.includes("jabsco");
-        }
-        if (queryText.includes("generador")) {
-          return name.includes("generador") || name.includes("panda");
-        }
-        return name.includes("yanmar");
+        return queryTokens.some((tok) => name.includes(tok));
       });
 
-      const manualTitle =
-        matchedChunk?.manual_title || "Manual de Operación Yanmar 4JH57 (Inyección Directa)";
-      const pageNum = matchedChunk?.page_number || 48;
+      const manualTitle = bestManual.manual_title;
+      const pageNum = bestManual.page_number;
       const spareText = matchedSpare
         ? `${matchedSpare.item_name} (Stock: ${matchedSpare.quantity} uds disponibles a bordo)`
         : "Sin repuestos específicos registrados para esta pieza en el pañol.";
 
       setResponse({
-        answer: `PROCEDIMIENTO TÉCNICO RECUPERADO:
-${matchedChunk?.content || "Revisar refrigeración de agua salada, nivel de aceite y filtro de combustible."}
+        answer: `PROCEDIMIENTO NÁUTICO / TÉCNICO RECUPERADO (0ms Offline):
+${bestManual.content}
 
-INVENTARIO DE REPUESTOS DISPONIBLES A BORDO:
+${matchedSpare ? `INVENTARIO DE REPUESTOS DISPONIBLES A BORDO:
 • ${spareText}
-
-${
-  matchedSpare?.specification
-    ? `Especificación de repuesto: ${matchedSpare.specification} (Fuente: ${matchedSpare.specification_source || "Manual de taller"})\n`
-    : ""
-}`,
+${matchedSpare.specification ? `Especificación técnica: ${matchedSpare.specification} (Fuente: ${matchedSpare.specification_source || "Manual de taller"})\n` : ""}` : ""}`,
         intent: "mechanic",
         manual_title: manualTitle,
         page_number: pageNum,
-        related_qr_slug: matchedChunk?.related_qr_slug || "yanmar-4jh57",
-        inventory_match: spareText,
+        related_qr_slug: bestManual.related_qr_slug || "yanmar-4jh57",
+        inventory_match: matchedSpare ? spareText : undefined,
         is_demo: !hasCloudLLM,
       });
       setLoading(false);
@@ -357,11 +341,11 @@ ${
 
     // 4. UNKNOWN / NO MATCH (PRD R-4.13.3 / R-4.13.6: decir honestamente "No encontré esto en tus manuales")
     setResponse({
-      answer: `No encontré esto en tus manuales de a bordo ni en los registros técnicos de tu embarcación.
+      answer: `No encontré una sección específica para "${queryText}" en los 22 manuales técnicos y náuticos precargados de tu embarcación.
 
-Te sugiero consultar el manual físico en la mesa de cartas o contactar al servicio oficial del fabricante para evitar maniobras no autorizadas.`,
+Te sugiero consultar el manual físico en la mesa de cartas, verificar la lista de verificación en la Academia o emitir consulta por VHF Canal 14 a la Capitanía de Puerto.`,
       intent: "unknown",
-      manual_title: "Sin coincidencia en manuales cargados",
+      manual_title: "Sin coincidencia en biblioteca técnica",
       page_number: 0,
       is_demo: !hasCloudLLM,
     });

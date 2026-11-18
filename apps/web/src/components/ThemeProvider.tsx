@@ -819,9 +819,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   <button
                     type="button"
                     onClick={toggleNavigationMode}
-                    className={`w-full py-2 rounded-xl bg-orange-950/60 border border-orange-500/40 text-orange-400 font-mono text-[10px] font-bold uppercase tracking-wider flex items-center justify-center ${
-                      sidebarCollapsed ? "px-1" : "px-3"
-                    }`}
+                    className={`w-full py-2 rounded-xl bg-orange-950/60 border border-orange-500/40 text-orange-400 font-mono text-[10px] font-bold uppercase tracking-wider flex items-center justify-center ${sidebarCollapsed ? "px-1" : "px-3"
+                      }`}
                     title="Desactivar Modo Alta Mar y volver a Modo Tierra"
                   >
                     {sidebarCollapsed ? "TIERRA" : "← VOLVER A TIERRA"}
@@ -1090,13 +1089,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             onClick={() => setMobileMoreOpen(false)}
           >
             <div
-              className={`p-5 rounded-t-3xl border-t space-y-4 max-h-[80vh] overflow-y-auto ${
-                isNight
-                  ? "bg-black border-[#FF0000]/50 text-[#FF0000]"
-                  : isDaylight
+              className={`p-5 rounded-t-3xl border-t space-y-4 max-h-[80vh] overflow-y-auto ${isNight
+                ? "bg-black border-[#FF0000]/50 text-[#FF0000]"
+                : isDaylight
                   ? "bg-[#F0F4F8] border-slate-300 text-[#0A192F]"
                   : "bg-[#060b14] border-white/10 text-slate-100"
-              }`}
+                }`}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between pb-2 border-b border-white/5">
@@ -1132,11 +1130,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                         setActiveSection(item.id as MarineSection);
                         setMobileMoreOpen(false);
                       }}
-                      className={`min-h-[56px] p-3 rounded-2xl border text-left flex items-center gap-3 transition ${
-                        isCurrent
-                          ? "bg-[var(--accent-primary)]/20 border-[var(--accent-primary)] text-[var(--accent-primary)]"
-                          : "bg-white/[0.04] border-white/5 hover:bg-white/[0.08]"
-                      }`}
+                      className={`min-h-[56px] p-3 rounded-2xl border text-left flex items-center gap-3 transition ${isCurrent
+                        ? "bg-[var(--accent-primary)]/20 border-[var(--accent-primary)] text-[var(--accent-primary)]"
+                        : "bg-white/[0.04] border-white/5 hover:bg-white/[0.08]"
+                        }`}
                     >
                       <Icon className="w-5 h-5 shrink-0 text-[var(--accent-primary)]" />
                       <div>
@@ -1170,13 +1167,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         {!isLoginRoute && (
           <nav
             aria-label="Navegación móvil"
-            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t flex items-center justify-around px-1 py-1 ${
-              isNight
-                ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
-                : isDaylight
+            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t flex items-center justify-around px-1 py-1 ${isNight
+              ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
+              : isDaylight
                 ? "bg-[#F0F4F8]/95 backdrop-blur-2xl border-slate-300 text-[#0A192F]"
                 : "backdrop-blur-2xl bg-[#060b14]/95 border-white/5 text-slate-200"
-            }`}
+              }`}
           >
             {isAtSeaMode ? (
               <>
@@ -1184,11 +1180,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   type="button"
                   data-testid="mobile-nav-bridge"
                   onClick={() => setActiveSection("bridge")}
-                  className={`flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
-                    activeSection === "bridge"
-                      ? "text-orange-400 font-bold bg-orange-950/30 border-b-2 border-orange-500"
-                      : "text-slate-400 opacity-70"
-                  }`}
+                  className={`flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${activeSection === "bridge"
+                    ? "text-orange-400 font-bold bg-orange-950/30 border-b-2 border-orange-500"
+                    : "text-slate-400 opacity-70"
+                    }`}
                 >
                   <Compass className="w-5 h-5 text-orange-400" />
                   <span>Puente Táctico</span>
@@ -1197,11 +1192,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   type="button"
                   data-testid="mobile-nav-vessel"
                   onClick={() => setActiveSection("vessel")}
-                  className={`flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
-                    activeSection === "vessel"
-                      ? "text-orange-400 font-bold bg-orange-950/30 border-b-2 border-orange-500"
-                      : "text-slate-400 opacity-70"
-                  }`}
+                  className={`flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${activeSection === "vessel"
+                    ? "text-orange-400 font-bold bg-orange-950/30 border-b-2 border-orange-500"
+                    : "text-slate-400 opacity-70"
+                    }`}
                 >
                   <Ship className="w-5 h-5" />
                   <span>Averías</span>
@@ -1235,15 +1229,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                         setActiveSection(item.id);
                         setMobileMoreOpen(false);
                       }}
-                      className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
-                        isCurrent
-                          ? isNight
-                            ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
-                            : isDaylight
+                      className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${isCurrent
+                        ? isNight
+                          ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
+                          : isDaylight
                             ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
                             : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
-                          : "text-slate-400 opacity-70 hover:opacity-100"
-                      }`}
+                        : "text-slate-400 opacity-70 hover:opacity-100"
+                        }`}
                     >
                       <Icon className="w-5 h-5" />
                       <span className="truncate">{item.shortLabel}</span>
@@ -1259,15 +1252,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                       type="button"
                       data-testid="mobile-nav-more"
                       onClick={() => setMobileMoreOpen((prev) => !prev)}
-                      className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${
-                        isMoreActive || mobileMoreOpen
-                          ? isNight
-                            ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
-                            : isDaylight
+                      className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${isMoreActive || mobileMoreOpen
+                        ? isNight
+                          ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
+                          : isDaylight
                             ? "text-[#D94A1A] font-bold bg-slate-200 border-b-2 border-[#D94A1A]"
                             : "text-[var(--accent-primary)] font-bold bg-[#1a2332] border-b-2 border-[var(--accent-primary)]"
-                          : "text-slate-400 opacity-70 hover:opacity-100"
-                      }`}
+                        : "text-slate-400 opacity-70 hover:opacity-100"
+                        }`}
                     >
                       <MoreHorizontal className="w-5 h-5" />
                       <span className="truncate">Más</span>

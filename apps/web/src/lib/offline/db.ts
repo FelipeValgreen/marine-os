@@ -642,12 +642,383 @@ export async function saveCrewContactFromVoyageCrew(
 export const DEMO_IDS = {
   ORG_ID: "11111111-1111-1111-1111-111111111111",
   VESSEL_ID: "22222222-2222-2222-2222-222222222222",
+  VESSEL_CATAMARAN_ID: "22222222-2222-2222-2222-222222222223",
+  VESSEL_JEANNEAU_ID: "22222222-2222-2222-2222-222222222224",
   QR_YANMAR_ID: "33333333-3333-3333-3333-333333333331",
   QR_JABSCO_ID: "33333333-3333-3333-3333-333333333332",
   QR_WINDLASS_ID: "33333333-3333-3333-3333-333333333333",
   VOYAGE_ID: "44444444-4444-4444-4444-444444444444",
   MAGIC_TOKEN: "demo-trip-albatros-2026",
 } as const;
+
+export const COMPREHENSIVE_VESSEL_MANUALS = [
+  {
+    "manual_title": "Manual Técnico Yanmar 4JH57 — Enfriamiento, Termostato e Impulsor",
+    "page_number": 48,
+    "category": "motor",
+    "keywords": [
+      "yanmar",
+      "temperatura",
+      "calentamiento",
+      "agua salada",
+      "impulsor",
+      "rodete",
+      "termostato",
+      "vetus"
+    ],
+    "content": "Alarma de sobretemperatura de agua o falta de caudal en escape húmedo: 1) Verificar de inmediato que el grifo de fondo esté 100% abierto (palanca paralela al pasacascos de bronce bajo escalera del salón). 2) Inspeccionar y limpiar canastillo del filtro de agua de mar Vetus (retirar hojas de sargazo o plásticos). 3) Desmontar tapa de bomba de agua salada (4 tornillos de bronce) y verificar rodete de neopreno Johnson/Yanmar. Si faltan paletas, extraerlas del haz tubular del intercambiador. Reemplazar con impulsor de respeto y junta tórica con grasa de silicona (2 uds disponibles en pañol de motor).",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Manual Técnico Yanmar 4JH57 — Inyección Common Rail y Prefiltro Racor",
+    "page_number": 33,
+    "category": "combustible",
+    "keywords": [
+      "combustible",
+      "racor",
+      "diesel",
+      "purga",
+      "purgado",
+      "inyeccion",
+      "aire",
+      "filtro",
+      "rpm"
+    ],
+    "content": "Pérdida de RPM, tironeos o alarma de baja presión de riel común (Rail Pressure): 1) Inspeccionar vaso decantador transparente del filtro Racor R20P. Si hay agua visible o sedimentos oscuros (alga de diésel), abrir purga inferior en botella de descarte. 2) Si la restricción persiste (>10 inHg en manómetro de vacío), desenroscar cartucho y colocar Filtro Racor R20P nuevo de 30 micras (lubricar junta con gasoil limpio). 3) Purgar circuito accionando la bomba de cebado manual del cabezal hasta notar resistencia firme. No encender arranque por más de 15 segundos continuos.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Manual de Taller Yanmar 4JH57 — Lubricación, Aceite y Servicio 250h",
+    "page_number": 62,
+    "category": "motor",
+    "keywords": [
+      "aceite",
+      "lubricacion",
+      "carter",
+      "15w40",
+      "filtro de aceite",
+      "nivel",
+      "presion de aceite"
+    ],
+    "content": "Protocolo de cambio de aceite y filtro cada 250 horas de motor o 12 meses: Capacidad de cárter: 5.5 litros de aceite multigrado marino 15W-40 API CI-4/SL. Extraer aceite tibio mediante bomba de vacío conectada al tubo de varilla. Desenroscar filtro de aceite Yanmar 129150-35170. Rellenar filtro nuevo con aceite limpio antes de roscar a mano (apriete 3/4 de vuelta tras contacto con junta). Verificar nivel entre marcas MAX y MIN sin exceder. Reiniciar horómetro de mantenimiento en MarinOS.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Manual de Taller Volvo Penta D2-40 y Saildrive 130S",
+    "page_number": 54,
+    "category": "motor",
+    "keywords": [
+      "volvo",
+      "saildrive",
+      "anodo",
+      "fuelle",
+      "cola",
+      "transmision",
+      "helice"
+    ],
+    "content": "Mantenimiento preventivo Saildrive 130S: 1) Inspección del ánodo de sacrificio circular de zinc en cola (reemplazar al alcanzar 50% de desgaste para evitar corrosión galvánica en aluminio). 2) Verificación del sensor de agua en fuelle de estanqueidad (alarma acústica si hay penetración de agua de mar entre las dos membranas de goma). 3) Nivel de aceite de transmisión 75W-90 GL-5 verificado con tapón varilla sin roscar. Reemplazo mandatorio del fuelle de goma cada 7 años según directiva del astillero.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Manual de Operación Fischer Panda 5000i Neo Inverter",
+    "page_number": 22,
+    "category": "generador",
+    "keywords": [
+      "generador",
+      "fischer",
+      "panda",
+      "230v",
+      "electricidad",
+      "corriente",
+      "inverter"
+    ],
+    "content": "Arranque y resolución de fallas del generador diésel: 1) Abrir grifo de fondo independiente y purgar aire si estuvo descebado. 2) Conectar panel digital iControl y verificar voltaje de salida 230V 50Hz. 3) Carga máxima continua: 4.0 kW (17.4 A). Si se conecta el desalinizador (1.5 kW) y el calentador de agua (1.2 kW), evitar encender microondas o aire acondicionado en simultáneo. Si salta alarma 'Overload', desconectar cargas pesadas en mesa de cartas y resetear panel.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Manual Técnico Victron Energy — Banco LiFePO4 & Monitor BMV-712",
+    "page_number": 15,
+    "category": "electricidad",
+    "keywords": [
+      "baterias",
+      "victron",
+      "litio",
+      "lifepo4",
+      "voltaje",
+      "soc",
+      "carga",
+      "descarga",
+      "amperios"
+    ],
+    "content": "Parámetros óptimos de banco de baterías de servicio 400Ah LiFePO4: Voltaje de flotación: 13.6V. Voltaje de absorción: 14.4V. Corte de seguridad por baja tensión (BMS Low Voltage Cutoff): 12.0V. Nunca descargar por debajo del 15% de SOC (State of Charge). Si el monitor BMV-712 descalibra por ciclos parciales, efectuar carga completa a 14.4V hasta que la corriente de cola (tail current) caiga por debajo de 8A durante 30 minutos.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Manual de Operación Victron MultiPlus 12V 3000VA Inversor/Cargador",
+    "page_number": 38,
+    "category": "electricidad",
+    "keywords": [
+      "inversor",
+      "cargador",
+      "multiplus",
+      "220v",
+      "230v",
+      "toma de tierra",
+      "sobrecarga"
+    ],
+    "content": "Operación de inversor y cargador de tierra: El MultiPlus cuenta con función PowerAssist para sumar energía de baterías a generadores pequeños o tomas de marina de 10A/16A. Si salta la protección de sobrecarga térmica (LED rojo parpadeante), ventilar cofre técnico de popa y reducir consumo 230V. Para operar la cafetera o el microondas fondeados, verificar que el voltaje de banco esté sobre 12.8V en el panel de control táctil.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Manual de Operación y Mantenimiento Spectra Ventura 150 Watermaker",
+    "page_number": 18,
+    "category": "agua",
+    "keywords": [
+      "desalinizadora",
+      "agua",
+      "agua potable",
+      "spectra",
+      "membrana",
+      "clark",
+      "osmosis"
+    ],
+    "content": "Producción de agua potable en alta mar: Capacidad 24 L/h a 12V (consumo 9A). 1) Operar únicamente en aguas abiertas limpias (nunca dentro de bahías, marinas ni estuarios con turbidez o hidrocarburos). 2) Abrir válvula de desvío (sample valve), encender bomba Clark a 55 bar (800 PSI) y comprobar TDS < 500 ppm con refractómetro/medidor digital antes de desviar agua al tanque principal. 3) OBLIGATORIO: Efectuar lavado con agua dulce (Fresh Water Flush) de 5 minutos al apagar para eliminar salmuera de las membranas.",
+    "related_qr_slug": "jabsco-wc-popa"
+  },
+  {
+    "manual_title": "Manual de Servicio Inodoros Marinos Jabsco Serie 29090 Twist 'n' Lock",
+    "page_number": 14,
+    "category": "fontaneria",
+    "keywords": [
+      "bano",
+      "inodoro",
+      "wc",
+      "jabsco",
+      "joker",
+      "valvula",
+      "reflujo",
+      "aguas negras"
+    ],
+    "content": "Protocolo de uso y desobstrucción: NUNCA arrojar toallitas húmedas, papel de cocina ni elementos extraños al WC. Secuencia: 10 bombeos con palanca en Flush (aspiración agua de mar) + 10 bombeos en Dry (vaciado seco). Girar pomo 90° para bloquear Twist 'n' Lock al navegar con escora. Si hay reflujo de agua negra al tazón, la válvula Joker de elastómero en la base de salida ha perdido elasticidad y debe reemplazarse (2 repuestos en caja Jabsco bajo vanitorio).",
+    "related_qr_slug": "jabsco-wc-popa"
+  },
+  {
+    "manual_title": "Manual de Seguridad de Sentinas Rule Industries 2000 GPH & Interruptores Ultra",
+    "page_number": 8,
+    "category": "seguridad",
+    "keywords": [
+      "achique",
+      "bomba de achique",
+      "sentina",
+      "rule",
+      "flotador",
+      "inundacion",
+      "agua"
+    ],
+    "content": "Sistema de achique de emergencia: Bomba primaria sumergible Rule 2000 GPH con flotador automático Ultra Safety Systems en pozo de sentina central. Capacidad real: 7.500 L/h con 1m de altura manométrica. Prueba semanal: levantar lengüeta de prueba manual del flotador y verificar zumbador acústico en mesa de cartas y expulsión por costado de babor. Bomba manual Whale Gusher Titan en bañera operativa para emergencias sin energía eléctrica.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Manual Técnico Molinete de Ancla Quick Dylan 1000W y Cabo de Boza",
+    "page_number": 19,
+    "category": "fondeo",
+    "keywords": [
+      "molinete",
+      "ancla",
+      "quick",
+      "barboten",
+      "fusible",
+      "rele",
+      "caida de tension",
+      "boza"
+    ],
+    "content": "Instrucciones de maniobra de fondeo: 1) Encender motor principal a 1.200 RPM antes de operar para mantener alternador cargando y evitar caída de tensión en relé inversor. 2) Filar ancla y cadena con pulsador de proa o mando a distancia. 3) Al completar el filado, colocar cabo de boza (snubber) con uña de cadena en cornamusa de proa para descargar el molinete. NUNCA fondear dejando la tensión sobre el barbotén. Si el interruptor térmico salta, rearmar pastilla de 80A junto al banco de proa.",
+    "related_qr_slug": "quick-windlass"
+  },
+  {
+    "manual_title": "Guía de Fondeo Seguro y Ratios de Cadena en Canales Australes",
+    "page_number": 5,
+    "category": "fondeo",
+    "keywords": [
+      "fondeo",
+      "anclaje",
+      "cadena",
+      "ratio",
+      "metros",
+      "marea",
+      "tenedero",
+      "chile",
+      "chiloe"
+    ],
+    "content": "Tenederos en el Seno de Reloncaví y Chiloé: El fondo predominante es fango blando o arena con cascajo. Ratios recomendados de cadena: 4:1 en calmas con marea tranquila; 5:1 a 6:1 con ráfagas de 20 a 30 nudos; 7:1 en temporal. Considerar SIEMPRE la amplitud de marea austral (hasta 6.5 metros de pleamar a bajamar en Puerto Montt). Si fondeas en 6m en bajamar, en pleamar habrá 12.5m de sonda: debes filar al menos 50 metros de cadena.",
+    "related_qr_slug": "quick-windlass"
+  },
+  {
+    "manual_title": "Instrucciones Náuticas SHOA — Paso Chacao y Estoa de Marea",
+    "page_number": 72,
+    "category": "navegacion",
+    "keywords": [
+      "paso chacao",
+      "chacao",
+      "corriente",
+      "marea",
+      "estoa",
+      "remolinos",
+      "shoa"
+    ],
+    "content": "Reglas críticas de paso por el Canal de Chacao: La corriente de marea alcanza velocidades extremas de entre 6 y 9 nudos, generando escarceos, remolinos y rompientes violentas en la Roca Remolinos y Bajo España. REGLA DE ORO: Las embarcaciones deportivas deben transitar ÚNICAMENTE durante la 'Estoa' (marea parada, unos 15 minutos antes y después de la pleamar/bajamar local). Nunca intentar el cruce contra corriente ni con viento en contra de la corriente (mar arbolada y peligrosa).",
+    "related_qr_slug": "quick-windlass"
+  },
+  {
+    "manual_title": "Manual de Radiocomunicaciones Marítimas DIRECTEMAR (VHF Marino)",
+    "page_number": 10,
+    "category": "radio",
+    "keywords": [
+      "vhf",
+      "radio",
+      "canal 16",
+      "canal 14",
+      "canal 71",
+      "directemar",
+      "armada",
+      "comunicacion"
+    ],
+    "content": "Plan de canales VHF en aguas chilenas: • CANAL 16 (156.800 MHz): Canal internacional de socorro, urgencia, seguridad y llamada inicial. Escucha obligatoria permanente en navegación. • CANAL 14: Operaciones de practicaje, tráfico de puerto y enlaces con Capitanías de Puerto (DIRECTEMAR). • CANALES 71, 72 y 77: Comunicaciones inter-barco para clubes náuticos y maniobras de conserva. Formato de reporte de zarpe: 'Costera Puerto Montt, aquí velero Albatros, matrícula CB-4582, zarpando con 4 POB rumbo a Mechuque, cambio'.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Procedimientos de Zafarrancho & Radiotelefonía de Socorro GMDSS/DIRECTEMAR",
+    "page_number": 3,
+    "category": "emergencia",
+    "keywords": [
+      "mayday",
+      "pan pan",
+      "socorro",
+      "emergencia",
+      "auxilio",
+      "distress",
+      "hundimiento"
+    ],
+    "content": "Protocolo de emisión de socorro por VHF Canal 16: 1) Pronunciar tres veces 'MAYDAY, MAYDAY, MAYDAY'. 2) 'AQUÍ (Nombre de la nave 3 veces) SV ALBATROS, ALBATROS, ALBATROS • MATRÍCULA CB-4582 • DISTINTIVO DE LLAMADA CB4582 • MMSI 725001234'. 3) 'POSICIÓN: Latitud 41° 48.3' Sur, Longitud 72° 56.2' Oeste (a 2 millas al sur de Isla Tenglo)'. 4) 'NATURALEZA DEL PELIGRO: Vía de agua incontrolable en sala de máquinas / Hundimiento inminente'. 5) 'AUXILIO REQUERIDO: Asistencia inmediata y rescate de 4 personas a bordo'. 6) 'Balsa salvavidas lista y chalecos colocados. CAMBIO'.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Control de Daños — Protocolo de Inundación y Taponamiento de Pasacascos",
+    "page_number": 7,
+    "category": "seguridad",
+    "keywords": [
+      "via de agua",
+      "espiche",
+      "rotura",
+      "pasacascos",
+      "manguera",
+      "grifo",
+      "inundacion",
+      "fuga"
+    ],
+    "content": "Respuesta ante vía de agua súbita: 1) Activar bomba de achique manual y eléctrica. 2) Localizar pasacascos averiado: grifos de refrigeración motor, toma de salada WC, descarga de lavamanos, transductor de corredera/profundidad. 3) Insertar de inmediato un espiche de madera blanda de la medida cónica correcta (ubicados atados a cada pasacascos en pañoles) golpeándolo firmemente. 4) En roturas de manguera, aplicar venda autovulcanizante o masilla epóxica submarina Splash Zone. 5) Si el nivel sube, aislar mamparos y emitir PAN-PAN / MAYDAY.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Seguridad y Salvamento — Maniobra de Hombre al Agua (MOB)",
+    "page_number": 1,
+    "category": "seguridad",
+    "keywords": [
+      "hombre al agua",
+      "mob",
+      "caida",
+      "williamson",
+      "rescate",
+      "aro salvavidas"
+    ],
+    "content": "Acciones inmediatas ante caída de tripulante al mar: 1) El primer testigo grita '¡HOMBRE AL AGUA A BABOR/ESTRIBOR!' y arroja sin dudar el aro salvavidas con rabiza y luz flotante. 2) Designar a un tripulante como VIGÍA EXCLUSIVO señalando con el brazo extendido sin apartar los ojos de la víctima. 3) Presionar tecla 'MOB' en el plotter o en la app MarinOS para fijar datum geográfico. 4) Arrancar motor inmediatamente comprobando que no haya cabos en el agua. 5) Ejecutar maniobra de Williamson Turn (caer 60° a la banda del caído y luego virar todo a la banda opuesta para volver por la estela invertida).",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Zafarrancho de Incendio y Seguridad de Gas Licuado",
+    "page_number": 4,
+    "category": "seguridad",
+    "keywords": [
+      "fuego",
+      "incendio",
+      "gas",
+      "cocina",
+      "extintor",
+      "manta",
+      "glp",
+      "solenoide"
+    ],
+    "content": "Prevención y combate de incendios marinos: • Incendio en cocina: Sofocar con manta apagafuegos (ubicada junto a mamparo cocina). Cerrar solenoide eléctrico de gas desde el panel 12V y cerrar válvula de corte en cofre estanco de popa. NUNCA arrojar agua a fuego de aceite. • Incendio en sala de máquinas: Detener motor inmediatamente. NO abrir la escotilla de inspección para no alimentar el fuego con oxígeno. Disparar extintor CO2 / polvo ABC por la boquilla de extinción rápida (orificio ignífugo bajo escalera).",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Técnica de Navegación a Vela — Rizado y Viento Aparente",
+    "page_number": 28,
+    "category": "velas",
+    "keywords": [
+      "vela",
+      "mayor",
+      "genova",
+      "rizo",
+      "rizado",
+      "viento aparente",
+      "aws",
+      "escota",
+      "driza"
+    ],
+    "content": "Criterios de toma de rizos en navegación por aguas australes: • Viento aparente (AWS) 16 a 20 kn: 1er rizo en vela mayor y enrollar génova al 85%. • AWS 21 a 26 kn: 2do rizo en mayor y génova al 60%. • AWS > 27 kn: 3er rizo o mayor de capa y tormentín de proa. Procedimiento: filar escota de mayor, orzar ligeramente a un descuartelar para despolarizar la vela, amurar al nuevo ollaode rizo en el mástil y cazar amante de rizo hasta aplanar la bolsa inferior antes de cazar driza.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Gobierno de Emergencia y Caña de Respeto",
+    "page_number": 16,
+    "category": "seguridad",
+    "keywords": [
+      "timon",
+      "cana de respeto",
+      "rueda",
+      "guardines",
+      "gobierno",
+      "falla timon",
+      "mecha"
+    ],
+    "content": "Acciones ante rotura de guardines de rueda o avería de sector de timón: 1) Desconectar embrague del piloto automático para evitar bloqueo mecánico del sector. 2) Abrir registro estanco en piso de bañera de popa directamente sobre la mecha del timón. 3) Insertar la caña de respeto de acero inoxidable (estibada en tambucho de popa estribor) encajándola en la cabeza cuadrangular de la mecha y fijar con pasador de seguridad. 4) Maniobrar de forma manual hasta alcanzar fondeadero abrigado.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Reglamento General de Deportes Náuticos — Zarpe e-Zarpe DIRECTEMAR",
+    "page_number": 2,
+    "category": "legislacion",
+    "keywords": [
+      "zarpe",
+      "directemar",
+      "rol",
+      "permiso",
+      "capitania",
+      "seguridad",
+      "tripulacion",
+      "chalecos"
+    ],
+    "content": "Requisitos de Zarpe según Ordenanza de la Armada de Chile: 1) Embarcación con Certificado de Navegabilidad y Matrícula vigentes. 2) Patrón o Capitán con licencia náutica acorde a la zona (Bahía, Costero o Alta Mar). 3) Rol de Tripulación firmado con RUT/Pasaporte de todos los POB. 4) Equipo obligatorio a bordo: Chalecos salvavidas para el 100% de tripulantes, balsa salvavidas homologada, pirotecnia vigente (6 bengalas de mano, 4 cohetes con paracaídas, 2 fumígenos flotantes), botiquín reglamentario y radio VHF operativa.",
+    "related_qr_slug": "yanmar-4jh57"
+  },
+  {
+    "manual_title": "Inspección y Mantenimiento de Jarcia Firme y Obenques",
+    "page_number": 41,
+    "category": "jarcia",
+    "keywords": [
+      "jarcia",
+      "obenques",
+      "estays",
+      "stay",
+      "mastil",
+      "tensores",
+      "cables"
+    ],
+    "content": "Chequeo visual pre-zarpe en travesías australes: 1) Inspeccionar terminales prensados de obenques altos, medios y bajos en busca de alambres cortados (mechas de cable de acero 1x19). 2) Verificar pasadores de aletas abiertos a 30° en los tensores de cubierta (nunca navegar sin pasador o con cinta aislante suelta). 3) Comprobar arraigo del stay de proa en enrollador Facnor/Harken y tensión del backstay regulable para ceñidas.",
+    "related_qr_slug": "quick-windlass"
+  }
+];
 
 let seedPromise: Promise<void> | null = null;
 
@@ -683,6 +1054,7 @@ export async function ensureDemoSeedData(): Promise<void> {
         db.frequent_crew,
         db.community_reports,
         db.vessel_service_history,
+        db.marketplace_orders,
       ],
       async () => {
         const existingPrefs = await db.user_preferences.get("default");
@@ -773,31 +1145,81 @@ export async function ensureDemoSeedData(): Promise<void> {
             created_at: now,
           });
 
-          // 2. Vessel (from 0002_seed_demo.sql)
-          await db.vessels.put({
-            id: DEMO_IDS.VESSEL_ID,
-            org_id: DEMO_IDS.ORG_ID,
-            name: "SV Albatros (Oceanis 41.1)",
-            registration_number: "CB-4582",
-            vessel_type: "sailboat",
-            loa_meters: 12.43,
-            beam_meters: 4.2,
-            draft_meters: 2.18,
-            mast_height_meters: 18.5,
-            fuel_capacity_l: 200,
-            water_capacity_l: 330,
-            engine_hours_current: 1420.5,
-            chain_length_meters: 60,
-            mmsi: "725001234",
-            call_sign: "CB-4582",
-            polar_data: {
-              tws_8: { beat_angle: 44, beat_vmg: 4.6, run_vmg: 5.1 },
-              tws_12: { beat_angle: 41, beat_vmg: 5.8, run_vmg: 6.7 },
-              tws_16: { beat_angle: 39, beat_vmg: 6.5, run_vmg: 7.6 },
-              tws_20: { beat_angle: 40, beat_vmg: 6.8, run_vmg: 8.2 },
+          // 2. Multi-Vessel Fleet (Monocasco Oceanis 41.1, Catamarán Lagoon 42, Velero Sun Odyssey 440)
+          await db.vessels.bulkPut([
+            {
+              id: DEMO_IDS.VESSEL_ID,
+              org_id: DEMO_IDS.ORG_ID,
+              name: "SV Albatros (Oceanis 41.1)",
+              registration_number: "CB-4582",
+              vessel_type: "sailboat",
+              loa_meters: 12.43,
+              beam_meters: 4.2,
+              draft_meters: 2.18,
+              mast_height_meters: 18.5,
+              fuel_capacity_l: 200,
+              water_capacity_l: 330,
+              engine_hours_current: 1420.5,
+              chain_length_meters: 60,
+              mmsi: "725001234",
+              call_sign: "CB-4582",
+              polar_data: {
+                tws_8: { beat_angle: 44, beat_vmg: 4.6, run_vmg: 5.1 },
+                tws_12: { beat_angle: 41, beat_vmg: 5.8, run_vmg: 6.7 },
+                tws_16: { beat_angle: 39, beat_vmg: 6.5, run_vmg: 7.6 },
+                tws_20: { beat_angle: 40, beat_vmg: 6.8, run_vmg: 8.2 },
+              },
+              created_at: now,
             },
-            created_at: now,
-          });
+            {
+              id: DEMO_IDS.VESSEL_CATAMARAN_ID,
+              org_id: DEMO_IDS.ORG_ID,
+              name: "SV Australis (Lagoon 42)",
+              registration_number: "PM-9120",
+              vessel_type: "catamaran",
+              loa_meters: 12.8,
+              beam_meters: 7.7,
+              draft_meters: 1.25,
+              mast_height_meters: 20.65,
+              fuel_capacity_l: 600,
+              water_capacity_l: 600,
+              engine_hours_current: 890.0,
+              chain_length_meters: 75,
+              mmsi: "725009876",
+              call_sign: "CB-9120",
+              polar_data: {
+                tws_8: { beat_angle: 48, beat_vmg: 5.2, run_vmg: 6.1 },
+                tws_12: { beat_angle: 45, beat_vmg: 6.9, run_vmg: 8.4 },
+                tws_16: { beat_angle: 43, beat_vmg: 8.1, run_vmg: 10.2 },
+                tws_20: { beat_angle: 44, beat_vmg: 8.8, run_vmg: 11.5 },
+              },
+              created_at: now,
+            },
+            {
+              id: DEMO_IDS.VESSEL_JEANNEAU_ID,
+              org_id: DEMO_IDS.ORG_ID,
+              name: "SV Patagonia (Sun Odyssey 440)",
+              registration_number: "AN-3204",
+              vessel_type: "sailboat",
+              loa_meters: 13.39,
+              beam_meters: 4.29,
+              draft_meters: 2.2,
+              mast_height_meters: 19.8,
+              fuel_capacity_l: 200,
+              water_capacity_l: 530,
+              engine_hours_current: 1120.0,
+              chain_length_meters: 70,
+              mmsi: "725004321",
+              call_sign: "CB-3204",
+              polar_data: {
+                tws_8: { beat_angle: 43, beat_vmg: 4.8, run_vmg: 5.4 },
+                tws_12: { beat_angle: 40, beat_vmg: 6.2, run_vmg: 7.1 },
+                tws_16: { beat_angle: 38, beat_vmg: 7.1, run_vmg: 8.0 },
+                tws_20: { beat_angle: 39, beat_vmg: 7.5, run_vmg: 8.6 },
+              },
+              created_at: now,
+            },
+          ]);
 
           // 3. Vessel QR Systems (from 0002_seed_demo.sql)
           await db.vessel_systems_qr.bulkPut([
@@ -1210,45 +1632,17 @@ export async function ensureDemoSeedData(): Promise<void> {
             await db.frequent_crew.bulkPut(initialFrequentCrew);
           }
 
-          // 8. Vessel Manual Chunks for local offline RAG
-          await db.vessel_manual_chunks.bulkPut([
-            {
-              id: "88888888-8888-8888-8888-888888888881",
+                    // 8. Vessel Manual Chunks for local offline RAG (Comprehensive Maritime Knowledge Base)
+          await db.vessel_manual_chunks.bulkPut(
+            COMPREHENSIVE_VESSEL_MANUALS.map((m, idx) => ({
+              id: `manual-chunk-${String(idx + 1).padStart(3, "0")}`,
               vessel_id: DEMO_IDS.VESSEL_ID,
-              manual_title: "Manual Técnico Yanmar 4JH57 Common Rail",
-              page_number: 48,
-              content:
-                "Alarma de sobretemperatura de agua o falta de caudal en escape: 1) Verificar grifo de fondo abierto (palanca vertical bajo escalera del salón). 2) Limpiar canastillo de filtro de agua de mar Vetus. 3) Reemplazar impulsor con repuesto a bordo (2 uds disponibles en nodo QR yanmar-4jh57).",
-              related_qr_slug: "yanmar-4jh57",
-            },
-            {
-              id: "88888888-8888-8888-8888-888888888882",
-              vessel_id: DEMO_IDS.VESSEL_ID,
-              manual_title: "Sistema de Combustible & Prefiltro Racor R20P",
-              page_number: 33,
-              content:
-                "Pérdida de RPM o caída de presión de riel en Yanmar 4JH57: Drenar decantador inferior del filtro Racor. Si persiste, cambiar cartucho por Filtro Racor R20P de 10 micras (3 uds en inventario a bordo) y bombear cebador manual.",
-              related_qr_slug: "yanmar-4jh57",
-            },
-            {
-              id: "88888888-8888-8888-8888-888888888883",
-              vessel_id: DEMO_IDS.VESSEL_ID,
-              manual_title: "Baño Marino Jabsco Twist 'n' Lock",
-              page_number: 12,
-              content:
-                "Nunca arrojar papel higiénico. Realizar 10 bombeos en modo Flush y 10 en modo Dry. Cerrar siempre con giro Twist 'n' Lock al navegar con escora.",
-              related_qr_slug: "jabsco-wc-popa",
-            },
-            {
-              id: "88888888-8888-8888-8888-888888888884",
-              vessel_id: DEMO_IDS.VESSEL_ID,
-              manual_title: "Molinete de Ancla Quick 1000W",
-              page_number: 19,
-              content:
-                "Operar exclusivamente con motor principal a >= 1.200 RPM. Si salta el térmico de 80A en mesa de cartas, aliviar tensión avante con motor antes de cobrar.",
-              related_qr_slug: "quick-windlass",
-            },
-          ]);
+              manual_title: m.manual_title,
+              page_number: m.page_number,
+              content: m.content,
+              related_qr_slug: m.related_qr_slug,
+            }))
+          );
 
           // 9. Initial Logbook Entries
           await db.logbook_entries.bulkPut([
@@ -1519,6 +1913,41 @@ export async function ensureDemoSeedData(): Promise<void> {
               sha256_signature: "4190ba32ecfa1982bbef341092aae4819023cbdf0129aae884013bcdae991204",
               notes: "Desarme e inmersión de haz tubular en ácido cítrico. Sin corrosión salina. Cobertura de garantía extendida revalidada.",
               created_at: "2025-05-12T18:00:00Z",
+            },
+          ]);
+        }
+
+        // 12. Seed Marketplace Orders for logistics tracker
+        const ordersCount = await db.marketplace_orders.count();
+        if (ordersCount === 0) {
+          await db.marketplace_orders.bulkPut([
+            {
+              id: "order-racor-001",
+              voyage_id: DEMO_IDS.VOYAGE_ID,
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              part_name: "Filtro Decantador Racor R20P (30 micras) • 2 unidades",
+              part_sku: "RAC-R20P-30M",
+              arrival_port: "Marina Puerto Montt (Canal Tenglo)",
+              supplier_name: "Yanmar & Parker Marine Store Chinquihue",
+              estimated_price_usd: 96,
+              status: "delivered",
+              tracking_code: "PM-LOG-4491",
+              created_at: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+              updated_at: new Date(Date.now() - 12 * 3600 * 1000).toISOString(),
+            },
+            {
+              id: "order-impeller-002",
+              voyage_id: DEMO_IDS.VOYAGE_ID,
+              vessel_id: DEMO_IDS.VESSEL_ID,
+              part_name: "Kit Impulsor Bomba de Agua Yanmar 4JH57 + Junta Tórica",
+              part_sku: "YAN-129670-42531",
+              arrival_port: "Club Náutico Castro (Chiloé)",
+              supplier_name: "Naval Express Castro & Repuestos del Sur",
+              estimated_price_usd: 85,
+              status: "in_transit",
+              tracking_code: "CAS-EXP-7721",
+              created_at: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
+              updated_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
             },
           ]);
         }

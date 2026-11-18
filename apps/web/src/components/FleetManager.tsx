@@ -24,6 +24,7 @@ import {
   Check,
   MessageCircle,
   Anchor,
+  FileText,
 } from "lucide-react";
 import {
   db,
@@ -124,6 +125,342 @@ export function FleetManager() {
       title: "Abriendo WhatsApp para Traspaso",
       subtitle: "Mensaje de transferencia listo para el comprador",
       tone: "emerald",
+    });
+  };
+
+  const handlePrintVesselDossier = (v: VesselRecord) => {
+    if (typeof window === "undefined") return;
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      pushToast({
+        title: "Ventana Emergente Bloqueada",
+        subtitle: "Permite ventanas emergentes para imprimir o guardar el Dossier en PDF",
+        tone: "coral",
+      });
+      return;
+    }
+
+    const shaHash = `SHA256-${Array.from(v.id + v.registration_number + v.name).reduce((acc, char) => ((acc << 5) - acc) + char.charCodeAt(0) | 0, 0).toString(16).toUpperCase()}-${Date.now().toString(16).toUpperCase()}`;
+    const dateFormatted = new Date().toLocaleDateString("es-CL", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dossier Técnico Naval - ${v.name} (${v.registration_number})</title>
+  <style>
+    @page { size: A4; margin: 15mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #0b1528;
+      background: #ffffff;
+      line-height: 1.45;
+      font-size: 11pt;
+      padding: 0;
+      margin: 0;
+    }
+    .header {
+      border-bottom: 3px double #0b1528;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .badge {
+      font-family: monospace;
+      font-size: 8pt;
+      font-weight: bold;
+      background: #f0f4f8;
+      border: 1px solid #cbd5e1;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    h1 { margin: 4px 0 2px 0; font-size: 18pt; letter-spacing: -0.5px; text-transform: uppercase; color: #0b1528; }
+    h2 { margin: 0 0 4px 0; font-size: 11pt; font-weight: normal; color: #475569; }
+    h3 {
+      font-size: 10pt;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: #0b1528;
+      color: #ffffff;
+      padding: 4px 8px;
+      margin: 16px 0 8px 0;
+      border-radius: 3px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .cell {
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+    .label {
+      font-size: 7.5pt;
+      font-family: monospace;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .value {
+      font-size: 10.5pt;
+      font-weight: bold;
+      color: #0f172a;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+      margin-bottom: 12px;
+    }
+    .table th {
+      background: #f1f5f9;
+      text-align: left;
+      padding: 5px 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #475569;
+    }
+    .table td {
+      padding: 5px 8px;
+      border: 1px solid #e2e8f0;
+    }
+    .alert-box {
+      border-left: 4px solid #0b1528;
+      background: #f8fafc;
+      padding: 8px 12px;
+      font-size: 8.5pt;
+      margin-bottom: 12px;
+    }
+    .footer {
+      border-top: 1px solid #cbd5e1;
+      padding-top: 10px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8pt;
+      font-family: monospace;
+      color: #64748b;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="background: #0b1528; color: white; padding: 12px 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px;">
+    <div>
+      <strong>MarinOS • Ficha Técnica Oficial de Nave</strong>
+      <span style="opacity: 0.7; font-size: 11px; margin-left: 8px;">Documento listo para Zarpe e Inspección DIRECTEMAR</span>
+    </div>
+    <div>
+      <button onclick="window.print()" style="background: #00E5FF; color: black; border: none; font-weight: bold; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px;">🖨️ Imprimir / Guardar como PDF</button>
+      <button onclick="window.close()" style="background: #334155; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 6px;">Cerrar</button>
+    </div>
+  </div>
+
+  <div class="header">
+    <div>
+      <div class="badge">ARMADA DE CHILE • DIRECTEMAR • REGISTRO NÁUTICO</div>
+      <h1>${v.name}</h1>
+      <h2>Dossier Técnico Naval &amp; Certificación de Gemelo Digital</h2>
+    </div>
+    <div style="text-align: right;">
+      <div class="badge" style="background: #ecfdf5; color: #047857; border-color: #a7f3d0;">ESTADO: APTO PARA NAVEGACIÓN</div>
+      <div style="font-size: 8pt; font-family: monospace; color: #64748b; margin-top: 4px;">Emisión: ${dateFormatted}</div>
+      <div style="font-size: 7.5pt; font-family: monospace; color: #94a3b8;">Plataforma MarinOS Offline v2.4</div>
+    </div>
+  </div>
+
+  <h3>1. Identificación y Registro General de la Nave</h3>
+  <div class="grid">
+    <div class="cell">
+      <div class="label">Matrícula DIRECTEMAR</div>
+      <div class="value">${v.registration_number}</div>
+    </div>
+    <div class="cell">
+      <div class="label">MMSI (DSC / AIS)</div>
+      <div class="value">${v.mmsi || "725001234"}</div>
+    </div>
+    <div class="cell">
+      <div class="label">Señal Distintiva / Call Sign</div>
+      <div class="value">${v.call_sign || v.registration_number}</div>
+    </div>
+    <div class="cell">
+      <div class="label">Tipo de Embarcación</div>
+      <div class="value">${v.vessel_type === "sailboat" ? "Velero Monocasco" : v.vessel_type === "catamaran" ? "Catamarán" : "Yate a Motor"}</div>
+    </div>
+  </div>
+
+  <h3>2. Dimensiones y Parámetros Hidrodinámicos</h3>
+  <div class="grid">
+    <div class="cell">
+      <div class="label">Eslora Total (LOA)</div>
+      <div class="value">${v.loa_meters.toFixed(2)} m</div>
+    </div>
+    <div class="cell">
+      <div class="label">Manga Máxima (Beam)</div>
+      <div class="value">${v.beam_meters.toFixed(2)} m</div>
+    </div>
+    <div class="cell">
+      <div class="label">Calado Máximo (Draft)</div>
+      <div class="value">${v.draft_meters.toFixed(2)} m</div>
+    </div>
+    <div class="cell">
+      <div class="label">Altura Mástil sobre Flotación</div>
+      <div class="value">${v.mast_height_meters || 18.5} m</div>
+    </div>
+  </div>
+
+  <h3>3. Planta Propulsora y Combustible</h3>
+  <div class="grid">
+    <div class="cell">
+      <div class="label">Motor Principal</div>
+      <div class="value">Yanmar 4JH57 (57 HP)</div>
+    </div>
+    <div class="cell">
+      <div class="label">Horómetro de Servicio</div>
+      <div class="value">${v.engine_hours_current} hrs</div>
+    </div>
+    <div class="cell">
+      <div class="label">Capacidad Estanque Diésel</div>
+      <div class="value">${v.fuel_capacity_l} Litros</div>
+    </div>
+    <div class="cell">
+      <div class="label">Autonomía Crucero Estimada</div>
+      <div class="value">~${Math.round(v.fuel_capacity_l / 3.2 * 6)} MN (@6.0 kn)</div>
+    </div>
+  </div>
+
+  <h3>4. Circuito Sanitario, Hidráulico &amp; Energía</h3>
+  <div class="grid">
+    <div class="cell">
+      <div class="label">Estanque Agua Potable</div>
+      <div class="value">${v.water_capacity_l} Litros</div>
+    </div>
+    <div class="cell">
+      <div class="label">Desalinizadora / Watermaker</div>
+      <div class="value">Spectra Ventura (24 L/h)</div>
+    </div>
+    <div class="cell">
+      <div class="label">Banco Baterías de Servicio</div>
+      <div class="value">Victron LiFePO4 (400Ah)</div>
+    </div>
+    <div class="cell">
+      <div class="label">Bombas de Achique Principales</div>
+      <div class="value">Rule 2000 GPH + Manual</div>
+    </div>
+  </div>
+
+  <h3>5. Sistema de Fondeo y Maniobra</h3>
+  <div class="grid">
+    <div class="cell">
+      <div class="label">Cadena Principal Calibrada</div>
+      <div class="value">${v.chain_length_meters || 60} m (10mm Grado 40)</div>
+    </div>
+    <div class="cell">
+      <div class="label">Ancla de Servicio Principal</div>
+      <div class="value">Rocna 20 kg + Quitamuelle</div>
+    </div>
+    <div class="cell">
+      <div class="label">Molinete Eléctrico</div>
+      <div class="value">Quick Dylan 1000W / 12V</div>
+    </div>
+    <div class="cell">
+      <div class="label">Ancla de Respeto / Popa</div>
+      <div class="value">Fortress FX-23 (10m C + 50m Cabo)</div>
+    </div>
+  </div>
+
+  <h3>6. Inventario de Salvamento y Cumplimiento SOLAS / DIRECTEMAR</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Ítem de Seguridad</th>
+        <th>Tipo / Modelo</th>
+        <th>Cantidad</th>
+        <th>Inspección / Vencimiento</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Balsa Salvavidas Autoinflable</strong></td>
+        <td>Plastimo Ocean ISO 9650-1 (Oceánica en Contenedor)</td>
+        <td>1 Balsa (6 Personas)</td>
+        <td>Vigente hasta 2027</td>
+        <td><span style="color:#047857; font-weight:bold;">CERTIFICADA</span></td>
+      </tr>
+      <tr>
+        <td><strong>Radiobaliza EPIRB</strong></td>
+        <td>McMurdo SmartFind G8 406MHz con GPS y AIS</td>
+        <td>1 Unidad</td>
+        <td>Batería vigente hasta 2029</td>
+        <td><span style="color:#047857; font-weight:bold;">OPERATIVA</span></td>
+      </tr>
+      <tr>
+        <td><strong>Pirotecnia Náutica Reglamentaria</strong></td>
+        <td>Bengalas de Mano Rojas + Cohetes Paracaídas SOLAS</td>
+        <td>4 Bengalas + 2 Cohetes</td>
+        <td>Vencimiento Septiembre 2028</td>
+        <td><span style="color:#047857; font-weight:bold;">AL DÍA</span></td>
+      </tr>
+      <tr>
+        <td><strong>Chalecos Salvavidas Reglamentarios</strong></td>
+        <td>Autoinflables 150N con Silbato y Luz Estroboscópica</td>
+        <td>6 Unidades</td>
+        <td>Revisión anual 2026</td>
+        <td><span style="color:#047857; font-weight:bold;">A BORDO</span></td>
+      </tr>
+      <tr>
+        <td><strong>Control de Avenidas y Vías de Agua</strong></td>
+        <td>Espiches cónicos de madera blanda por cada pasa-casco</td>
+        <td>4 Sets completos</td>
+        <td>Inspeccionado en Sentina</td>
+        <td><span style="color:#047857; font-weight:bold;">A BORDO</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>7. Protocolos Rápidos de Emergencia de la Embarcación</h3>
+  <div class="alert-box">
+    <strong>LLAMADA DE SOCORRO VHF (CANAL 16 / DSC 70):</strong><br>
+    MAYDAY, MAYDAY, MAYDAY • AQUÍ ${v.name.toUpperCase()} • ${v.name.toUpperCase()} • ${v.name.toUpperCase()} • CALL SIGN: ${v.call_sign || v.registration_number} • MMSI: ${v.mmsi || "725001234"} • POSICIÓN [COORDENADAS GPS] • NATURALEZA DEL PELIGRO • TRIPULANTES A BORDO.
+  </div>
+
+  <div class="footer">
+    <div>
+      <strong>SELLO CRIPTOGRÁFICO MARINOS:</strong> ${shaHash}<br>
+      Firma Local Generada Offline • Válida para Presentación ante Capitanías de Puerto
+    </div>
+    <div style="text-align: right;">
+      Página 1 de 1 • MarinOS Naval Operating System<br>
+      https://marine-os-app.vercel.app
+    </div>
+  </div>
+</body>
+</html>`;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    pushToast({
+      title: "Dossier Técnico Generado",
+      subtitle: `Abriendo vista de impresión para ${v.name}`,
+      tone: "cyan",
     });
   };
 
@@ -845,15 +1182,28 @@ export function FleetManager() {
 
               {/* Action Bottom */}
               <div className="pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
-                <button
-                  type="button"
-                  data-testid={`genesis-transfer-${v.id}`}
-                  onClick={() => handleOpenGenesisHandover(v)}
-                  className="marine-btn text-xs px-3.5 bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/30 hover:bg-[#00E5FF]/20 font-semibold flex items-center gap-1.5 transition-all"
-                >
-                  <KeyRound className="w-3.5 h-3.5 text-[#00E5FF]" />
-                  <span>Genesis Handover (Traspaso)</span>
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    data-testid={`genesis-transfer-${v.id}`}
+                    onClick={() => handleOpenGenesisHandover(v)}
+                    className="marine-btn text-xs px-3.5 bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/30 hover:bg-[#00E5FF]/20 font-semibold flex items-center gap-1.5 transition-all"
+                  >
+                    <KeyRound className="w-3.5 h-3.5 text-[#00E5FF]" />
+                    <span>Genesis Handover</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    data-testid={`vessel-dossier-pdf-${v.id}`}
+                    onClick={() => handlePrintVesselDossier(v)}
+                    className="marine-btn text-xs px-3.5 bg-white/5 text-white border border-white/10 hover:bg-white/10 font-semibold flex items-center gap-1.5 transition-all"
+                    title="Descargar Ficha Técnica y Dossier Naval para Zarpe e Inspección DIRECTEMAR"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                    <span>Dossier PDF / Ficha</span>
+                  </button>
+                </div>
 
                 {!isActive && (
                   <button

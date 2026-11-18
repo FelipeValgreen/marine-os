@@ -29,14 +29,9 @@ import {
   ShieldCheck,
   Compass,
   Ship,
-  LogOut,
   Mic,
   UserCog,
   ShoppingBag,
-  Truck,
-  PackageCheck,
-  Package,
-  Share2,
   CheckCircle2,
   MessageCircle,
   Copy,
@@ -77,6 +72,7 @@ import { DamageControl } from "@/components/DamageControl";
 import { FleetManager } from "@/components/FleetManager";
 import { CrewDirectory } from "@/components/CrewDirectory";
 import { IntegrationHub } from "@/components/IntegrationHub";
+import { MarineMarketplace } from "@/components/MarineMarketplace";
 import { useNavigationMode } from "@/context/NavigationModeContext";
 import { GimbalUI } from "@/components/GimbalUI";
 import { FlashChecklist } from "@/components/FlashChecklist";
@@ -195,7 +191,6 @@ export default function MarineOSHomePage() {
     setTheme,
     activeAccount,
     updatePassportProfile,
-    logoutSession,
     activeSection,
     setActiveSection,
     requestedVesselSubView,
@@ -348,36 +343,6 @@ export default function MarineOSHomePage() {
       avatarInitials: initials,
     });
     setIsEditingProfile(false);
-  };
-
-  const handleUpdateOrderStatus = async (
-    orderId: string,
-    nextStatus: "quoted_offline" | "dispatched" | "delivered"
-  ) => {
-    const existing = await db.marketplace_orders.get(orderId);
-    if (!existing) return;
-    const updated = {
-      ...existing,
-      status: nextStatus,
-      updated_at: new Date().toISOString(),
-    };
-    await db.marketplace_orders.put(updated);
-    await enqueueOfflineMutation({
-      table_name: "marketplace_orders",
-      operation: "UPDATE",
-      record_id: orderId,
-      payload: updated as unknown as Record<string, unknown>,
-    });
-    pushToast({
-      title: "Estado de Repuesto Actualizado",
-      subtitle: `${existing.part_name} marcado como ${nextStatus === "dispatched"
-        ? "En Tránsito"
-        : nextStatus === "delivered"
-          ? "Entregado a Bordo"
-          : "Cotizado"
-        }`,
-      tone: "emerald",
-    });
   };
 
   // =========================================================================
@@ -2661,25 +2626,38 @@ export default function MarineOSHomePage() {
                 </div>
               </div>
 
-              {/* Traffic Light Expiration Semaphore */}
-              <div
-                data-testid="license-expiry-semaphore"
-                className={`px-3.5 py-1.5 rounded-full font-mono text-xs font-bold flex items-center gap-2 border ${semaphore.tone === "green"
-                  ? "bg-[#00E676]/15 border-[#00E676]/50 text-[#00E676]"
-                  : semaphore.tone === "amber"
-                    ? "bg-[#FF9F0A]/15 border-[#FF9F0A]/50 text-[#FF9F0A]"
-                    : "bg-[#FF2D55]/20 border-[#FF2D55] text-[#FF2D55] animate-pulse"
-                  }`}
-              >
-                <span
-                  className={`w-2 h-2 rounded-full ${semaphore.tone === "green"
-                    ? "bg-[#00E676]"
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  data-testid="edit-passport-profile-btn"
+                  onClick={handleOpenEditProfile}
+                  className="px-3 py-1.5 rounded-full font-mono text-xs font-semibold flex items-center gap-1.5 border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"
+                  title="Editar Perfil y Licencia de Capitán"
+                >
+                  <UserCog className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
+                  <span>Editar</span>
+                </button>
+
+                {/* Traffic Light Expiration Semaphore */}
+                <div
+                  data-testid="license-expiry-semaphore"
+                  className={`px-3.5 py-1.5 rounded-full font-mono text-xs font-bold flex items-center gap-2 border ${semaphore.tone === "green"
+                    ? "bg-[#00E676]/15 border-[#00E676]/50 text-[#00E676]"
                     : semaphore.tone === "amber"
-                      ? "bg-[#FF9F0A]"
-                      : "bg-[#FF2D55]"
+                      ? "bg-[#FF9F0A]/15 border-[#FF9F0A]/50 text-[#FF9F0A]"
+                      : "bg-[#FF2D55]/20 border-[#FF2D55] text-[#FF2D55] animate-pulse"
                     }`}
-                />
-                <span className="tracking-wide uppercase text-[11px]">{semaphore.badgeLabel}</span>
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full ${semaphore.tone === "green"
+                      ? "bg-[#00E676]"
+                      : semaphore.tone === "amber"
+                        ? "bg-[#FF9F0A]"
+                        : "bg-[#FF2D55]"
+                      }`}
+                  />
+                  <span className="tracking-wide uppercase text-[11px]">{semaphore.badgeLabel}</span>
+                </div>
               </div>
             </div>
 
@@ -3296,189 +3274,8 @@ export default function MarineOSHomePage() {
               </div>
             </div>
           ) : (
-            /* Marketplace Orders Tracker Tab */
-            <div className="space-y-6">
-              {/* Metrics Top Row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
-                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
-                  <div className="text-[10px] opacity-60">TOTAL ÓRDENES</div>
-                  <div className="text-2xl font-bold mt-1 text-[var(--accent-primary)]">
-                    {marketplaceOrders.length}
-                  </div>
-                  <div className="text-[10px] opacity-50 mt-0.5">Repuestos Solicitados</div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
-                  <div className="text-[10px] opacity-60">EN TRÁNSITO</div>
-                  <div className="text-2xl font-bold mt-1 text-[#00E5FF]">
-                    {marketplaceOrders.filter((o) => o.status === "dispatched" || o.status === "in_transit").length}
-                  </div>
-                  <div className="text-[10px] opacity-50 mt-0.5">Rumbo al Puerto</div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
-                  <div className="text-[10px] opacity-60">A BORDO / ENTREGADOS</div>
-                  <div className="text-2xl font-bold mt-1 text-[#00E676]">
-                    {marketplaceOrders.filter((o) => o.status === "delivered").length}
-                  </div>
-                  <div className="text-[10px] opacity-50 mt-0.5">Recibidos por Tripulación</div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
-                  <div className="text-[10px] opacity-60">PRESUPUESTO TOTAL</div>
-                  <div className="text-2xl font-bold mt-1 text-white">
-                    USD ${marketplaceOrders.reduce((acc, o) => acc + (o.estimated_price_usd || 0), 0).toLocaleString("es-CL")}
-                  </div>
-                  <div className="text-[10px] opacity-50 mt-0.5">
-                    ~CLP ${(marketplaceOrders.reduce((acc, o) => acc + (o.estimated_price_usd || 0), 0) * 950).toLocaleString("es-CL")}
-                  </div>
-                </div>
-              </div>
-
-              {/* Orders List / Empty State */}
-              {marketplaceOrders.length === 0 ? (
-                <div className="marine-card p-12 text-center space-y-4">
-                  <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mx-auto text-[var(--accent-primary)]">
-                    <ShoppingBag className="w-8 h-8" />
-                  </div>
-                  <div className="max-w-md mx-auto space-y-2">
-                    <h3 className="text-lg font-bold">No hay órdenes de repuestos activas</h3>
-                    <p className="text-xs font-mono opacity-70">
-                      Cuando registres una rotura en el módulo de Control de Daños (Damage Control), el sistema cotizará los repuestos con proveedores locales y podrás monitorear su entrega aquí.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveSection("vessel")}
-                    className="marine-btn marine-btn-primary text-xs px-6 py-3 min-h-12 inline-flex items-center gap-2"
-                  >
-                    <Package className="w-4 h-4" />
-                    <span>Ir a Control de Daños de la Embarcación</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-base font-semibold flex items-center gap-2">
-                      <Truck className="w-5 h-5 text-[var(--accent-primary)]" />
-                      <span>Seguimiento de Despachos &amp; Logística Portuaria</span>
-                    </h3>
-                    <span className="text-xs font-mono opacity-60">
-                      Persistencia local en Dexie.js (Offline-Ready)
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {marketplaceOrders.map((order) => {
-                      const isDelivered = order.status === "delivered";
-                      const isInTransit = order.status === "dispatched" || order.status === "in_transit";
-                      return (
-                        <div
-                          key={order.id}
-                          className={`marine-card p-5 space-y-4 border transition ${isDelivered
-                            ? "border-[#00E676]/40 bg-[#00E676]/[0.02]"
-                            : isInTransit
-                              ? "border-[#00E5FF]/40 bg-[#00E5FF]/[0.02]"
-                              : "border-white/5"
-                            }`}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <div className="font-semibold text-base flex items-center gap-2">
-                                <Package className="w-4 h-4 text-[var(--accent-primary)]" />
-                                <span>{order.part_name}</span>
-                              </div>
-                              <div className="text-xs font-mono opacity-65 mt-0.5">
-                                SKU: {order.part_sku}
-                              </div>
-                            </div>
-
-                            <div
-                              className={`px-3 py-1 rounded-full font-mono text-[11px] font-bold shrink-0 ${isDelivered
-                                ? "bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/50"
-                                : isInTransit
-                                  ? "bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/50 animate-pulse"
-                                  : "bg-[#FF9F0A]/15 text-[#FF9F0A] border border-[#FF9F0A]/50"
-                                }`}
-                            >
-                              {isDelivered
-                                ? "ENTREGADO A BORDO"
-                                : isInTransit
-                                  ? "EN TRÁNSITO"
-                                  : "COTIZADO"}
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2 font-mono text-xs pt-1 border-t border-white/5">
-                            <div>
-                              <div className="text-[10px] opacity-50 uppercase">Puerto de Destino</div>
-                              <div className="font-semibold text-[var(--accent-primary)] truncate mt-0.5">
-                                {order.arrival_port}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-[10px] opacity-50 uppercase">Proveedor Asignado</div>
-                              <div className="font-semibold truncate mt-0.5">
-                                {order.supplier_name}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-[10px] opacity-50 uppercase">Precio Estimado</div>
-                              <div className="font-semibold text-white mt-0.5">
-                                USD ${order.estimated_price_usd}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-[10px] opacity-50 uppercase">Tracking / Orden</div>
-                              <div className="font-semibold opacity-80 truncate mt-0.5">
-                                {order.tracking_code || `#${order.id.slice(0, 8)}`}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
-                            <div className="text-[10px] font-mono opacity-50">
-                              {order.created_at ? new Date(order.created_at).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" }) : "Fecha no disp."}
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              {!isDelivered && (
-                                <>
-                                  {!isInTransit && (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleUpdateOrderStatus(order.id, "dispatched")}
-                                      className="marine-btn marine-btn-secondary text-xs px-3 py-1.5"
-                                    >
-                                      <Truck className="w-3.5 h-3.5" />
-                                      <span>Marcar en Tránsito</span>
-                                    </button>
-                                  )}
-                                  <button
-                                    type="button"
-                                    onClick={() => handleUpdateOrderStatus(order.id, "delivered")}
-                                    className="marine-btn marine-btn-primary text-xs px-3 py-1.5"
-                                  >
-                                    <PackageCheck className="w-3.5 h-3.5" />
-                                    <span>Confirmar Entrega</span>
-                                  </button>
-                                </>
-                              )}
-                              {isDelivered && (
-                                <span className="text-xs font-mono text-[#00E676] flex items-center gap-1">
-                                  <PackageCheck className="w-4 h-4" />
-                                  <span>Instalado &amp; Operativo</span>
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
+            /* Marine Marketplace & Technical Spare Parts Store */
+            <MarineMarketplace activeVesselId={activeVesselId} pushToast={pushToast} />
           )}
         </div>
 
