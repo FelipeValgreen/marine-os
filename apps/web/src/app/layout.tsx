@@ -44,7 +44,7 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased" suppressHydrationWarning>
         <NavigationModeProvider>
           <ThemeProvider>{children}</ThemeProvider>
         </NavigationModeProvider>

@@ -150,6 +150,7 @@ export function NauticalMap({
   const [isTouchLocked, setIsTouchLocked] = useState<boolean>(false);
   const [unlockPressStart, setUnlockPressStart] = useState<number | null>(null);
   const [unlockProgressPct, setUnlockProgressPct] = useState<number>(0);
+  const [webGlError, setWebGlError] = useState<string | null>(null);
   const unlockTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastHeadingRef = useRef<number>(0);
 
@@ -618,133 +619,142 @@ export function NauticalMap({
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const map = new maplibregl.Map({
-      container: mapContainerRef.current,
-      style: CARTO_DARK_MATTER_STYLE,
-      center: [vesselPosition.lon, vesselPosition.lat],
-      zoom: 11.2,
-      attributionControl: false,
-    });
+    let mapInstance: maplibregl.Map | null = null;
+    try {
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: CARTO_DARK_MATTER_STYLE,
+        center: [vesselPosition.lon, vesselPosition.lat],
+        zoom: 11.2,
+        attributionControl: false,
+      });
+      mapInstance = map;
 
-    map.addControl(
-      new maplibregl.NavigationControl({ showCompass: true }),
-      "bottom-right"
-    );
+      map.addControl(
+        new maplibregl.NavigationControl({ showCompass: true }),
+        "bottom-right"
+      );
 
-    // Disable follow mode when user manually drags or touches the map
-    map.on("dragstart", () => {
-      setFollow(false);
-    });
-
-    map.on("load", () => {
-      addNauticalOverlays(map);
-
-      map.on("click", "anchorages-layer", (e) => {
-        const feature = e.features?.[0];
-        if (!feature || !onSelectAnchorage) return;
-        const slug = feature.properties?.slug;
-        const found = anchorages.find((a) => a.slug === slug);
-        if (found) onSelectAnchorage(found);
+      // Disable follow mode when user manually drags or touches the map
+      map.on("dragstart", () => {
+        setFollow(false);
       });
 
-      map.on("mouseenter", "community-pins-layer", () => {
-        map.getCanvas().style.cursor = "pointer";
-      });
-      map.on("mouseleave", "community-pins-layer", () => {
-        map.getCanvas().style.cursor = "";
-      });
+      map.on("load", () => {
+        addNauticalOverlays(map);
 
-      map.on("click", "community-pins-layer", (e) => {
-        const feature = e.features?.[0];
-        if (!feature) return;
-        const p = feature.properties as Record<string, string | number>;
-        const geom = feature.geometry as GeoJSON.Point;
-        const coordinates = geom.coordinates.slice() as [number, number];
+        map.on("click", "anchorages-layer", (e) => {
+          const feature = e.features?.[0];
+          if (!feature || !onSelectAnchorage) return;
+          const slug = feature.properties?.slug;
+          const found = anchorages.find((a) => a.slug === slug);
+          if (found) onSelectAnchorage(found);
+        });
 
-        const createdAtStr = String(p.created_at || "");
-        const createdMs = createdAtStr ? new Date(createdAtStr).getTime() : 0;
-        const ageMs = createdMs ? Math.max(0, Date.now() - createdMs) : 0;
-        const ageHours = Math.floor(ageMs / (3600 * 1000));
-        const remainingHours = Math.max(0, 24 - ageHours);
-        const isExpired = ageHours >= 24;
+        map.on("mouseenter", "community-pins-layer", () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", "community-pins-layer", () => {
+          map.getCanvas().style.cursor = "";
+        });
 
-        let distanceBadge = "";
-        if (vesselPositionRef.current && p.lat && p.lon) {
-          const dMeters = haversineDistanceMeters(
-            vesselPositionRef.current.lat,
-            vesselPositionRef.current.lon,
-            Number(p.lat),
-            Number(p.lon)
-          );
-          const dNm = (dMeters / 1852).toFixed(1);
-          distanceBadge = ` • 📍 A ${dNm} NM de proa`;
-        }
+        map.on("click", "community-pins-layer", (e) => {
+          const feature = e.features?.[0];
+          if (!feature) return;
+          const p = feature.properties as Record<string, string | number>;
+          const geom = feature.geometry as GeoJSON.Point;
+          const coordinates = geom.coordinates.slice() as [number, number];
 
-        const validityHtml = isExpired
-          ? `<span style="color: #FF453A; font-weight: 600;">⚠️ EXPIRADO (>24h) — Archivo</span>`
-          : `<span style="color: #30D158; font-weight: 600;">⏱️ Hace ${ageHours}h (Vigente por ${remainingHours}h)</span>`;
+          const createdAtStr = String(p.created_at || "");
+          const createdMs = createdAtStr ? new Date(createdAtStr).getTime() : 0;
+          const ageMs = createdMs ? Math.max(0, Date.now() - createdMs) : 0;
+          const ageHours = Math.floor(ageMs / (3600 * 1000));
+          const remainingHours = Math.max(0, 24 - ageHours);
+          const isExpired = ageHours >= 24;
 
-        const popupHtml = `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #FFFFFF; min-width: 260px; max-width: 320px; padding: 4px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
-              <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; color: #FF5722; background: rgba(255, 87, 34, 0.16); border: 1px solid rgba(255, 87, 34, 0.45); border-radius: 999px; padding: 2px 8px;">
-                📻 RADIO COMUNIDAD
-              </span>
-              <span style="font-size: 10px; font-family: monospace; opacity: 0.85;">
-                ${validityHtml}
-              </span>
-            </div>
+          let distanceBadge = "";
+          if (vesselPositionRef.current && p.lat && p.lon) {
+            const dMeters = haversineDistanceMeters(
+              vesselPositionRef.current.lat,
+              vesselPositionRef.current.lon,
+              Number(p.lat),
+              Number(p.lon)
+            );
+            const dNm = (dMeters / 1852).toFixed(1);
+            distanceBadge = ` • 📍 A ${dNm} NM de proa`;
+          }
 
-            <div style="font-weight: 700; font-size: 13px; line-height: 1.3; margin-bottom: 4px; color: #FFFFFF;">
-              ${p.title}
-            </div>
+          const validityHtml = isExpired
+            ? `<span style="color: #FF453A; font-weight: 600;">⚠️ EXPIRADO (>24h) — Archivo</span>`
+            : `<span style="color: #30D158; font-weight: 600;">⏱️ Hace ${ageHours}h (Vigente por ${remainingHours}h)</span>`;
 
-            <div style="font-size: 11px; font-family: monospace; color: #00E5FF; margin-bottom: 8px;">
-              👤 ${p.author_name} • ⛵ ${p.vessel_name}${distanceBadge}
-            </div>
-
-            <p style="font-size: 12px; line-height: 1.45; opacity: 0.92; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
-              "${p.content}"
-            </p>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; font-family: monospace; margin-bottom: 8px;">
-              <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
-                <div style="opacity: 0.55;">CONDICIÓN VIENTO</div>
-                <div style="font-weight: bold; color: #FF9F0A;">${p.wind_conditions || "Calma"}</div>
+          const popupHtml = `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #FFFFFF; min-width: 260px; max-width: 320px; padding: 4px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
+                <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; color: #FF5722; background: rgba(255, 87, 34, 0.16); border: 1px solid rgba(255, 87, 34, 0.45); border-radius: 999px; padding: 2px 8px;">
+                  📻 RADIO COMUNIDAD
+                </span>
+                <span style="font-size: 10px; font-family: monospace; opacity: 0.85;">
+                  ${validityHtml}
+                </span>
               </div>
-              <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
-                <div style="opacity: 0.55;">CADENA & TENEDERO</div>
-                <div style="font-weight: bold; color: #00E676;">${p.chain_payout_m ? p.chain_payout_m + "m " : ""}${p.seabed_type || "Arena"}</div>
+
+              <div style="font-weight: 700; font-size: 13px; line-height: 1.3; margin-bottom: 4px; color: #FFFFFF;">
+                ${p.title}
+              </div>
+
+              <div style="font-size: 11px; font-family: monospace; color: #00E5FF; margin-bottom: 8px;">
+                👤 ${p.author_name} • ⛵ ${p.vessel_name}${distanceBadge}
+              </div>
+
+              <p style="font-size: 12px; line-height: 1.45; opacity: 0.92; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                "${p.content}"
+              </p>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; font-family: monospace; margin-bottom: 8px;">
+                <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
+                  <div style="opacity: 0.55;">CONDICIÓN VIENTO</div>
+                  <div style="font-weight: bold; color: #FF9F0A;">${p.wind_conditions || "Calma"}</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.04); padding: 5px 6px; border-radius: 6px;">
+                  <div style="opacity: 0.55;">CADENA & TENEDERO</div>
+                  <div style="font-weight: bold; color: #00E676;">${p.chain_payout_m ? p.chain_payout_m + "m " : ""}${p.seabed_type || "Arena"}</div>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px; font-size: 10px; font-family: monospace;">
+                <span style="color: #00E676; font-weight: bold;">
+                  ▲ ${p.upvotes || 18} confirmaciones
+                </span>
+                <span style="color: rgba(255,255,255,0.5); font-weight: 500;">
+                  TTL 24H • LOCAL
+                </span>
               </div>
             </div>
+          `;
 
-            <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px; font-size: 10px; font-family: monospace;">
-              <span style="color: #00E676; font-weight: bold;">
-                ▲ ${p.upvotes || 18} confirmaciones
-              </span>
-              <span style="color: rgba(255,255,255,0.5); font-weight: 500;">
-                TTL 24H • LOCAL
-              </span>
-            </div>
-          </div>
-        `;
-
-        new maplibregl.Popup({
-          className: "marinos-tactical-popup",
-          closeButton: true,
-          closeOnClick: true,
-          maxWidth: "340px",
-        })
-          .setLngLat(coordinates)
-          .setHTML(popupHtml)
-          .addTo(map);
+          new maplibregl.Popup({
+            className: "marinos-tactical-popup",
+            closeButton: true,
+            closeOnClick: true,
+            maxWidth: "340px",
+          })
+            .setLngLat(coordinates)
+            .setHTML(popupHtml)
+            .addTo(map);
+        });
       });
-    });
 
-    mapRef.current = map;
+      mapRef.current = map;
+    } catch (err: unknown) {
+      console.warn("MapLibre WebGL context initialization error (fallback active):", err);
+      setWebGlError(err instanceof Error ? err.message : "WebGL context failed");
+    }
 
     return () => {
-      map.remove();
+      if (mapInstance) {
+        mapInstance.remove();
+      }
       mapRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -980,6 +990,23 @@ export function NauticalMap({
       }
     >
       <div ref={mapContainerRef} className="w-full h-full" />
+
+      {webGlError && (
+        <div className="absolute inset-0 bg-[#040B16] flex flex-col items-center justify-center p-6 text-center z-10 space-y-3">
+          <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <Compass className="w-7 h-7" />
+          </div>
+          <div className="max-w-md space-y-1.5">
+            <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">Carta Náutica Digital • Modo Seguro</h3>
+            <p className="text-xs font-mono text-cyan-400">
+              {vesselPosition.lat.toFixed(4)}°S, {vesselPosition.lon.toFixed(4)}°W • Rumbo {vesselCogDeg || 0}°
+            </p>
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              GPS y telemetría operando en tiempo real.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* TOP FLOATING ACTIVE NAVIGATION HUD OVERLAY */}
       {navStats && (
