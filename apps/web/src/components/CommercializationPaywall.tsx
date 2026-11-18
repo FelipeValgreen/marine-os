@@ -11,7 +11,6 @@ import {
   Compass,
   X,
   CreditCard,
-  Ship,
   Sparkles,
   ArrowRight,
 } from "lucide-react";
@@ -42,6 +41,29 @@ export function CommercializationPaywall({
   const handleSelectPlan = async (tier: "b2c_free" | "b2c_pro" | "b2b_fleet") => {
     setIsProcessing(tier);
     try {
+      // If paid tier, attempt Stripe Checkout redirection
+      if (tier !== "b2c_free" && typeof window !== "undefined") {
+        try {
+          const res = await fetch("/api/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              planTier: tier,
+              billingCycle,
+              successUrl: `${window.location.origin}/?checkout_status=success&tier=${tier}`,
+              cancelUrl: `${window.location.origin}/?checkout_status=cancelled`,
+            }),
+          });
+          const checkoutData = await res.json();
+          if (checkoutData.ok && checkoutData.mode === "stripe_live" && checkoutData.checkoutUrl) {
+            window.location.href = checkoutData.checkoutUrl;
+            return;
+          }
+        } catch {
+          // If offline or network error, fall through to local grace activation
+        }
+      }
+
       // Update first organization in Dexie DB
       const orgs = await db.organizations.toArray();
       if (orgs.length > 0) {
