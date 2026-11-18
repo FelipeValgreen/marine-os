@@ -689,9 +689,9 @@ export async function ensureDemoSeedData(): Promise<void> {
         if (!existingPrefs) {
           await db.user_preferences.put({
             id: "default",
-            has_completed_onboarding: false,
-            tooltip_gps_seen: false,
-            tooltip_zarpe_pdf_seen: false,
+            has_completed_onboarding: true,
+            tooltip_gps_seen: true,
+            tooltip_zarpe_pdf_seen: true,
             completed_lessons: ["lesson-offline-first"],
             updated_at: now,
           });

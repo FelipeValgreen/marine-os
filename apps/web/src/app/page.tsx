@@ -2685,25 +2685,16 @@ export default function MarineOSHomePage() {
 
             {/* Middle Body: Captain Metadata + Simulated Official QR Code */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-              <div className="space-y-3 flex-1">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">
-                      TITULAR DEL PASAPORTE NÁUTICO
-                    </div>
-                    <div className="text-2xl font-bold tracking-tight text-white mt-0.5">
-                      {activeAccount.name}
-                    </div>
-                    <div className="text-xs opacity-75 font-medium text-slate-300">
-                      {activeAccount.email || "demo@marinos.app"} •{" "}
-                      <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
-                    </div>
+              <div className="space-y-4 flex-1">
+                <div>
+                  <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">
+                    TITULAR DEL PASAPORTE NÁUTICO
                   </div>
                   <div className="text-2xl font-bold tracking-tight text-white mt-0.5">
                     {activeAccount.name}
                   </div>
                   <div className="text-xs opacity-75 font-medium text-slate-300">
-                    {activeAccount.email || "filipo.valverde@gmail.com"} •{" "}
+                    {activeAccount.email || "demo@marinos.app"} •{" "}
                     <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
                   </div>
                 </div>
@@ -2729,164 +2720,6 @@ export default function MarineOSHomePage() {
                   </div>
                 </div>
 
-                {/* Middle Body: Captain Metadata + Simulated Official QR Code */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                  <div className="space-y-3 flex-1">
-                    <div>
-                      <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">
-                        TITULAR DEL PASAPORTE NÁUTICO
-                      </div>
-                      <div className="text-2xl font-bold tracking-tight text-white mt-0.5">
-                        {activeAccount.name}
-                      </div>
-                      <div className="text-xs opacity-75 font-medium text-slate-300">
-                        {activeAccount.email || "demo@marinos.app"} •{" "}
-                        <span className="font-semibold text-[var(--accent-primary)]">{activeAccount.roleBadge}</span>
-                      </div>
-                    </div>
-
-                    {/* Insignias de Logros (Gamificación y Prestigio Náutico) */}
-                    <div className="space-y-1.5 pt-2">
-                      <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold flex items-center gap-1.5">
-                        <Award className="w-3.5 h-3.5" />
-                        <span>INSIGNIAS DE LOGROS • PRESTIGIO NÁUTICO</span>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 font-semibold shadow-sm">
-                          <span>🌊</span> Cruce Golfo de Ancud
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/30 font-semibold shadow-sm">
-                          <span>⚓</span> Veterano de Chiloé: 1500+ MN
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30 font-semibold shadow-sm">
-                          <span>🛡️</span> Fondeo Seguro: 10 Noches
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 text-white border border-white/20 font-semibold shadow-sm">
-                          <span>🇨🇱</span> DIRECTEMAR Verificado
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Simulated Vector QR Code for Port Authority Verification */}
-                  <div className="p-3.5 rounded-2xl bg-black/60 border border-white/15 flex flex-col items-center justify-center shrink-0 self-start sm:self-center">
-                    <svg
-                      viewBox="0 0 100 100"
-                      className="w-28 h-28"
-                      aria-label="Código QR de Verificación DIRECTEMAR"
-                    >
-                      <rect width="100" height="100" rx="8" fill="#040B16" />
-                      <rect
-                        x="10"
-                        y="10"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        stroke={isNight ? "#FF1E1E" : "#00E5FF"}
-                        strokeWidth="4"
-                      />
-                      <rect
-                        x="16"
-                        y="16"
-                        width="12"
-                        height="12"
-                        fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                      />
-                      <rect
-                        x="66"
-                        y="10"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        stroke={isNight ? "#FF1E1E" : "#00E5FF"}
-                        strokeWidth="4"
-                      />
-                      <rect
-                        x="72"
-                        y="16"
-                        width="12"
-                        height="12"
-                        fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                      />
-                      <rect
-                        x="10"
-                        y="66"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        stroke={isNight ? "#FF1E1E" : "#00E5FF"}
-                        strokeWidth="4"
-                      />
-                      <rect
-                        x="16"
-                        y="72"
-                        width="12"
-                        height="12"
-                        fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                      />
-                      <rect
-                        x="42"
-                        y="14"
-                        width="6"
-                        height="6"
-                        fill={isNight ? "#FF1E1E" : "#00E676"}
-                      />
-                      <rect
-                        x="52"
-                        y="22"
-                        width="6"
-                        height="14"
-                        fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                      />
-                      <rect
-                        x="42"
-                        y="42"
-                        width="16"
-                        height="16"
-                        fill={isNight ? "#FF1E1E" : "#00E676"}
-                      />
-                      <rect
-                        x="14"
-                        y="44"
-                        width="18"
-                        height="6"
-                        fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                      />
-                      <rect
-                        x="66"
-                        y="44"
-                        width="22"
-                        height="6"
-                        fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                      />
-                      <rect
-                        x="44"
-                        y="68"
-                        width="8"
-                        height="20"
-                        fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                      />
-                      <rect
-                        x="62"
-                        y="62"
-                        width="12"
-                        height="12"
-                        fill={isNight ? "#FF1E1E" : "#00E676"}
-                      />
-                      <rect
-                        x="78"
-                        y="76"
-                        width="12"
-                        height="12"
-                        fill={isNight ? "#FF1E1E" : "#00E5FF"}
-                      />
-                    </svg>
-                    <span className="font-mono text-[9px] uppercase tracking-widest opacity-70 mt-1.5">
-                      QR VERIFICACIÓN ARMADA
-                    </span>
-                  </div>
-                </div>
-
                 {/* Insignias de Logros (Gamificación y Prestigio Náutico) */}
                 <div className="space-y-1.5 pt-2">
                   <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)] font-semibold flex items-center gap-1.5">
@@ -2898,13 +2731,13 @@ export default function MarineOSHomePage() {
                       <span>🌊</span> Cruce Golfo de Ancud
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/30 font-semibold shadow-sm">
-                      <span>⚓</span> Navegante Austral: 1500+ MN
+                      <span>⚓</span> Veterano de Chiloé: 1500+ MN
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30 font-semibold shadow-sm">
                       <span>🛡️</span> Fondeo Seguro: 10 Noches
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 text-white border border-white/20 font-semibold shadow-sm">
-                      <span>🇨🇱</span> Credencial Registrada
+                      <span>🇨🇱</span> DIRECTEMAR Verificado
                     </span>
                   </div>
                 </div>
@@ -3024,62 +2857,63 @@ export default function MarineOSHomePage() {
                   />
                 </svg>
                 <span className="font-mono text-[9px] uppercase tracking-widest opacity-70 mt-1.5">
-                  QR IDENTIFICACIÓN TRIPULANTE
+                  QR IDENTIFICACIÓN DIRECTEMAR
                 </span>
               </div>
             </div>
+          </div>
 
-            {/* Right 5 cols: Total Nautical Miles (Sea Time Log) & Certification Summary — Bento Card */}
-            <div className="lg:col-span-5 marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/60">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)]">
-                    SEA TIME LOG • BITÁCORA CERTIFICADA
-                  </span>
-                  <Compass className="w-5 h-5 text-[var(--accent-primary)]" />
-                </div>
-                <h2 className="text-lg font-bold tracking-tight text-white">
-                  Millas Náuticas Totales Acumuladas
-                </h2>
-                <p className="text-xs text-slate-300 opacity-80 leading-relaxed font-normal">
-                  Suma automática de tu historial base certificado más todas las
-                  travesías GPS grabadas en IndexedDB.
-                </p>
+          {/* Right 5 cols: Total Nautical Miles (Sea Time Log) & Certification Summary — Bento Card */}
+          <div className="lg:col-span-5 marine-card p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-white/5 shadow-2xl shadow-black/60">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--accent-primary)]">
+                  SEA TIME LOG • BITÁCORA CERTIFICADA
+                </span>
+                <Compass className="w-5 h-5 text-[var(--accent-primary)]" />
               </div>
+              <h2 className="text-lg font-bold tracking-tight text-white">
+                Millas Náuticas Totales Acumuladas
+              </h2>
+              <p className="text-xs text-slate-300 opacity-80 leading-relaxed font-normal">
+                Suma automática de tu historial base certificado más todas las
+                travesías GPS grabadas en IndexedDB.
+              </p>
+            </div>
 
-              <div className="p-5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2">
-                <div className="text-[10px] font-bold tracking-[0.15em] uppercase opacity-65 text-slate-300">
-                  TOTAL SEA TIME (INDEXEDDB + TRACKS)
-                </div>
-                <div
-                  data-testid="sea-time-total-miles"
-                  className="text-4xl sm:text-5xl font-mono font-bold tracking-tight text-[#00E5FF]"
-                >
-                  {totalSeaTimeMilesNm.toLocaleString("es-CL")}{" "}
-                  <span className="text-base font-normal font-sans text-slate-400">MN</span>
-                </div>
-                <div className="text-xs text-[#00E676] pt-1 font-mono">
-                  • Base histórica: {activeAccount.loggedMilesNm} MN + Travesías
-                  grabadas: +{loggedTrackMilesNm} MN ({savedTracks.length} piernas)
+            <div className="p-5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2">
+              <div className="text-[10px] font-bold tracking-[0.15em] uppercase opacity-65 text-slate-300">
+                TOTAL SEA TIME (INDEXEDDB + TRACKS)
+              </div>
+              <div
+                data-testid="sea-time-total-miles"
+                className="text-4xl sm:text-5xl font-mono font-bold tracking-tight text-[#00E5FF]"
+              >
+                {totalSeaTimeMilesNm.toLocaleString("es-CL")}{" "}
+                <span className="text-base font-normal font-sans text-slate-400">MN</span>
+              </div>
+              <div className="text-xs text-[#00E676] pt-1 font-mono">
+                • Base histórica: {activeAccount.loggedMilesNm} MN + Travesías
+                grabadas: +{loggedTrackMilesNm} MN ({savedTracks.length} piernas)
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
+                <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">TRAVESÍAS GRABADAS</div>
+                <div className="text-lg font-mono font-bold mt-1 text-white">
+                  {savedTracks.length} <span className="text-xs font-sans font-normal opacity-60">Piernas</span>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
-                  <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">TRAVESÍAS GRABADAS</div>
-                  <div className="text-lg font-mono font-bold mt-1 text-white">
-                    {savedTracks.length} <span className="text-xs font-sans font-normal opacity-60">Piernas</span>
-                  </div>
-                </div>
-                <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
-                  <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">PROVEEDOR AUTH</div>
-                  <div className="text-xs font-mono font-semibold mt-1 uppercase text-[#00E676] truncate">
-                    {activeAccount.authProvider || "GOOGLE OAUTH"}
-                  </div>
+              <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5">
+                <div className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-60">PROVEEDOR AUTH</div>
+                <div className="text-xs font-mono font-semibold mt-1 uppercase text-[#00E676] truncate">
+                  {activeAccount.authProvider || "GOOGLE OAUTH"}
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
           {/* Sub-Tab Navigation: Bitácora & Replay vs. Órdenes de Repuestos */}
           <div className="flex flex-wrap items-center gap-2 border-b border-white/5 pb-3 pt-2">
@@ -3647,7 +3481,6 @@ export default function MarineOSHomePage() {
             </div>
           )}
         </div>
-      </div>
 
         {/* Profile Edit Modal */}
         {isEditingProfile && (

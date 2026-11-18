@@ -215,7 +215,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [authChecked, setAuthChecked] = useState<boolean>(false);
   const [activeSection, setActiveSectionState] =
     useState<MarineSection>("bridge");
-  const [dataMode, setDataMode] = useState<"SIMULADO" | "EN_VIVO">("SIMULADO");
+  const [dataMode, setDataMode] = useState<"SIMULADO" | "EN_VIVO">("EN_VIVO");
   const [simulatedOffline, setSimulatedOffline] = useState<boolean>(false);
   const [browserOffline, setBrowserOffline] = useState<boolean>(false);
   const [isSeeded, setIsSeeded] = useState<boolean>(false);
@@ -238,7 +238,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const userPreferences = useLiveQuery(
+  const _userPreferences = useLiveQuery(
     () => db.user_preferences.get("default"),
     []
   );
@@ -619,11 +619,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const isDaylight = theme === "daylight-high-contrast";
   const isLoginRoute = pathname === "/login";
   const isBridgeFullscreen = pathname === "/" && activeSection === "bridge";
-  const showSeaTrialsModal =
-    !isLoginRoute &&
-    (forceSeaTrials ||
-      (userPreferences !== undefined &&
-        userPreferences.has_completed_onboarding === false));
+  // Sea Trials Onboarding is NEVER forced automatically on entry.
+  // The app lands directly on the Bridge with live GPS telemetry.
+  // Only opens if explicitly triggered from Academy/Tutorials.
+  const showSeaTrialsModal = !isLoginRoute && forceSeaTrials;
 
   return (
     <ThemeContext.Provider
@@ -982,15 +981,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         )}
 
         {/* ===================================================================
-            PERSISTENT SIMULATION BANNER - R-4.1.2
+            SIMULATION MODE BADGE (Discreet & Non-Intrusive)
         =================================================================== */}
         {!isLoginRoute && dataMode === "SIMULADO" && (
           <div
             data-testid="simulation-mode-banner"
-            className={`${sidebarCollapsed ? "lg:pl-16" : "lg:pl-60"
-              } w-full bg-[#D94A1A] text-white py-1 px-4 text-center font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase shadow-md flex items-center justify-center gap-2 relative z-40 transition-all duration-200`}
+            className="fixed bottom-20 right-4 z-40 px-3 py-1.5 rounded-xl bg-orange-600/90 text-white font-mono text-[10px] font-bold tracking-wider uppercase shadow-xl backdrop-blur-md border border-white/20 flex items-center gap-2.5"
           >
-            <span>⚠️ MODO SIMULACIÓN — datos ficticios, no usar para navegar</span>
+            <span>⚠️ Simulación</span>
+            <button
+              type="button"
+              onClick={() => setDataMode("EN_VIVO")}
+              className="px-2 py-0.5 rounded bg-black/50 hover:bg-black/70 text-[9px] font-bold text-white transition-colors"
+            >
+              GPS En Vivo
+            </button>
           </div>
         )}
 

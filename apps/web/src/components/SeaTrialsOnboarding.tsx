@@ -129,9 +129,9 @@ export function SeaTrialsOnboarding({
                 type="button"
                 data-testid="skip-sea-trials-btn"
                 onClick={handleFinishSeaTrials}
-                className="min-h-14 px-3 rounded-xl bg-white/5 hover:bg-white/10 font-mono text-xs opacity-75 hover:opacity-100"
+                className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 font-mono text-xs font-semibold text-white transition flex items-center gap-1.5"
               >
-                Omitir
+                <span>Cerrar y Salir al Puente ✕</span>
               </button>
             </div>
           </div>
@@ -212,20 +212,19 @@ export function SeaTrialsOnboarding({
           </form>
         )}
 
-        {/* STEP 2: Simulate QR Scan */}
+        {/* STEP 2: System Identification (Manual or Optional QR) */}
         {step === 2 && (
           <div className="space-y-5">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/40 flex items-center justify-center text-[var(--accent-primary)] shrink-0">
-                <QrCode className="w-6 h-6" />
+                <Ship className="w-6 h-6" />
               </div>
               <div>
                 <h2 className="text-xl font-bold">
-                  2. Escanea un Nodo QR en Caché Local
+                  2. Identificación de Equipos y Sistemas
                 </h2>
                 <p className="text-xs opacity-75">
-                  Cada sistema crítico a bordo tiene un QR que abre su
-                  micro-tutorial en 0ms sin depender de señal celular.
+                  Diseñado para naves de cualquier antigüedad: ingresa equipos por nombre o usa QR adhesivo opcional.
                 </p>
               </div>
             </div>
@@ -233,30 +232,39 @@ export function SeaTrialsOnboarding({
             <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="space-y-1 font-mono text-xs">
                 <div className="text-[var(--accent-primary)] font-bold">
-                  NODO DETECTADO: yanmar-4jh57
+                  SISTEMA DETECTADO: yanmar-4jh57
                 </div>
                 <div className="text-sm font-sans font-semibold">
                   Motor Yanmar 4JH57 (57 HP)
                 </div>
                 <div className="opacity-70">
-                  Ubicación: Bajo escalera salón principal • 2 repuestos
-                  vinculados
+                  Ubicación: Sala de máquinas / Salón principal • Manual técnico disponible offline
                 </div>
               </div>
               <span className="px-3 py-1 rounded-full bg-[var(--status-ok)]/15 text-[var(--status-ok)] font-mono text-xs font-bold">
-                {qrScanned ? "¡ESCANEADO 0ms!" : "LISTO PARA ESCANEAR"}
+                {qrScanned ? "¡EQUIPO VINCULADO!" : "COMPATIBLE SIN QR"}
               </span>
             </div>
 
-            <button
-              type="button"
-              data-testid="sea-trials-step2-btn"
-              onClick={handleStep2ScanQR}
-              className="w-full marine-btn marine-btn-primary text-sm"
-            >
-              <QrCode className="w-4 h-4" />
-              <span>Simular Escaneo QR Motor Yanmar (+50 XP)</span>
-            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                data-testid="sea-trials-step2-btn"
+                onClick={handleStep2ScanQR}
+                className="marine-btn marine-btn-primary text-xs py-3.5 flex items-center justify-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Vincular por Nombre / Manual (+50 XP)</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleStep2ScanQR}
+                className="marine-btn marine-btn-secondary text-xs py-3.5 flex items-center justify-center gap-2"
+              >
+                <QrCode className="w-4 h-4" />
+                <span>Escanear QR (Si existe a bordo)</span>
+              </button>
+            </div>
           </div>
         )}
 
