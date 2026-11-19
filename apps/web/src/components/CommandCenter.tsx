@@ -23,6 +23,8 @@ import {
   Users,
   Sliders,
   Anchor,
+  ShoppingBag,
+  FileText,
 } from "lucide-react";
 import { db, DEMO_IDS, enqueueOfflineMutation } from "@/lib/offline/db";
 import { triggerHapticFeedback, formatNauticalCoordsDMS } from "@/lib/nautical";
@@ -294,6 +296,45 @@ export function CommandCenter({
         icon: BookOpen,
         action: () => {
           onNavigateSection("logbook");
+          onClose();
+        },
+      },
+      {
+        id: "cmd-marketplace",
+        title: "Marketplace de Repuestos Navales (Pedir a Puerto)",
+        subtitle: "Catálogo de filtros Racor, rodetes Yanmar, bombas Rule y despacho a muelle",
+        category: "ACCIONES DIRECTAS",
+        keywords: "marketplace tienda repuestos racor yanmar bombas pedidos compras muelle puerto",
+        shortcut: "M K",
+        icon: ShoppingBag,
+        action: () => {
+          onNavigateSection("logbook");
+          onClose();
+        },
+      },
+      {
+        id: "cmd-dossier",
+        title: "Ficha Técnica Naval & Dossier PDF (DIRECTEMAR)",
+        subtitle: "Imprimir dossier de barco, dimensiones LOA, estanques y sello SHA-256",
+        category: "ACCIONES DIRECTAS",
+        keywords: "dossier ficha tecnica pdf descargar imprimir directemar barco albatros",
+        shortcut: "F T",
+        icon: FileText,
+        action: () => {
+          onNavigateSection("fleet");
+          onClose();
+        },
+      },
+      {
+        id: "cmd-manuals",
+        title: "Biblioteca de 22 Manuales Técnicos Offline",
+        subtitle: "Procedimientos Yanmar 4JH57, Volvo Penta, Victron, Paso Chacao y emergencias",
+        category: "NAVEGACIÓN",
+        keywords: "manuales tecnicos offline yanmar volvo victron paso chacao libros copilot",
+        shortcut: "G M L",
+        icon: BookOpen,
+        action: () => {
+          onNavigateSection("academy");
           onClose();
         },
       },

@@ -193,7 +193,7 @@ const SCENARIOS: EmergencyScenario[] = [
 ];
 
 export function DamageControl() {
-  const { pushToast } = useMarineContext();
+  const { pushToast, setActiveSection } = useMarineContext();
 
   const voyage = useLiveQuery(() => db.voyages.get(DEMO_IDS.VOYAGE_ID), []);
   const marketplaceOrders = useLiveQuery(
@@ -573,7 +573,7 @@ export function DamageControl() {
             data-testid="marketplace-orders-list"
             className="marine-card p-6 space-y-3"
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <div className="flex flex-wrap items-center justify-between border-b border-white/10 pb-2.5 gap-2">
               <h3 className="text-base font-semibold flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4 text-[var(--accent-primary)]" />
                 <span>
@@ -581,9 +581,19 @@ export function DamageControl() {
                   {marketplaceOrders.length})
                 </span>
               </h3>
-              <span className="font-mono text-[11px] text-[#00E676]">
-                Destino: {destinationPort}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[11px] text-[#00E676]">
+                  Destino: {destinationPort}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveSection("logbook")}
+                  className="text-xs font-mono text-[var(--accent-primary)] hover:underline flex items-center gap-1 font-semibold"
+                >
+                  <span>Ir a Tienda de Repuestos</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
 
             {marketplaceOrders.length === 0 ? (

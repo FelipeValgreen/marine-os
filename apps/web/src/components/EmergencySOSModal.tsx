@@ -16,6 +16,9 @@ import {
   HelpCircle,
   Eye,
   Navigation,
+  MessageCircle,
+  Copy,
+  Check,
 } from "lucide-react";
 import {
   db,
@@ -155,6 +158,25 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
       integrationSettings.satellite.provider !== "none" &&
       integrationSettings.satellite.device_imei
   );
+
+  const [copiedText, setCopiedText] = useState(false);
+
+  const handleSendEmergencyWhatsApp = () => {
+    const text = `🚨 *EMERGENCIA MARÍTIMA • LLAMADA DE SOCORRO*\n\nEmbarcación: *${vesselName.toUpperCase()}* (${regNumber})\nCall Sign: ${callSign} • MMSI: ${mmsi}\n\n*NATURALEZA DEL PELIGRO:* ${currentEmergencyDef?.description || "EMERGENCIA GRAVE"}\n*ASISTENCIA:* ${currentEmergencyDef?.assistance || "SOLICITO ASISTENCIA INMEDIATA"}\n\n📍 *POSICIÓN GPS:* ${dms.latDms}, ${dms.lonDms}\n(Lat: ${liveCoords.lat.toFixed(5)}, Lon: ${liveCoords.lon.toFixed(5)})\n👥 *PERSONAS A BORDO (POB):* ${pobCount}\nℹ️ *DETALLE:* ${currentEmergencyDef?.extraInfo || "Sin detalles adicionales"}\n\nVer ubicación en mapa: https://maps.google.com/?q=${liveCoords.lat},${liveCoords.lon}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    if (typeof window !== "undefined") {
+      window.open(url, "_blank");
+    }
+  };
+
+  const handleCopyEmergencyText = () => {
+    const text = `🚨 EMERGENCIA MARÍTIMA • LLAMADA DE SOCORRO\nEmbarcación: ${vesselName.toUpperCase()} (${regNumber})\nCall Sign: ${callSign} • MMSI: ${mmsi}\n\nNATURALEZA: ${currentEmergencyDef?.description || "EMERGENCIA GRAVE"}\nASISTENCIA: ${currentEmergencyDef?.assistance || "SOLICITO ASISTENCIA INMEDIATA"}\n\nPOSICIÓN GPS: ${dms.latDms}, ${dms.lonDms}\n(Lat: ${liveCoords.lat.toFixed(5)}, Lon: ${liveCoords.lon.toFixed(5)})\nPERSONAS A BORDO: ${pobCount}\n\nUbicación: https://maps.google.com/?q=${liveCoords.lat},${liveCoords.lon}`;
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text).catch(() => {});
+      setCopiedText(true);
+      setTimeout(() => setCopiedText(false), 2500);
+    }
+  };
 
   return (
     <motion.div
@@ -418,6 +440,39 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
 
                 <div className="text-red-500 font-bold tracking-wider pt-1">
                   CAMBIO
+                </div>
+              </div>
+
+              {/* 1-Click WhatsApp / SMS Emergency Broadcast Button */}
+              <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                <div>
+                  <div className="text-xs font-bold text-white flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4 text-emerald-400" />
+                    <span>Emisión Rápida de Socorro por Celular / WhatsApp</span>
+                  </div>
+                  <div className="text-[11px] font-mono text-slate-400 mt-0.5">
+                    Genera mensaje con coordenadas GPS exactas, POB y naturaleza del peligro para contactos de guardia o Capitanía.
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSendEmergencyWhatsApp}
+                    className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center gap-2 transition"
+                  >
+                    <MessageCircle className="w-4 h-4 fill-white" />
+                    <span>Enviar por WhatsApp</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCopyEmergencyText}
+                    className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono text-xs font-semibold flex items-center gap-1.5 transition"
+                    title="Copiar texto de socorro al portapapeles"
+                  >
+                    {copiedText ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    <span>{copiedText ? "Copiado" : "Copiar Mensaje"}</span>
+                  </button>
                 </div>
               </div>
             </div>
