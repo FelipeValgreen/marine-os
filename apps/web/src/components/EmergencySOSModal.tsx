@@ -112,7 +112,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
     useState<IntegrationSettingsRecord | null>(null);
 
   useEffect(() => {
-    getIntegrationSettings().then(setIntegrationSettings).catch(() => {});
+    getIntegrationSettings().then(setIntegrationSettings).catch(() => { });
 
     if (typeof navigator !== "undefined" && "geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -122,7 +122,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
             lon: pos.coords.longitude,
           });
         },
-        () => {},
+        () => { },
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 }
       );
 
@@ -133,7 +133,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
             lon: pos.coords.longitude,
           });
         },
-        () => {},
+        () => { },
         { enableHighAccuracy: true, maximumAge: 5000 }
       );
 
@@ -155,8 +155,8 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
   // R-4.5.5: Verificar si existe dispositivo satelital configurado y activo
   const hasActiveSatelliteHardware = Boolean(
     integrationSettings?.satellite?.enabled &&
-      integrationSettings.satellite.provider !== "none" &&
-      integrationSettings.satellite.device_imei
+    integrationSettings.satellite.provider !== "none" &&
+    integrationSettings.satellite.device_imei
   );
 
   const [copiedText, setCopiedText] = useState(false);
@@ -186,11 +186,10 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.15 }}
-      className={`fixed inset-0 z-[80] w-screen h-screen overflow-y-auto p-3 sm:p-6 flex items-center justify-center select-none ${
-        isNight
-          ? "bg-black text-[#FF1E1E]"
-          : "bg-black/90 backdrop-blur-2xl text-slate-100"
-      }`}
+      className={`fixed inset-0 z-[80] w-screen h-screen overflow-y-auto p-3 sm:p-6 flex items-center justify-center select-none ${isNight
+        ? "bg-black text-[#FF1E1E]"
+        : "bg-black/90 backdrop-blur-2xl text-slate-100"
+        }`}
     >
       <motion.div
         key="emergency-sos-panel"
@@ -198,11 +197,10 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className={`w-full max-w-5xl rounded-3xl p-5 sm:p-7 border shadow-2xl shadow-black/90 space-y-5 my-6 ${
-          isNight
-            ? "bg-black border-[#FF1E1E]"
-            : "bg-[#060b14] border-red-900/60"
-        }`}
+        className={`w-full max-w-5xl rounded-3xl p-5 sm:p-7 border shadow-2xl shadow-black/90 space-y-5 my-6 ${isNight
+          ? "bg-black border-[#FF1E1E]"
+          : "bg-[#060b14] border-red-900/60"
+          }`}
       >
         {/* Top Emergency Header + Close Button (R-4.5.7: Área táctil >= 48px con 1 toque) */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-3.5">
@@ -305,16 +303,14 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
                   type="button"
                   data-testid={`sos-select-${em.id}`}
                   onClick={() => setSelectedEmergency(em.id)}
-                  className={`min-h-[52px] p-2.5 rounded-xl border text-left transition flex items-center gap-2.5 ${
-                    isSelected
-                      ? "bg-red-950/60 text-white border-red-600 font-bold"
-                      : "bg-[#0d1524] border-white/5 text-slate-300 hover:bg-[#142033]"
-                  }`}
+                  className={`min-h-[52px] p-2.5 rounded-xl border text-left transition flex items-center gap-2.5 ${isSelected
+                    ? "bg-red-950/60 text-white border-red-600 font-bold"
+                    : "bg-[#0d1524] border-white/5 text-slate-300 hover:bg-[#142033]"
+                    }`}
                 >
                   <Icon
-                    className={`w-5 h-5 shrink-0 ${
-                      isSelected ? "text-red-400" : "text-slate-400"
-                    }`}
+                    className={`w-5 h-5 shrink-0 ${isSelected ? "text-red-400" : "text-slate-400"
+                      }`}
                   />
                   <span className="text-xs leading-tight">{em.label}</span>
                 </button>

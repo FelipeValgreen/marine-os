@@ -273,17 +273,17 @@ export function NauticalMap({
   }, [activeWp, vesselPosition, vesselSogKn, vesselCogDeg, selectedWpIdx]);
 
   const liveReports = useLiveQuery(() => db.community_reports.toArray(), [], []);
-  const allReports = communityReports || liveReports || [];
 
   const effectiveReports = useMemo(() => {
-    if (!filter24hOnly) return allReports;
+    const reportsList = communityReports || liveReports || [];
+    if (!filter24hOnly) return reportsList;
     const now = Date.now();
     const ttlMs = 24 * 60 * 60 * 1000;
-    return allReports.filter((r) => {
+    return reportsList.filter((r) => {
       const age = now - new Date(r.created_at).getTime();
       return age >= 0 && age <= ttlMs;
     });
-  }, [allReports, filter24hOnly]);
+  }, [communityReports, liveReports, filter24hOnly]);
 
   // Compute 10-minute course projection vector
   const courseVectorGeoJSON = useMemo(() => {

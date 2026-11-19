@@ -10,22 +10,13 @@ import {
   Ship,
   Search,
   CheckCircle2,
-  AlertTriangle,
   ExternalLink,
   ShieldCheck,
-  RefreshCw,
   Clock,
   Sparkles,
-  Award,
-  ChevronRight,
   Filter,
 } from "lucide-react";
-import {
-  db,
-  type UserProfileAccount,
-  type VesselRecord,
-  type HandoverInspectionRecord,
-} from "@/lib/offline/db";
+import { db } from "@/lib/offline/db";
 
 interface BackofficeManagerProps {
   pushToast?: (toast: {

@@ -238,11 +238,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const _userPreferences = useLiveQuery(
-    () => db.user_preferences.get("default"),
-    []
-  );
-
   const { isAtSeaMode, toggleNavigationMode } = useNavigationMode();
 
   useEffect(() => {

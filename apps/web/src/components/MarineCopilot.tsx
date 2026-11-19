@@ -100,6 +100,9 @@ export function MarineCopilot({
 
   // Speech Recognition Ref
   const recognitionRef = useRef<unknown>(null);
+  const handleAskCopilotRef = useRef<(query?: string) => Promise<void>>(async () => {});
+  const pushToastRef = useRef(pushToast);
+  pushToastRef.current = pushToast;
 
   useEffect(() => {
     // Check SpeechRecognition support in window
@@ -121,12 +124,12 @@ export function MarineCopilot({
           const transcript = event.results[0][0].transcript;
           setQuestion(transcript);
           setIsListening(false);
-          pushToast({
+          pushToastRef.current({
             title: "Comando de Voz Recibido",
             subtitle: `"${transcript}"`,
             tone: "cyan",
           });
-          handleAskCopilot(transcript);
+          handleAskCopilotRef.current(transcript);
         };
 
         reco.onerror = () => {
@@ -351,6 +354,7 @@ Te sugiero consultar el manual físico en la mesa de cartas, verificar la lista 
     });
     setLoading(false);
   };
+  handleAskCopilotRef.current = handleAskCopilot;
 
   return (
     <div
