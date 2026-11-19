@@ -36,6 +36,9 @@ export function CommercializationPaywall({
   pushToast,
 }: CommercializationPaywallProps) {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("annual");
+  const [needsInvoice, setNeedsInvoice] = useState(false);
+  const [companyRut, setCompanyRut] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const handleSelectPlan = async (tier: "b2c_free" | "b2c_pro" | "b2b_fleet") => {
@@ -50,6 +53,8 @@ export function CommercializationPaywall({
             body: JSON.stringify({
               planTier: tier,
               billingCycle,
+              companyRut: needsInvoice ? companyRut : "",
+              companyName: needsInvoice ? companyName : "",
               successUrl: `${window.location.origin}/?checkout_status=success&tier=${tier}`,
               cancelUrl: `${window.location.origin}/?checkout_status=cancelled`,
             }),
@@ -176,6 +181,45 @@ export function CommercializationPaywall({
                   </span>
                 </button>
               </div>
+            </div>
+
+            {/* Chilean B2B Tax Invoice Option (Para Empresas de Charter y Astilleros) */}
+            <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5 space-y-2.5">
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-200">
+                <input
+                  type="checkbox"
+                  checked={needsInvoice}
+                  onChange={(e) => setNeedsInvoice(e.target.checked)}
+                  className="rounded border-white/20 bg-white/5 text-[var(--accent-primary)] focus:ring-0"
+                />
+                <span className="font-semibold">¿Requieres Factura Electrónica en Chile (RUT Empresa / Astillero)?</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-400">SII / Deducible</span>
+              </label>
+
+              {needsInvoice && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-white/5">
+                  <div>
+                    <label className="block text-[10px] font-mono uppercase opacity-60 mb-1">RUT Empresa (Chile)</label>
+                    <input
+                      type="text"
+                      value={companyRut}
+                      onChange={(e) => setCompanyRut(e.target.value)}
+                      placeholder="76.123.456-7"
+                      className="w-full px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-mono uppercase opacity-60 mb-1">Razón Social</label>
+                    <input
+                      type="text"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      placeholder="Patagonia Yacht Charter SpA"
+                      className="w-full px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Pricing Cards Grid (Bento style) */}

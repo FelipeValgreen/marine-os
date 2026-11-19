@@ -64,9 +64,18 @@ export async function POST(req: Request) {
       mode: "subscription",
       success_url: finalSuccessUrl,
       cancel_url: finalCancelUrl,
+      tax_id_collection: {
+        enabled: true,
+      },
+      invoice_creation: {
+        enabled: true,
+      },
       metadata: {
         plan_tier: planTier,
         billing_cycle: billingCycle,
+        company_rut: body.companyRut || "",
+        company_name: body.companyName || "",
+        is_fleet: isFleet ? "true" : "false",
       },
     });
 
