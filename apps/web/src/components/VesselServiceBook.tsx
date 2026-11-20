@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   ShieldCheck,
@@ -123,7 +123,11 @@ export function VesselServiceBook({ vessel }: VesselServiceBookProps) {
   const [formTechnician, setFormTechnician] = useState("Carlos Morales (Yanmar Cert. #CL-901)");
   const [formDealer, setFormDealer] = useState("Yanmar Marine Chile Official");
   const [formCost, setFormCost] = useState("450");
-  const [formDate, setFormDate] = useState(new Date().toISOString().slice(0, 10));
+  const [formDate, setFormDate] = useState("");
+
+  useEffect(() => {
+    setFormDate(new Date().toISOString().slice(0, 10));
+  }, []);
   const [formNotes, setFormNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 

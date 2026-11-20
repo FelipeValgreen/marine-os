@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   ScanLine,
@@ -146,8 +146,13 @@ export function VoyagesZarpeView({
   const [newTitle, setNewTitle] = useState("Travesía Seno de Reloncaví - Chiloé");
   const [newDepPort, setNewDepPort] = useState("Marina Puerto Montt");
   const [newArrPort, setNewArrPort] = useState("Caleta Mechuque");
-  const [newDepDate, setNewDepDate] = useState(() => new Date(Date.now() + 7200000).toISOString().slice(0, 16));
-  const [newArrDate, setNewArrDate] = useState(() => new Date(Date.now() + 86400000 * 2).toISOString().slice(0, 16));
+  const [newDepDate, setNewDepDate] = useState("");
+  const [newArrDate, setNewArrDate] = useState("");
+
+  useEffect(() => {
+    setNewDepDate(new Date(Date.now() + 7200000).toISOString().slice(0, 16));
+    setNewArrDate(new Date(Date.now() + 86400000 * 2).toISOString().slice(0, 16));
+  }, []);
 
   // Checklist interactive state - Starts empty (0/6) per PRD R-4.6 safety rule
   const [checklistChecks, setChecklistChecks] = useState<Record<string, boolean>>({});
