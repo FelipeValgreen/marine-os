@@ -250,11 +250,13 @@ export function NauticalMap({
       etaText = `${hh}:${mm} (${minutesToWp < 60 ? `${minutesToWp}m` : `${Math.floor(minutesToWp / 60)}h ${minutesToWp % 60}m`})`;
     }
 
-    // Steering deviation relative to target bearing
+    // Steering deviation relative to target bearing & VMG calculation
     let steerAdvice = "EN RUMBO";
     let steerDelta = 0;
+    let vmgKn = 0;
     if (vesselCogDeg !== undefined && vesselSogKn && vesselSogKn > 0.4) {
       steerDelta = ((btwDeg - vesselCogDeg + 540) % 360) - 180;
+      vmgKn = Math.round(vesselSogKn * Math.cos((steerDelta * Math.PI) / 180) * 10) / 10;
       if (steerDelta > 2) {
         steerAdvice = `CAER ESTRIBOR +${Math.round(steerDelta)}°`;
       } else if (steerDelta < -2) {
@@ -266,6 +268,7 @@ export function NauticalMap({
       wpName: activeWp.name || `WP #${selectedWpIdx + 1}`,
       dtwNm,
       btwDeg,
+      vmgKn,
       etaText,
       steerAdvice,
       steerDelta,
@@ -1010,7 +1013,13 @@ export function NauticalMap({
 
       {/* TOP FLOATING ACTIVE NAVIGATION HUD OVERLAY */}
       {navStats && (
-        <div className="absolute top-3 left-3 right-3 sm:left-4 sm:right-auto z-20 max-w-md">
+        <div
+          className={
+            fullScreen
+              ? "absolute top-16 sm:top-20 left-2 sm:left-4 lg:left-20 right-36 sm:right-auto z-20 max-w-sm sm:max-w-md"
+              : "absolute top-3 left-3 right-3 sm:left-4 sm:right-auto z-20 max-w-md"
+          }
+        >
           <div
             className={`rounded-2xl border backdrop-blur-xl shadow-2xl transition-all ${isNight
               ? "bg-black/95 border-[#FF1E1E]/40 text-[#FF453A]"
@@ -1018,8 +1027,8 @@ export function NauticalMap({
               }`}
           >
             {/* Header row */}
-            <div className="flex items-center justify-between px-3.5 py-2 border-b border-white/5 text-xs font-mono">
-              <div className="flex items-center gap-2 truncate">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-white/5 text-xs font-mono">
+              <div className="flex items-center gap-1.5 truncate">
                 <Navigation className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                 <span className="font-semibold text-white truncate">
                   {navStats.wpName}
@@ -1030,7 +1039,7 @@ export function NauticalMap({
                     onClick={() =>
                       setSelectedWpIdx((prev) => (prev + 1) % waypoints.length)
                     }
-                    className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-cyan-400 flex items-center gap-0.5 transition"
+                    className="min-h-0 text-[10px] px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-cyan-400 flex items-center gap-0.5 transition"
                     title="Pasar al siguiente Waypoint"
                   >
                     Sig <ChevronRight className="w-3 h-3" />
@@ -1040,7 +1049,7 @@ export function NauticalMap({
               <button
                 type="button"
                 onClick={() => setHudCollapsed((c) => !c)}
-                className="text-[10px] text-white/50 hover:text-white transition px-1"
+                className="min-h-0 text-[10px] text-white/50 hover:text-white transition px-1"
               >
                 {hudCollapsed ? "Ver HUD" : "Ocultar"}
               </button>
@@ -1048,15 +1057,15 @@ export function NauticalMap({
 
             {/* Tactical Glanceable Telemetry Grid */}
             {!hudCollapsed && (
-              <div className="p-3 grid grid-cols-4 gap-2 text-center font-mono">
+              <div className="p-2.5 sm:p-3 grid grid-cols-4 gap-1.5 sm:gap-2 text-center font-mono">
                 {/* DTW */}
                 <div className="p-1.5 rounded-lg bg-white/5 border border-white/5">
                   <div className="text-[9px] uppercase tracking-wider opacity-60">
                     DTW
                   </div>
-                  <div className="text-base sm:text-lg font-bold text-cyan-400">
-                    {navStats.dtwNm}{" "}
-                    <span className="text-[10px] font-normal opacity-70">
+                  <div className="text-sm sm:text-lg font-bold text-cyan-400">
+                    {navStats.dtwNm}
+                    <span className="text-[9px] font-normal opacity-70 ml-0.5">
                       NM
                     </span>
                   </div>
@@ -1067,19 +1076,19 @@ export function NauticalMap({
                   <div className="text-[9px] uppercase tracking-wider opacity-60">
                     BTW
                   </div>
-                  <div className="text-base sm:text-lg font-bold text-emerald-400">
+                  <div className="text-sm sm:text-lg font-bold text-emerald-400">
                     {navStats.btwDeg}°
                   </div>
                 </div>
 
-                {/* SOG */}
+                {/* VMG */}
                 <div className="p-1.5 rounded-lg bg-white/5 border border-white/5">
                   <div className="text-[9px] uppercase tracking-wider opacity-60">
-                    SOG
+                    VMG
                   </div>
-                  <div className="text-base sm:text-lg font-bold text-white">
-                    {(vesselSogKn || 0).toFixed(1)}{" "}
-                    <span className="text-[10px] font-normal opacity-70">
+                  <div className="text-sm sm:text-lg font-bold text-white">
+                    {navStats.vmgKn.toFixed(1)}
+                    <span className="text-[9px] font-normal opacity-70 ml-0.5">
                       kn
                     </span>
                   </div>
@@ -1090,16 +1099,16 @@ export function NauticalMap({
                   <div className="text-[9px] uppercase tracking-wider opacity-60">
                     ETA
                   </div>
-                  <div className="text-xs sm:text-sm font-bold text-amber-400 pt-1">
+                  <div className="text-[11px] sm:text-sm font-bold text-amber-400 pt-0.5 truncate">
                     {navStats.etaText}
                   </div>
                 </div>
 
                 {/* Steering Guidance Advice Bar */}
-                <div className="col-span-4 mt-1 flex items-center justify-between px-2.5 py-1 rounded-md bg-white/5 border border-white/5 text-[11px]">
-                  <span className="opacity-60">Rumbo a gobernar:</span>
+                <div className="col-span-4 mt-1 flex items-center justify-between px-2.5 py-1 rounded-md bg-white/5 border border-white/5 text-[10px] sm:text-[11px]">
+                  <span className="opacity-60 truncate">Gobernar:</span>
                   <span
-                    className={`font-bold font-mono ${Math.abs(navStats.steerDelta) <= 2
+                    className={`font-bold font-mono truncate ${Math.abs(navStats.steerDelta) <= 2
                       ? "text-emerald-400"
                       : "text-amber-400 animate-pulse"
                       }`}
@@ -1114,13 +1123,19 @@ export function NauticalMap({
       )}
 
       {/* FLOATING TACTICAL CONTROL BAR (Follow-Me, Course-Up, Wake Lock, Radio TTL) */}
-      <div className="absolute top-3 right-3 z-20 flex flex-col items-end gap-2">
+      <div
+        className={
+          fullScreen
+            ? "absolute top-16 sm:top-20 right-2 sm:right-4 z-20 flex flex-col items-end gap-1.5 sm:gap-2"
+            : "absolute top-3 right-3 z-20 flex flex-col items-end gap-2"
+        }
+      >
         {/* Follow-Me Auto-Center Button */}
         <button
           type="button"
           onClick={handleToggleFollow}
           data-testid="follow-vessel-btn"
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${followVessel
+          className={`min-h-[38px] sm:min-h-[44px] flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${followVessel
             ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-cyan-900/30"
             : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
             }`}
@@ -1131,10 +1146,11 @@ export function NauticalMap({
           }
         >
           <Crosshair
-            className={`w-4 h-4 ${followVessel ? "text-cyan-400 animate-spin" : "opacity-60"
+            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${followVessel ? "text-cyan-400 animate-spin" : "opacity-60"
               }`}
           />
-          <span>{followVessel ? "SIGUIENDO BARCO" : "CENTRAR BARCO"}</span>
+          <span className="hidden sm:inline">{followVessel ? "SIGUIENDO BARCO" : "CENTRAR BARCO"}</span>
+          <span className="sm:hidden">{followVessel ? "SIGUIENDO" : "CENTRAR"}</span>
         </button>
 
         {/* Orientation Toggle: North-Up vs Course-Up */}
@@ -1142,20 +1158,23 @@ export function NauticalMap({
           type="button"
           onClick={handleToggleOrientation}
           data-testid="orientation-toggle-btn"
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${orientationMode === "course-up"
+          className={`min-h-[38px] sm:min-h-[44px] flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${orientationMode === "course-up"
             ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-emerald-900/30"
             : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
             }`}
           title="Alternar entre orientación Norte Arriba y Proa Arriba"
         >
           <Compass
-            className={`w-4 h-4 ${orientationMode === "course-up" ? "text-emerald-400" : "opacity-60"
+            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${orientationMode === "course-up" ? "text-emerald-400" : "opacity-60"
               }`}
           />
-          <span>
+          <span className="hidden sm:inline">
             {orientationMode === "course-up"
               ? `PROA ARRIBA (${vesselCogDeg ?? 0}°)`
               : "NORTE ARRIBA (0°)"}
+          </span>
+          <span className="sm:hidden">
+            {orientationMode === "course-up" ? `PROA (${vesselCogDeg ?? 0}°)` : "NORTE (0°)"}
           </span>
         </button>
 
@@ -1165,18 +1184,21 @@ export function NauticalMap({
             type="button"
             onClick={onToggleWakeLock}
             data-testid="wake-lock-toggle-btn"
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${wakeLockActive
+            className={`min-h-[38px] sm:min-h-[44px] flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${wakeLockActive
               ? "bg-amber-500/20 text-amber-300 border-amber-500/50"
               : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
               }`}
             title="Mantener pantalla activa (evita que el dispositivo se apague en el cockpit)"
           >
             <Zap
-              className={`w-4 h-4 ${wakeLockActive ? "text-amber-400 animate-pulse" : "opacity-60"
+              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${wakeLockActive ? "text-amber-400 animate-pulse" : "opacity-60"
                 }`}
             />
-            <span>
+            <span className="hidden sm:inline">
               {wakeLockActive ? "PANTALLA ACTIVA" : "AHORRO PANTALLA"}
+            </span>
+            <span className="sm:hidden">
+              {wakeLockActive ? "ACTIVA" : "AHORRO"}
             </span>
           </button>
         )}
@@ -1186,22 +1208,23 @@ export function NauticalMap({
           type="button"
           onClick={() => setIsTouchLocked((prev) => !prev)}
           data-testid="touch-lock-toggle-btn"
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${isTouchLocked
+          className={`min-h-[38px] sm:min-h-[44px] flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-mono font-semibold backdrop-blur-xl border shadow-xl transition-all active:scale-95 ${isTouchLocked
             ? "bg-cyan-500/30 text-cyan-300 border-cyan-400 shadow-cyan-900/40"
             : "bg-[#040B16]/90 text-white/70 border-white/10 hover:border-white/30"
             }`}
           title="Bloquear pantalla táctil contra lluvia y toques accidentales"
         >
           {isTouchLocked ? (
-            <Lock className="w-4 h-4 text-cyan-400 animate-pulse" />
+            <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 animate-pulse" />
           ) : (
-            <Unlock className="w-4 h-4 opacity-60" />
+            <Unlock className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-60" />
           )}
-          <span>{isTouchLocked ? "TÁCTIL BLOQUEADO" : "BLOQUEAR TÁCTIL"}</span>
+          <span className="hidden sm:inline">{isTouchLocked ? "TÁCTIL BLOQUEADO" : "BLOQUEAR TÁCTIL"}</span>
+          <span className="sm:hidden">{isTouchLocked ? "BLOQUEADO" : "BLOQUEAR"}</span>
         </button>
 
         {/* Radio Comunidad TTL Filter Pill */}
-        <div className="flex items-center gap-2 bg-[#040B16]/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono shadow-xl">
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#040B16]/90 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-white/10 text-[10px] sm:text-xs font-mono shadow-xl">
           <span className="w-2 h-2 rounded-full bg-[#FF5722] animate-pulse" />
           <span className="text-white/90 font-medium hidden sm:inline">
             Radio Comunidad

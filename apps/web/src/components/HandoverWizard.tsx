@@ -490,18 +490,16 @@ export function HandoverWizard({
             <button
               type="button"
               onClick={() => setInspectionType("checkin")}
-              className={`marine-btn text-xs min-h-12 px-4 ${
-                inspectionType === "checkin" ? "marine-btn-primary" : "marine-btn-secondary"
-              }`}
+              className={`marine-btn text-xs min-h-12 px-4 ${inspectionType === "checkin" ? "marine-btn-primary" : "marine-btn-secondary"
+                }`}
             >
               <span>CHECK-IN (ENTREGA)</span>
             </button>
             <button
               type="button"
               onClick={() => setInspectionType("checkout")}
-              className={`marine-btn text-xs min-h-12 px-4 ${
-                inspectionType === "checkout" ? "marine-btn-primary" : "marine-btn-secondary"
-              }`}
+              className={`marine-btn text-xs min-h-12 px-4 ${inspectionType === "checkout" ? "marine-btn-primary" : "marine-btn-secondary"
+                }`}
             >
               <span>CHECK-OUT (RECEPCIÓN)</span>
             </button>
@@ -520,9 +518,8 @@ export function HandoverWizard({
               key={s.step}
               type="button"
               onClick={() => setWizardStep(s.step as 1 | 2 | 3 | 4)}
-              className={`min-h-12 px-3.5 py-2 rounded-xl font-semibold flex items-center justify-between transition ${
-                wizardStep === s.step ? "marine-btn-primary" : "marine-btn-secondary"
-              }`}
+              className={`min-h-12 px-3.5 py-2 rounded-xl font-semibold flex items-center justify-between transition ${wizardStep === s.step ? "marine-btn-primary" : "marine-btn-secondary"
+                }`}
             >
               <span>{s.title}</span>
               {wizardStep > s.step && <CheckCircle2 className="w-4 h-4 shrink-0" />}
@@ -581,33 +578,30 @@ export function HandoverWizard({
                         <button
                           type="button"
                           onClick={() => handleStatusChange(item.id, "ok")}
-                          className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition ${
-                            item.status === "ok"
+                          className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition ${item.status === "ok"
                               ? "bg-[#34d399]/20 text-[#34d399] border-[#34d399]/50"
                               : "bg-white/5 text-white/50 border-white/5 hover:bg-white/10"
-                          }`}
+                            }`}
                         >
                           CONFORME
                         </button>
                         <button
                           type="button"
                           onClick={() => handleStatusChange(item.id, "observation")}
-                          className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition ${
-                            item.status === "observation"
+                          className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition ${item.status === "observation"
                               ? "bg-[#fbbf24]/20 text-[#fbbf24] border-[#fbbf24]/50"
                               : "bg-white/5 text-white/50 border-white/5 hover:bg-white/10"
-                          }`}
+                            }`}
                         >
                           OBSERVACIÓN
                         </button>
                         <button
                           type="button"
                           onClick={() => handleStatusChange(item.id, "critical")}
-                          className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition ${
-                            item.status === "critical"
+                          className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition ${item.status === "critical"
                               ? "bg-[#f87171]/20 text-[#f87171] border-[#f87171]/50"
                               : "bg-white/5 text-white/50 border-white/5 hover:bg-white/10"
-                          }`}
+                            }`}
                         >
                           CRÍTICO
                         </button>
@@ -1026,11 +1020,10 @@ export function HandoverWizard({
           {verificationResult && verifyingRecord && (
             <div
               data-testid="handover-verification-result"
-              className={`marine-card p-5 space-y-3 border transition-all ${
-                verificationResult.valid
+              className={`marine-card p-5 space-y-3 border transition-all ${verificationResult.valid
                   ? "border-[#34d399]/40 bg-[#34d399]/[0.03]"
                   : "border-[#f87171]/40 bg-[#f87171]/[0.03]"
-              }`}
+                }`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold flex items-center gap-2">

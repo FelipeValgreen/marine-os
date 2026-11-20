@@ -160,6 +160,33 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
   );
 
   const [copiedText, setCopiedText] = useState(false);
+  const [isSpeakingMayday, setIsSpeakingMayday] = useState(false);
+
+  const handleSpeakMaydayScript = () => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (isSpeakingMayday) {
+      window.speechSynthesis.cancel();
+      setIsSpeakingMayday(false);
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const spokenText = `Mayday, Mayday, Mayday. Aquí ${vesselName}, ${vesselName}, ${vesselName}. Distintivo ${callSign}. M M S I: ${mmsi}. Mayday ${vesselName}. Posición actual: Latitud ${liveCoords.lat.toFixed(4)} grados Sur, Longitud ${Math.abs(liveCoords.lon).toFixed(4)} grados Oeste. Naturaleza de la emergencia: ${currentEmergencyDef?.description || "Emergencia grave a bordo"}. ${currentEmergencyDef?.assistance || "Solicito asistencia inmediata"}. Personas a bordo: ${pobCount} personas. Cambio.`;
+    const utterance = new SpeechSynthesisUtterance(spokenText);
+    utterance.lang = "es-CL";
+    utterance.rate = 0.88;
+    utterance.pitch = 1.0;
+    utterance.onend = () => setIsSpeakingMayday(false);
+    utterance.onerror = () => setIsSpeakingMayday(false);
+    setIsSpeakingMayday(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleSendEmergencySMS2G = () => {
+    const smsBody = `MAYDAY ${vesselName.toUpperCase()} (${regNumber}) MMSI:${mmsi}. PELIGRO: ${currentEmergencyDef?.label || "EMERGENCIA"}. POS GPS: ${dms.latDms} ${dms.lonDms} (${liveCoords.lat.toFixed(5)},${liveCoords.lon.toFixed(5)}). POB:${pobCount}.`;
+    if (typeof window !== "undefined") {
+      window.location.href = `sms:?&body=${encodeURIComponent(smsBody)}`;
+    }
+  };
 
   const handleSendEmergencyWhatsApp = () => {
     const text = `🚨 *EMERGENCIA MARÍTIMA • LLAMADA DE SOCORRO*\n\nEmbarcación: *${vesselName.toUpperCase()}* (${regNumber})\nCall Sign: ${callSign} • MMSI: ${mmsi}\n\n*NATURALEZA DEL PELIGRO:* ${currentEmergencyDef?.description || "EMERGENCIA GRAVE"}\n*ASISTENCIA:* ${currentEmergencyDef?.assistance || "SOLICITO ASISTENCIA INMEDIATA"}\n\n📍 *POSICIÓN GPS:* ${dms.latDms}, ${dms.lonDms}\n(Lat: ${liveCoords.lat.toFixed(5)}, Lon: ${liveCoords.lon.toFixed(5)})\n👥 *PERSONAS A BORDO (POB):* ${pobCount}\nℹ️ *DETALLE:* ${currentEmergencyDef?.extraInfo || "Sin detalles adicionales"}\n\nVer ubicación en mapa: https://maps.google.com/?q=${liveCoords.lat},${liveCoords.lon}`;
@@ -439,35 +466,71 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
                 </div>
               </div>
 
-              {/* 1-Click WhatsApp / SMS Emergency Broadcast Button */}
-              <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+              {/* 1-Click Voice TTS + 137 Armada + SMS 2G + WhatsApp Emergency Broadcast */}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/10">
                 <div>
                   <div className="text-xs font-bold text-white flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-emerald-400" />
-                    <span>Emisión Rápida de Socorro por Celular / WhatsApp</span>
+                    <span>Canales de Emisión Rápida (Voz VHF • Fono 137 • SMS 2G • WhatsApp)</span>
                   </div>
                   <div className="text-[11px] font-mono text-slate-400 mt-0.5">
-                    Genera mensaje con coordenadas GPS exactas, POB y naturaleza del peligro para contactos de guardia o Capitanía.
+                    Usa Locución TTS frente al micrófono VHF, llama al 137 (Rescate Armada) o envía SMS 2G si no hay datos 4G.
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    data-testid="sos-tts-speak-mayday-btn"
+                    onClick={handleSpeakMaydayScript}
+                    className={`min-h-[44px] px-3.5 py-2 rounded-xl font-mono text-xs font-bold flex items-center gap-1.5 transition ${
+                      isSpeakingMayday
+                        ? "bg-red-600 text-white animate-pulse border border-red-400"
+                        : "bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40"
+                    }`}
+                    title="Lee en voz alta el guion MAYDAY oficial para acercar al micrófono PTT de la radio VHF"
+                  >
+                    <Volume2 className="w-4 h-4 shrink-0" />
+                    <span>{isSpeakingMayday ? "Detener Locución" : "Locutar MAYDAY (VHF)"}</span>
+                  </button>
+
+                  <a
+                    href="tel:137"
+                    data-testid="sos-call-137-btn"
+                    className="min-h-[44px] px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold flex items-center gap-1.5 transition"
+                    title="Llamada directa al 137 — Número Oficial de Emergencias Marítimas de la Armada de Chile"
+                  >
+                    <Radio className="w-4 h-4 shrink-0" />
+                    <span>Llamar 137 Armada</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    data-testid="sos-sms-2g-btn"
+                    onClick={handleSendEmergencySMS2G}
+                    className="min-h-[44px] px-3.5 py-2 rounded-xl bg-cyan-600/30 hover:bg-cyan-600/45 text-cyan-300 border border-cyan-500/40 font-mono text-xs font-bold flex items-center gap-1.5 transition"
+                    title="Envía SMS nativo por red celular 2G (funciona sin datos móviles ni internet)"
+                  >
+                    <span>SMS 2G GPS</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={handleSendEmergencyWhatsApp}
-                    className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center gap-2 transition"
+                    className="min-h-[44px] px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center gap-1.5 transition"
                   >
-                    <MessageCircle className="w-4 h-4 fill-white" />
-                    <span>Enviar por WhatsApp</span>
+                    <MessageCircle className="w-4 h-4 fill-white shrink-0" />
+                    <span>WhatsApp SOS</span>
                   </button>
+
                   <button
                     type="button"
                     onClick={handleCopyEmergencyText}
-                    className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono text-xs font-semibold flex items-center gap-1.5 transition"
+                    className="min-h-[44px] px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono text-xs font-semibold flex items-center gap-1.5 transition"
                     title="Copiar texto de socorro al portapapeles"
                   >
                     {copiedText ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                    <span>{copiedText ? "Copiado" : "Copiar Mensaje"}</span>
+                    <span>{copiedText ? "Copiado" : "Copiar"}</span>
                   </button>
                 </div>
               </div>
