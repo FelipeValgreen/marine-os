@@ -752,6 +752,90 @@ export function IntegrationHub() {
                 </div>
 
                 <div>
+                  <label className="block opacity-70 mb-1">
+                    Perfil Plug &amp; Play (Preconfigurado):
+                  </label>
+                  <select
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "native") {
+                        setFormData({
+                          ...formData,
+                          signalk: {
+                            ...formData.signalk,
+                            enabled: true,
+                            host: "sensores-nativos.marinos.local",
+                            port: 3000,
+                            protocol: "https",
+                          },
+                        });
+                      } else if (val === "cerbo") {
+                        setFormData({
+                          ...formData,
+                          signalk: {
+                            ...formData.signalk,
+                            enabled: true,
+                            host: "192.168.1.100",
+                            port: 3000,
+                            protocol: "http",
+                          },
+                        });
+                      } else if (val === "actisense") {
+                        setFormData({
+                          ...formData,
+                          signalk: {
+                            ...formData.signalk,
+                            enabled: true,
+                            host: "192.168.4.1",
+                            port: 2000,
+                            protocol: "http",
+                          },
+                        });
+                      } else if (val === "navico") {
+                        setFormData({
+                          ...formData,
+                          signalk: {
+                            ...formData.signalk,
+                            enabled: true,
+                            host: "192.168.1.1",
+                            port: 10110,
+                            protocol: "http",
+                          },
+                        });
+                      } else if (val === "openplotter") {
+                        setFormData({
+                          ...formData,
+                          signalk: {
+                            ...formData.signalk,
+                            enabled: true,
+                            host: "openplotter.local",
+                            port: 3000,
+                            protocol: "http",
+                          },
+                        });
+                      }
+                    }}
+                    className="w-full min-h-12 px-3 text-xs rounded-xl bg-white/5 border border-white/5"
+                  >
+                    <option value="native">
+                      📱 Autónomo Sin Multiplexor (GPS + Compás Nativo Celular/Tablet)
+                    </option>
+                    <option value="cerbo">
+                      ⚡ Victron Cerbo GX / Venus OS (192.168.1.100:3000)
+                    </option>
+                    <option value="actisense">
+                      📡 Actisense W2K-1 NMEA 2000 Wi-Fi (192.168.4.1:2000)
+                    </option>
+                    <option value="navico">
+                      🧭 B&amp;G / Simrad / Lowrance GoFree (192.168.1.1:10110)
+                    </option>
+                    <option value="openplotter">
+                      🍓 Raspberry Pi OpenPlotter Signal K (openplotter.local:3000)
+                    </option>
+                  </select>
+                </div>
+
+                <div>
                   <label className="block opacity-70 mb-1">Host IP local del Barco *</label>
                   <input
                     type="text"

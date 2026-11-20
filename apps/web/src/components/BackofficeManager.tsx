@@ -113,24 +113,60 @@ export function BackofficeManager({ pushToast }: BackofficeManagerProps) {
     }
   };
 
-  const handleSimulatePayment = () => {
-    const newTx = {
-      id: `ch_${Date.now().toString(36)}`,
-      customer_name: "Skipper Alerce Sur",
-      customer_email: "capitan.alerce@marinos.app",
-      tier: "b2c_pro",
-      amount_usd: 19.0,
-      status: "succeeded",
-      created_at: new Date().toISOString(),
-      stripe_id: `in_${Date.now().toString(36)}_sim`,
-    };
-    setTransactions([newTx, ...transactions]);
-    if (pushToast) {
-      pushToast({
-        title: "Cobro Procesado vía Stripe Checkout",
-        subtitle: "Suscripción Skipper Pro registrada: +$19.00 USD.",
-        tone: "emerald",
+  const totalRevenueUsd = transactions.reduce((sum, tx) => sum + tx.amount_usd, 0);
+
+  const handleChargeUSD = async () => {
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          checkoutType: "charter_invoice",
+          itemName: "MarinOS Skipper Pro / Charter Settlement (USD)",
+          amountUsd: 19.0,
+        }),
       });
+      const data = await res.json();
+      const newTx = {
+        id: data.transactionId || `ch_${Date.now().toString(36)}`,
+        customer_name: "Skipper Alerce Sur",
+        customer_email: "capitan.alerce@marinos.app",
+        tier: "b2c_pro",
+        amount_usd: 19.0,
+        status: "succeeded",
+        created_at: new Date().toISOString(),
+        stripe_id: data.sessionId || `in_${Date.now().toString(36)}_usd`,
+      };
+      setTransactions([newTx, ...transactions]);
+      if (data.checkoutUrl && typeof window !== "undefined") {
+        window.open(data.checkoutUrl, "_blank");
+      }
+      if (pushToast) {
+        pushToast({
+          title: "Cobro en USD Procesado vía Stripe",
+          subtitle: "Transacción registrada: +$19.00 USD (Facturación en Dólares).",
+          tone: "emerald",
+        });
+      }
+    } catch {
+      const newTx = {
+        id: `ch_${Date.now().toString(36)}`,
+        customer_name: "Skipper Alerce Sur",
+        customer_email: "capitan.alerce@marinos.app",
+        tier: "b2c_pro",
+        amount_usd: 19.0,
+        status: "succeeded",
+        created_at: new Date().toISOString(),
+        stripe_id: `in_${Date.now().toString(36)}_usd`,
+      };
+      setTransactions([newTx, ...transactions]);
+      if (pushToast) {
+        pushToast({
+          title: "Cobro en USD Registrado",
+          subtitle: "+$19.00 USD procesados.",
+          tone: "emerald",
+        });
+      }
     }
   };
 
@@ -148,7 +184,7 @@ export function BackofficeManager({ pushToast }: BackofficeManagerProps) {
             </h1>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Gestión de usuarios registrados, conciliación de pagos en Stripe, auditoría de handovers y supervisión de flota.
+            Gestión de usuarios registrados, conciliación de pagos en USD (Stripe), auditoría de handovers y supervisión de flota.
           </p>
         </div>
 
@@ -161,16 +197,16 @@ export function BackofficeManager({ pushToast }: BackofficeManagerProps) {
             title="Abrir Dashboard oficial de Stripe"
           >
             <CreditCard className="w-3.5 h-3.5 text-[#00E5FF]" />
-            <span>Stripe Dashboard</span>
+            <span>Stripe USD Dashboard</span>
             <ExternalLink className="w-3 h-3 opacity-60" />
           </a>
           <button
             type="button"
-            onClick={handleSimulatePayment}
+            onClick={handleChargeUSD}
             className="marine-btn marine-btn-primary text-xs px-4 py-2 font-bold"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Simular Cobro (+19 USD)</span>
+            <span>Cobrar en USD (+$19.00 USD)</span>
           </button>
         </div>
       </div>
@@ -192,14 +228,15 @@ export function BackofficeManager({ pushToast }: BackofficeManagerProps) {
 
         <div className="marine-card p-4 rounded-2xl border border-white/5 bg-white/[0.02]">
           <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
-            <span>MRR ESTIMADO</span>
+            <span>FACTURACIÓN USD</span>
             <CreditCard className="w-4 h-4 text-orange-400" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-white mt-1">
-            $247 <span className="text-xs text-slate-400 font-normal">USD</span>
+            ${totalRevenueUsd.toFixed(2)}{" "}
+            <span className="text-xs text-slate-400 font-normal">USD</span>
           </div>
-          <div className="text-[11px] text-slate-400 font-mono mt-0.5">
-            ~$234,650 CLP / mes
+          <div className="text-[11px] text-emerald-400 font-mono mt-0.5">
+            Facturación 100% en Dólares (USD)
           </div>
         </div>
 

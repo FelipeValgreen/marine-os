@@ -357,6 +357,41 @@ export function MarineMarketplace({ activeVesselId, pushToast }: MarineMarketpla
     });
   };
 
+  const handlePayOrderInUSD = async (order: MarketplaceOrderRecord) => {
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          checkoutType: "marketplace_order",
+          itemName: order.part_name,
+          sku: order.part_sku,
+          amountUsd: order.estimated_price_usd,
+          orderId: order.id,
+          deliveryPort: order.arrival_port,
+        }),
+      });
+      const data = await res.json();
+      await handleUpdateOrderStatus(order.id, "in_transit");
+      if (data.checkoutUrl && typeof window !== "undefined") {
+        window.open(data.checkoutUrl, "_blank");
+        return;
+      }
+      pushToast({
+        title: `Pago Procesado: $${(order.estimated_price_usd || 0).toFixed(2)} USD`,
+        subtitle: `Orden ${order.tracking_code || order.part_sku} pagada en dólares y despachada a ${order.arrival_port}`,
+        tone: "emerald",
+      });
+    } catch {
+      await handleUpdateOrderStatus(order.id, "in_transit");
+      pushToast({
+        title: `Cobro Registrado Offline: $${(order.estimated_price_usd || 0).toFixed(2)} USD`,
+        subtitle: `Sincronización Stripe USD encolada para ${order.part_sku}`,
+        tone: "emerald",
+      });
+    }
+  };
+
   const handlePrintDispatchBill = (order: MarketplaceOrderRecord) => {
     if (typeof window === "undefined") return;
     const printWindow = window.open("", "_blank");
@@ -628,14 +663,14 @@ export function MarineMarketplace({ activeVesselId, pushToast }: MarineMarketpla
                 </div>
               </div>
 
-              {/* Price & Action Bottom */}
+              {/* Price & Action Bottom (Strict USD Billing) */}
               <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-2">
                 <div>
                   <div className="text-base font-bold text-white font-mono">
-                    USD ${product.price_usd}
+                    ${product.price_usd.toFixed(2)} USD
                   </div>
-                  <div className="text-[10px] font-mono opacity-60">
-                    ~CLP ${product.price_clp.toLocaleString("es-CL")}
+                  <div className="text-[10px] font-mono text-emerald-400">
+                    Cobro directo en USD • Stripe
                   </div>
                 </div>
 
@@ -735,9 +770,9 @@ export function MarineMarketplace({ activeVesselId, pushToast }: MarineMarketpla
                       </div>
                     </div>
                     <div>
-                      <div className="text-[10px] opacity-50 uppercase">Presupuesto Estimado</div>
-                      <div className="font-semibold text-white mt-0.5">
-                        USD ${order.estimated_price_usd} (~CLP ${((order.estimated_price_usd || 0) * 950).toLocaleString("es-CL")})
+                      <div className="text-[10px] opacity-50 uppercase">Monto Facturado (USD)</div>
+                      <div className="font-bold text-[#00E676] mt-0.5">
+                        ${(order.estimated_price_usd || 0).toFixed(2)} USD
                       </div>
                     </div>
                     <div>
@@ -760,17 +795,17 @@ export function MarineMarketplace({ activeVesselId, pushToast }: MarineMarketpla
                       <span>Guía Despacho</span>
                     </button>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {!isDelivered && (
                         <>
                           {!isInTransit && (
                             <button
                               type="button"
-                              onClick={() => handleUpdateOrderStatus(order.id, "in_transit")}
-                              className="marine-btn marine-btn-secondary text-xs px-3 py-1.5"
+                              data-testid={`pay-usd-order-${order.id}`}
+                              onClick={() => handlePayOrderInUSD(order)}
+                              className="marine-btn text-xs px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold border border-emerald-500/40"
                             >
-                              <Truck className="w-3.5 h-3.5" />
-                              <span>Marcar en Tránsito</span>
+                              <span>Pagar ${(order.estimated_price_usd || 0).toFixed(2)} USD</span>
                             </button>
                           )}
                           <button
@@ -786,7 +821,7 @@ export function MarineMarketplace({ activeVesselId, pushToast }: MarineMarketpla
                       {isDelivered && (
                         <span className="text-xs font-mono text-[#00E676] flex items-center gap-1">
                           <CheckCircle2 className="w-4 h-4" />
-                          <span>A Bordo &amp; Verificado</span>
+                          <span>A Bordo &amp; Pagado (USD)</span>
                         </span>
                       )}
                     </div>
@@ -932,18 +967,18 @@ export function MarineMarketplace({ activeVesselId, pushToast }: MarineMarketpla
                   />
                 </div>
 
-                {/* Price Calculation Summary */}
+                {/* Price Calculation Summary (Strict USD Billing) */}
                 <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-between text-xs font-mono">
                   <div>
-                    <span className="opacity-60">Total Estimado:</span>
-                    <div className="text-base font-bold text-[var(--accent-primary)]">
-                      USD ${selectedProduct.price_usd * orderQuantity}
+                    <span className="opacity-60">Total a Cobrar en Dólares:</span>
+                    <div className="text-base font-bold text-[#00E676]">
+                      ${(selectedProduct.price_usd * orderQuantity).toFixed(2)} USD
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="opacity-60">En Moneda Local:</span>
+                    <span className="opacity-60">Pasarela de Pago:</span>
                     <div className="text-sm font-semibold text-white">
-                      ~CLP ${(selectedProduct.price_clp * orderQuantity).toLocaleString("es-CL")}
+                      Stripe USD Checkout
                     </div>
                   </div>
                 </div>

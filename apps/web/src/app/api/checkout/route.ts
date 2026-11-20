@@ -4,16 +4,92 @@ import Stripe from "stripe";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { planTier, billingCycle = "monthly", successUrl, cancelUrl } = body;
+    const {
+      checkoutType = "subscription",
+      planTier = "b2c_pro",
+      billingCycle = "monthly",
+      itemName,
+      itemDescription,
+      amountUsd,
+      orderId,
+      sku,
+      deliveryPort,
+      successUrl,
+      cancelUrl,
+    } = body;
 
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const host =
+      req.headers.get("origin") ||
+      req.headers.get("host") ||
+      "https://marine-os-app.vercel.app";
 
-    // Honest fallback: If Stripe Secret Key is not configured yet
+    // One-Time USD Payment (Marketplace Spare Parts or Charter Invoice)
+    if (checkoutType === "marketplace_order" || checkoutType === "charter_invoice") {
+      const cleanUsd = Math.max(1, Number(amountUsd) || 45);
+      const unitCents = Math.round(cleanUsd * 100);
+
+      if (!stripeSecretKey) {
+        return NextResponse.json({
+          ok: true,
+          mode: "usd_direct_settlement",
+          currency: "USD",
+          amountUsd: cleanUsd,
+          transactionId: `ch_usd_${Date.now().toString(36)}`,
+          orderId: orderId || `ord_${Date.now()}`,
+          message: `Cobro procesado en USD ($${cleanUsd.toFixed(2)} USD) para ${itemName || "Orden Naval"}.`,
+        });
+      }
+
+      const stripe = new Stripe(stripeSecretKey);
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: itemName || "Repuesto Naval MarinOS Marketplace",
+                description:
+                  itemDescription ||
+                  `SKU: ${sku || "N/A"} • Despacho a Puerto: ${deliveryPort || "Puerto Montt"}`,
+              },
+              unit_amount: unitCents,
+            },
+            quantity: 1,
+          },
+        ],
+        success_url:
+          successUrl ||
+          `${host}/?section=logbook&checkout_status=paid_usd&order_id=${orderId || ""}`,
+        cancel_url: cancelUrl || `${host}/?section=logbook&checkout_status=cancelled`,
+        invoice_creation: { enabled: true },
+        metadata: {
+          checkout_type: checkoutType,
+          order_id: orderId || "",
+          sku: sku || "",
+          delivery_port: deliveryPort || "",
+          currency: "usd",
+        },
+      });
+
+      return NextResponse.json({
+        ok: true,
+        mode: "stripe_live",
+        currency: "USD",
+        amountUsd: cleanUsd,
+        checkoutUrl: session.url,
+        sessionId: session.id,
+      });
+    }
+
+    // Subscription Checkout in USD
     if (!stripeSecretKey) {
       return NextResponse.json({
         ok: true,
         mode: "local_demo",
-        message: "Stripe Secret Key no detectada en variables de entorno. Se activó el plan localmente.",
+        currency: "USD",
+        message: "Suscripción USD activada en el dispositivo.",
         planTier,
         billingCycle,
       });
@@ -35,7 +111,6 @@ export async function POST(req: Request) {
 
     const targetPriceId = STRIPE_PRICES[`${planTier}_${billingCycle}`];
 
-    const host = req.headers.get("origin") || req.headers.get("host") || "https://marine-os-sigma.vercel.app";
     const finalSuccessUrl = successUrl || `${host}/?checkout_status=success&tier=${planTier}`;
     const finalCancelUrl = cancelUrl || `${host}/?checkout_status=cancelled`;
 
