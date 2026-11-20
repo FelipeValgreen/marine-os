@@ -550,9 +550,9 @@ export function HandoverWizard({
       </div>
 
       {/* Main Content Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         {/* Left Column: Active Wizard Step */}
-        <div className="lg:col-span-7 marine-card p-6 space-y-5">
+        <div className="xl:col-span-7 marine-card p-6 space-y-5">
           {/* STEP 1: 12-POINT DETAILED CHECKLIST */}
           {wizardStep === 1 && (
             <div className="space-y-4">
@@ -961,7 +961,7 @@ export function HandoverWizard({
         </div>
 
         {/* Right Column: Historical Inspections & Integrity Verification */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="xl:col-span-5 space-y-6">
           <div className="marine-card p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <h2 className="text-base font-semibold flex items-center gap-2">

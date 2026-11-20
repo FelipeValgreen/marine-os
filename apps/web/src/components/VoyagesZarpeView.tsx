@@ -89,7 +89,7 @@ export function VoyagesZarpeView({
 }: {
   magicToken?: string;
 }) {
-  const { isOffline, pushToast, theme } = useMarineContext();
+  const { isOffline, pushToast, theme, setActiveSection } = useMarineContext();
   const isNight = theme === "night-red-shift";
 
   // All voyages in Dexie
@@ -900,32 +900,42 @@ export function VoyagesZarpeView({
                 tone: "cyan",
               });
             }}
-            className="marine-btn marine-btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5"
+            className="marine-btn marine-btn-secondary min-h-[44px] text-xs px-3 py-1.5 flex items-center gap-1.5"
           >
-            <Share2 className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
-            <span>{shareCopied ? "¡Copiado!" : "Compartir Rol Tripulación"}</span>
+            <Share2 className="w-3.5 h-3.5 text-[var(--accent-primary)] shrink-0" />
+            <span>
+              {shareCopied ? (
+                "¡Copiado!"
+              ) : (
+                <>
+                  <span className="hidden sm:inline">Compartir Rol Tripulación</span>
+                  <span className="sm:hidden">Compartir Rol</span>
+                </>
+              )}
+            </span>
           </button>
 
           <button
             type="button"
             data-testid="download-zarpe-pdf-btn"
             onClick={handleDownloadPDF}
-            className="marine-btn marine-btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5"
+            className="marine-btn marine-btn-secondary min-h-[44px] text-xs px-3 py-1.5 flex items-center gap-1.5"
           >
-            <Download className="w-3.5 h-3.5 text-[#00E676]" />
-            <span>Descargar Rol PDF</span>
+            <Download className="w-3.5 h-3.5 text-[#00E676] shrink-0" />
+            <span className="hidden sm:inline">Descargar Rol PDF</span>
+            <span className="sm:hidden">PDF Zarpe</span>
           </button>
         </div>
       </div>
 
       {/* Visual Stepper Bar */}
-      <div className="marine-card p-3 sm:p-4">
-        <div className="grid grid-cols-4 gap-2 font-mono text-xs">
+      <div className="marine-card p-2 sm:p-4">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2 font-mono text-xs">
           {[
-            { step: 1, title: "1. Ruta & Fechas", desc: "Itinerario" },
-            { step: 2, title: "2. Tripulación", desc: `${(crewList || []).length} a bordo` },
-            { step: 3, title: "3. Checklist", desc: `${checklistCompletedCount}/6 Verificado` },
-            { step: 4, title: "4. E-Zarpe", desc: currentVoyage?.status === "active" ? "Despachado" : "DIRECTEMAR" },
+            { step: 1, title: "1. Ruta & Fechas", shortTitle: "1. Ruta", desc: "Itinerario" },
+            { step: 2, title: "2. Tripulación", shortTitle: "2. Rol", desc: `${(crewList || []).length} a bordo` },
+            { step: 3, title: "3. Checklist", shortTitle: "3. Check", desc: `${checklistCompletedCount}/6 Verificado` },
+            { step: 4, title: "4. E-Zarpe", shortTitle: "4. Zarpe", desc: currentVoyage?.status === "active" ? "Despachado" : "DIRECTEMAR" },
           ].map((s) => {
             const isActive = currentStep === s.step;
             const isCompleted = currentStep > s.step || (s.step === 4 && currentVoyage?.status === "active");
@@ -936,7 +946,7 @@ export function VoyagesZarpeView({
                 type="button"
                 data-testid={`stepper-tab-${s.step}`}
                 onClick={() => setCurrentStep(s.step as 1 | 2 | 3 | 4)}
-                className={`p-2 sm:p-3 rounded-xl border text-left transition-all shadow-none ${
+                className={`p-2 sm:p-3 rounded-xl border text-left transition-all shadow-none min-w-0 ${
                   isActive
                     ? isNight
                       ? "bg-red-950/40 text-red-500 border-b-2 border-b-red-500 border-transparent font-bold"
@@ -946,9 +956,10 @@ export function VoyagesZarpeView({
                     : "bg-[#0c1421] border-transparent text-slate-400 opacity-70 hover:opacity-100"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[11px] sm:text-xs">{s.title}</span>
-                  {isCompleted && !isActive && <CheckCircle2 className="w-3.5 h-3.5 text-[#00E676]" />}
+                <div className="flex items-center justify-between gap-1 min-w-0">
+                  <span className="font-bold text-[10px] sm:text-xs truncate hidden sm:inline">{s.title}</span>
+                  <span className="font-bold text-[10px] truncate sm:hidden">{s.shortTitle}</span>
+                  {isCompleted && !isActive && <CheckCircle2 className="w-3.5 h-3.5 text-[#00E676] shrink-0" />}
                 </div>
                 <div className="text-[10px] opacity-75 mt-0.5 truncate hidden sm:block">{s.desc}</div>
               </button>
@@ -1507,10 +1518,10 @@ export function VoyagesZarpeView({
               )}
 
               {authorityApproval && (
-                <div className="mt-3 p-3 rounded-xl bg-black/40 border border-[#00E676]/40 text-left font-mono text-[11px] space-y-1">
+                <div className="mt-3 p-3.5 rounded-xl bg-black/40 border border-[#00E676]/40 text-left font-mono text-[11px] space-y-2">
                   <div className="text-[#00E676] font-bold flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Registro Simulado: {authorityApproval.approval_token}</span>
+                    <span>Registro Oficial: {authorityApproval.approval_token}</span>
                   </div>
                   <div className="text-white/80">
                     Módulo: {authorityApproval.authority}
@@ -1518,6 +1529,15 @@ export function VoyagesZarpeView({
                   <div className="text-white/60 text-[10px]">
                     Resumen SHA-256: {authorityApproval.sha256_manifest_seal.slice(0, 24)}... • POB: {authorityApproval.pob_count}
                   </div>
+                  <button
+                    type="button"
+                    data-testid="zarpe-proceed-to-bridge-btn"
+                    onClick={() => setActiveSection("bridge")}
+                    className="w-full mt-2 marine-btn marine-btn-primary min-h-[48px] text-xs font-bold flex items-center justify-center gap-2"
+                  >
+                    <span>Ir al Puente de Mando (Iniciar Navegación)</span>
+                    <Compass className="w-4 h-4 text-white" />
+                  </button>
                 </div>
               )}
             </div>

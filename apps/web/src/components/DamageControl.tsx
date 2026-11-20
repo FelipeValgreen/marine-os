@@ -288,9 +288,9 @@ export function DamageControl() {
       </div>
 
       {/* Main Responsive Industrial Grid: Decision Tree + Marketplace Sourcing (Left) & Hull Map (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         {/* Left 6 cols: Interactive Decision Tree + Spare Parts Marketplace Sourcing */}
-        <div className="lg:col-span-6 marine-card p-6 flex flex-col justify-between space-y-5">
+        <div className="xl:col-span-6 marine-card p-6 flex flex-col justify-between space-y-5">
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div>
@@ -448,7 +448,7 @@ export function DamageControl() {
         </div>
 
         {/* Right 6 cols: Interactive Digital Twin Hull Map + Marketplace Orders in IndexedDB */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="xl:col-span-6 space-y-6">
           <div className="marine-card p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div>

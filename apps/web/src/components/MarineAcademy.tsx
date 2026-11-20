@@ -217,9 +217,9 @@ export function MarineAcademy({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         {/* PART A: Grilla de "Micro-Clases" (7 cols) */}
-        <div className="lg:col-span-7 space-y-4">
+        <div className="xl:col-span-7 space-y-4">
           <div className="marine-card p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -322,7 +322,7 @@ export function MarineAcademy({
         </div>
 
         {/* PART B: Chat de Soporte IA (Cómo usar la App) (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="xl:col-span-5 space-y-6">
           <div className="marine-card p-6 space-y-4">
             <div className="border-b border-white/5 pb-3">
               <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-primary)]">

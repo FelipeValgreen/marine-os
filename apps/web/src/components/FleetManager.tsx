@@ -68,7 +68,7 @@ const EMPTY_FORM: VesselFormData = {
 };
 
 export function FleetManager() {
-  const { theme, pushToast } = useMarineContext();
+  const { theme, pushToast, setActiveSection } = useMarineContext();
   const isNight = theme === "night-red-shift";
 
   const vessels = useLiveQuery(() => db.vessels.toArray(), [], []);
@@ -1205,7 +1205,17 @@ export function FleetManager() {
                   </button>
                 </div>
 
-                {!isActive && (
+                {isActive ? (
+                  <button
+                    type="button"
+                    data-testid={`plan-zarpe-${v.id}`}
+                    onClick={() => setActiveSection("voyages")}
+                    className="marine-btn marine-btn-primary text-xs px-4 font-bold flex items-center gap-1.5"
+                  >
+                    <span>Planificar Zarpe</span>
+                    <Compass className="w-3.5 h-3.5 text-white" />
+                  </button>
+                ) : (
                   <button
                     type="button"
                     data-testid={`activate-vessel-${v.id}`}

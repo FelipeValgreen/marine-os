@@ -172,7 +172,7 @@ export function EmergencySOSModal({ onClose }: { onClose: () => void }) {
   const handleCopyEmergencyText = () => {
     const text = `🚨 EMERGENCIA MARÍTIMA • LLAMADA DE SOCORRO\nEmbarcación: ${vesselName.toUpperCase()} (${regNumber})\nCall Sign: ${callSign} • MMSI: ${mmsi}\n\nNATURALEZA: ${currentEmergencyDef?.description || "EMERGENCIA GRAVE"}\nASISTENCIA: ${currentEmergencyDef?.assistance || "SOLICITO ASISTENCIA INMEDIATA"}\n\nPOSICIÓN GPS: ${dms.latDms}, ${dms.lonDms}\n(Lat: ${liveCoords.lat.toFixed(5)}, Lon: ${liveCoords.lon.toFixed(5)})\nPERSONAS A BORDO: ${pobCount}\n\nUbicación: https://maps.google.com/?q=${liveCoords.lat},${liveCoords.lon}`;
     if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {});
+      navigator.clipboard.writeText(text).catch(() => { });
       setCopiedText(true);
       setTimeout(() => setCopiedText(false), 2500);
     }

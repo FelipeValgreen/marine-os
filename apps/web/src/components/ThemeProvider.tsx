@@ -1017,7 +1017,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             BOTÓN SOS ZAFARRANCHO (3-SECOND LONG-PRESS + DIRECT OVERRIDE)
         =================================================================== */}
         {!isLoginRoute && (
-          <div className="fixed bottom-20 lg:bottom-6 right-4 z-[55] flex flex-col items-end gap-2">
+          <div className="fixed bottom-[70px] sm:bottom-20 lg:bottom-6 right-2.5 sm:right-4 z-[55] flex flex-col items-end gap-2">
             {sosHoldHintVisible && (
               <div
                 data-testid="sos-longpress-hint-card"
@@ -1031,14 +1031,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                     type="button"
                     data-testid="sos-immediate-override-btn"
                     onClick={activateSOSZafarrancho}
-                    className="flex-1 min-h-14 px-3 rounded-xl bg-[#FF2D55] text-white font-mono text-xs font-black"
+                    className="flex-1 min-h-12 px-3 rounded-xl bg-[#FF2D55] text-white font-mono text-xs font-black"
                   >
                     ACTIVAR SOS AHORA
                   </button>
                   <button
                     type="button"
                     onClick={() => setSosHoldHintVisible(false)}
-                    className="min-h-14 px-3 rounded-xl bg-white/10 font-mono text-xs"
+                    className="min-h-12 px-3 rounded-xl bg-white/10 font-mono text-xs"
                   >
                     Cancelar
                   </button>
@@ -1053,7 +1053,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
               onPointerUp={handleSOSPointerUpOrLeave}
               onPointerLeave={handleSOSPointerUpOrLeave}
               onDoubleClick={activateSOSZafarrancho}
-              className="relative overflow-hidden min-h-[64px] px-5 rounded-full bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm font-bold tracking-wider flex items-center gap-2.5 border border-red-800 shadow-none transition transform active:scale-95 select-none"
+              className="relative overflow-hidden min-h-[48px] sm:min-h-[56px] lg:min-h-[64px] px-3.5 sm:px-5 rounded-full bg-red-600 hover:bg-red-700 text-white font-mono text-xs sm:text-sm font-bold tracking-wider flex items-center gap-2 border border-red-800 shadow-xl transition transform active:scale-95 select-none"
+              title="Emergencia SOLAS: Mantén presionado 3 segundos para Zafarrancho y difusión de auxilio"
             >
               {/* 3-Second Hold Progress Fill Bar */}
               {sosHoldProgress > 0 && (
@@ -1063,13 +1064,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   className="absolute inset-y-0 left-0 bg-white/35 transition-all duration-75"
                 />
               )}
-              <AlertOctagon className="w-5 h-5 animate-pulse shrink-0 relative z-10" />
-              <span className="relative z-10">
+              <AlertOctagon className="w-5 h-5 animate-pulse shrink-0 relative z-10 text-white" />
+              <span className="relative z-10 hidden sm:inline">
                 {sosHoldProgress > 0
                   ? `ZAFARRANCHO ${Math.ceil(
                     ((100 - sosHoldProgress) / 100) * 3
                   )}S...`
                   : "SOS • MANTENER 3S"}
+              </span>
+              <span className="relative z-10 sm:hidden">
+                {sosHoldProgress > 0
+                  ? `${Math.ceil(((100 - sosHoldProgress) / 100) * 3)}S`
+                  : "SOS"}
               </span>
             </button>
           </div>
@@ -1112,7 +1118,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   { id: "integrations", label: "Integraciones", icon: Sliders, desc: "NMEA y satelital" },
                   { id: "handover", label: "Entrega", icon: ShieldCheck, desc: "Acta y sello SHA-256" },
                   { id: "academy", label: "Aprende", icon: LifeBuoy, desc: "Seguridad marítima" },
-                  { id: "admin", label: "Backoffice", icon: ShieldCheck, desc: "Usuarios, pagos y auditoría" },
+                  { id: "admin", label: "Backoffice", icon: ShieldCheck, desc: "FinOps, pagos y flota" },
                 ].map((item) => {
                   const Icon = item.icon;
                   const isCurrent = activeSection === item.id;
@@ -1125,15 +1131,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                         setActiveSection(item.id as MarineSection);
                         setMobileMoreOpen(false);
                       }}
-                      className={`min-h-[56px] p-3 rounded-2xl border text-left flex items-center gap-3 transition ${isCurrent
+                      className={`min-h-[52px] p-2.5 rounded-2xl border text-left flex items-center gap-2.5 transition ${isCurrent
                         ? "bg-[var(--accent-primary)]/20 border-[var(--accent-primary)] text-[var(--accent-primary)]"
                         : "bg-white/[0.04] border-white/5 hover:bg-white/[0.08]"
                         }`}
                     >
                       <Icon className="w-5 h-5 shrink-0 text-[var(--accent-primary)]" />
-                      <div>
-                        <div className="text-xs font-bold">{item.label}</div>
-                        <div className="text-[10px] opacity-60">{item.desc}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold truncate">{item.label}</div>
+                        <div className="text-[10px] opacity-60 truncate">{item.desc}</div>
                       </div>
                     </button>
                   );
@@ -1147,7 +1153,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   toggleTheme();
                   setMobileMoreOpen(false);
                 }}
-                className="w-full min-h-[52px] rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center gap-2 text-xs font-bold"
+                className="w-full min-h-[48px] rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center gap-2 text-xs font-bold"
               >
                 <Eye className="w-4 h-4 text-red-500" />
                 <span>Cambiar Tema (Día / Noche / Sol)</span>
@@ -1162,7 +1168,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         {!isLoginRoute && (
           <nav
             aria-label="Navegación móvil"
-            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t flex items-center justify-around px-1 py-1 ${isNight
+            className={`lg:hidden fixed bottom-0 inset-x-0 z-50 border-t flex items-center justify-between px-1.5 py-1 ${isNight
               ? "bg-black border-[#FF0000]/40 text-[#FF0000]"
               : isDaylight
                 ? "bg-[#F0F4F8]/95 backdrop-blur-2xl border-slate-300 text-[#0A192F]"
@@ -1175,34 +1181,34 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                   type="button"
                   data-testid="mobile-nav-bridge"
                   onClick={() => setActiveSection("bridge")}
-                  className={`flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${activeSection === "bridge"
+                  className={`flex-1 min-w-0 min-h-[52px] flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold transition rounded-xl ${activeSection === "bridge"
                     ? "text-orange-400 font-bold bg-orange-950/30 border-b-2 border-orange-500"
                     : "text-slate-400 opacity-70"
                     }`}
                 >
                   <Compass className="w-5 h-5 text-orange-400" />
-                  <span>Puente Táctico</span>
+                  <span className="truncate max-w-full">Puente</span>
                 </button>
                 <button
                   type="button"
                   data-testid="mobile-nav-vessel"
                   onClick={() => setActiveSection("vessel")}
-                  className={`flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${activeSection === "vessel"
+                  className={`flex-1 min-w-0 min-h-[52px] flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold transition rounded-xl ${activeSection === "vessel"
                     ? "text-orange-400 font-bold bg-orange-950/30 border-b-2 border-orange-500"
                     : "text-slate-400 opacity-70"
                     }`}
                 >
                   <Ship className="w-5 h-5" />
-                  <span>Averías</span>
+                  <span className="truncate max-w-full">Averías</span>
                 </button>
                 <button
                   type="button"
                   data-testid="mobile-nav-exit-at-sea"
                   onClick={toggleNavigationMode}
-                  className="flex-1 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-slate-300 hover:text-white"
+                  className="flex-1 min-w-0 min-h-[52px] flex flex-col items-center justify-center gap-0.5 text-[10px] font-bold text-slate-300 hover:text-white"
                 >
                   <Anchor className="w-5 h-5 text-slate-400" />
-                  <span>Modo Tierra</span>
+                  <span className="truncate max-w-full">Tierra</span>
                 </button>
               </>
             ) : (
@@ -1224,7 +1230,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                         setActiveSection(item.id);
                         setMobileMoreOpen(false);
                       }}
-                      className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${isCurrent
+                      className={`flex-1 min-w-0 min-h-[52px] flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold transition rounded-xl ${isCurrent
                         ? isNight
                           ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
                           : isDaylight
@@ -1233,8 +1239,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                         : "text-slate-400 opacity-70 hover:opacity-100"
                         }`}
                     >
-                      <Icon className="w-5 h-5" />
-                      <span className="truncate">{item.shortLabel}</span>
+                      <Icon className="w-5 h-5 shrink-0" />
+                      <span className="truncate max-w-full px-0.5">{item.shortLabel}</span>
                     </button>
                   );
                 })}
@@ -1247,7 +1253,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                       type="button"
                       data-testid="mobile-nav-more"
                       onClick={() => setMobileMoreOpen((prev) => !prev)}
-                      className={`w-1/5 min-h-[56px] flex flex-col items-center justify-center gap-1 text-[11px] font-semibold transition rounded-xl ${isMoreActive || mobileMoreOpen
+                      className={`flex-1 min-w-0 min-h-[52px] flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold transition rounded-xl ${isMoreActive || mobileMoreOpen
                         ? isNight
                           ? "text-red-500 font-bold bg-red-950/30 border-b-2 border-red-500"
                           : isDaylight
@@ -1256,8 +1262,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                         : "text-slate-400 opacity-70 hover:opacity-100"
                         }`}
                     >
-                      <MoreHorizontal className="w-5 h-5" />
-                      <span className="truncate">Más</span>
+                      <MoreHorizontal className="w-5 h-5 shrink-0" />
+                      <span className="truncate max-w-full px-0.5">Más</span>
                     </button>
                   );
                 })()}
